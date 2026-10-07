@@ -15,6 +15,8 @@ Estas reglas aplican a Codex, Cursor, Claude y cualquier otro agente que modifiq
 
 Leer [docs/reglas-documentacion.md](docs/reglas-documentacion.md) antes de documentar. Los comentarios son en español y explican propósito, flujo de datos y decisiones no evidentes. Las recetas en `.agents/skills/` son parte de la guía operativa para agentes.
 
+Cuando cambies dependencias, scripts, variables de entorno, estructura de carpetas o funcionalidades, aplica el estándar `readme-standard` (`.agents/skills/readme-standard/SKILL.md`) en modo Actualizar sobre `README.md`. Edita solo las secciones afectadas; no reescribas el archivo.
+
 ## Límites y seguridad
 
 - No modificar `D:\Lenny\Projects\Koffi-Soft` ni copiar PHP, contraseñas, hashes, tokens, dumps o credenciales del legacy.
