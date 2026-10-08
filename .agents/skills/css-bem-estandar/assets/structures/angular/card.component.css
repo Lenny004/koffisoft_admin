@@ -1,0 +1,18 @@
+/* Angular card block: :host owns the component root. */
+:host {
+  display: block;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius-md);
+}
+
+.card__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}

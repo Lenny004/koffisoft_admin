@@ -1,0 +1,28 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["apply", "theme", "custom-variant", "utility", "variant", "source", "plugin", "reference"]
+      }
+    ],
+    "at-rule-prelude-no-invalid": [
+      true,
+      {
+        "ignoreAtRules": ["apply", "theme", "custom-variant", "utility", "variant", "source", "plugin", "reference"]
+      }
+    ],
+    "selector-class-pattern": [
+      "^(?:[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*)+)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?|(?:is|has|js)-[a-z0-9-]+|(?:[a-z0-9]+:)*[a-z0-9][a-z0-9/_\\[\\].%+~-]*)$",
+      {
+        "message": "Use BEM en clases propias; se permiten estados y utilidades Tailwind/shadcn."
+      }
+    ],
+    "custom-property-pattern": null,
+    "declaration-empty-line-before": null,
+    "no-descending-specificity": null,
+    "property-no-unknown": [true, {"ignoreProperties": ["text-size-adjust"]}],
+    "selector-pseudo-class-no-unknown": [true, {"ignorePseudoClasses": ["global", "local"]}]
+  }
+}

@@ -1,28 +1,43 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+/* Koffi-Soft admin: Tailwind 4 tokens, shadcn theme, reset and accessible base. */
+@import url('tailwindcss');
+@import url('tw-animate-css');
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Primitive tokens: the palette is defined once. */
+  --white: oklch(100% 0 0deg);
+  --slate-50: oklch(98.5% 0.01 260deg);
+  --slate-100: oklch(94% 0.02 260deg);
+  --slate-200: oklch(93% 0.03 260deg);
+  --slate-300: oklch(86% 0.03 260deg);
+  --indigo-700: oklch(42% 0.15 260deg);
+  --indigo-900: oklch(23% 0.03 260deg);
+  --danger-500: oklch(58% 0.2 25deg);
+
+  /* Semantic tokens consumed by shadcn-svelte. */
   --radius: 0.625rem;
-  --background: oklch(0.985 0.01 260);
-  --foreground: oklch(0.23 0.03 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.23 0.03 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.23 0.03 260);
-  --primary: oklch(0.42 0.15 260);
-  --primary-foreground: oklch(0.98 0.01 260);
-  --secondary: oklch(0.93 0.03 260);
-  --secondary-foreground: oklch(0.3 0.06 260);
-  --muted: oklch(0.94 0.02 260);
-  --muted-foreground: oklch(0.5 0.05 260);
-  --accent: oklch(0.9 0.06 260);
-  --accent-foreground: oklch(0.3 0.06 260);
-  --destructive: oklch(0.58 0.2 25);
-  --border: oklch(0.86 0.03 260);
-  --input: oklch(0.86 0.03 260);
-  --ring: oklch(0.55 0.15 260);
+  --background: var(--slate-50);
+  --foreground: var(--indigo-900);
+  --card: var(--white);
+  --card-foreground: var(--indigo-900);
+  --popover: var(--white);
+  --popover-foreground: var(--indigo-900);
+  --primary: var(--indigo-700);
+  --primary-foreground: oklch(98% 0.01 260deg);
+  --secondary: var(--slate-200);
+  --secondary-foreground: oklch(30% 0.06 260deg);
+  --muted: var(--slate-100);
+  --muted-foreground: oklch(50% 0.05 260deg);
+  --accent: oklch(90% 0.06 260deg);
+  --accent-foreground: oklch(30% 0.06 260deg);
+  --destructive: var(--danger-500);
+  --border: var(--slate-300);
+  --input: var(--slate-300);
+  --ring: oklch(55% 0.15 260deg);
+  --font-family-base: ui-sans-serif, system-ui, sans-serif;
+  --focus-ring: 2px solid var(--ring);
+  --transition-fast: 150ms ease;
 }
 
 @theme inline {
@@ -44,6 +59,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --font-sans: var(--font-family-base);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -51,12 +67,79 @@
 }
 
 @layer base {
+  /* Reset: loaded once for the application. */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
 
+  html {
+    font-family: var(--font-family-base);
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
-    font-family: ui-sans-serif, system-ui, sans-serif;
+    min-height: 100dvh;
+    margin: 0;
+    line-height: 1.5;
   }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto;
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+      transition-duration: 0.01ms;
+    }
+  }
+}
+
+/* Explicit dark theme: redefine semantic tokens only. */
+.dark,
+[data-theme='dark'] {
+  --background: oklch(18% 0.03 260deg);
+  --foreground: oklch(98% 0.01 260deg);
+  --card: oklch(23% 0.03 260deg);
+  --card-foreground: oklch(98% 0.01 260deg);
+  --popover: oklch(23% 0.03 260deg);
+  --popover-foreground: oklch(98% 0.01 260deg);
+  --primary: oklch(72% 0.14 260deg);
+  --primary-foreground: oklch(18% 0.03 260deg);
+  --secondary: oklch(30% 0.04 260deg);
+  --secondary-foreground: oklch(95% 0.01 260deg);
+  --muted: oklch(30% 0.03 260deg);
+  --muted-foreground: oklch(75% 0.04 260deg);
+  --accent: oklch(35% 0.06 260deg);
+  --accent-foreground: oklch(95% 0.01 260deg);
+  --destructive: oklch(68% 0.18 25deg);
+  --border: oklch(38% 0.04 260deg);
+  --input: oklch(38% 0.04 260deg);
+  --ring: oklch(72% 0.14 260deg);
 }

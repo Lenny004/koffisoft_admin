@@ -1,0 +1,7 @@
+/* Mobile-first base: no breakpoint overrides. */
+.navbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm);
+}

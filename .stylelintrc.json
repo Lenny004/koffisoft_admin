@@ -1,0 +1,3 @@
+{
+  "extends": ["./.agents/skills/css-bem-estandar/assets/.stylelintrc.json"]
+}

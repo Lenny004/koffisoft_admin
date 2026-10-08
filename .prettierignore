@@ -9,3 +9,4 @@ pnpm-lock.yaml
 src/generated/
 
 .agents/skills/readme-standard/
+.agents/skills/css-bem-estandar/

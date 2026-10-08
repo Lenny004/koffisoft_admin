@@ -61,6 +61,7 @@ Cuando se apruebe la fase de contratos, el panel consumirá una versión exacta 
 - shadcn-svelte `1.7.0` sobre Bits UI `2.19.5`; los componentes base incluidos son `Button`, `Input`, `Dialog`, `DropdownMenu` y `Table`.
 - ESLint `10.12.0`, `eslint-plugin-svelte` `3.23.0`, TypeScript ESLint `8.71.0`, Prettier `3.9.9` y `prettier-plugin-svelte` `4.1.1`.
 - Svelte-check `4.7.6`, Vitest `5.0.3` y Playwright `1.63.0` para verificación y pruebas.
+- Stylelint `17.16.0` con `stylelint-config-standard` `40.0.0` para revisar CSS.
 
 Las versiones directas están fijadas sin rangos en `package.json`; `pnpm-lock.yaml` fija el árbol completo de dependencias.
 
@@ -118,7 +119,7 @@ El árbol muestra como máximo dos niveles. `src/lib/` contiene utilidades y com
 ```text
 .
 ├── .agents/
-│   └── skills/                  # recetas operativas para agentes
+│   └── skills/                  # recetas operativas, incluida css-bem-estandar
 ├── .github/
 │   └── workflows/               # workflow de CI
 ├── docs/
@@ -156,6 +157,7 @@ Los comandos disponibles para desarrollar, revisar y generar el panel son:
 pnpm dev
 pnpm format
 pnpm lint
+pnpm lint:css
 pnpm check
 pnpm typecheck
 pnpm build
@@ -165,6 +167,7 @@ pnpm start
 
 - `pnpm dev` inicia Vite en modo desarrollo.
 - `pnpm format` aplica Prettier; `pnpm lint` comprueba ESLint y el formato.
+- `pnpm lint:css` revisa los archivos CSS con Stylelint y la convención BEM.
 - `pnpm check` sincroniza SvelteKit y ejecuta `svelte-check`; `pnpm typecheck` invoca ese mismo chequeo.
 - `pnpm build` genera el build para `adapter-node`.
 - `pnpm preview` sirve el build localmente; ejecuta `pnpm start` después de compilar para arrancar `build` con Node.js.

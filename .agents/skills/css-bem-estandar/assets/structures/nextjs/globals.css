@@ -1,0 +1,9 @@
+/* Next.js global entry: tokens, reset and base only. */
+@import "../../tokens.css";
+@import "../../reset.css";
+
+body {
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-family-base);
+}

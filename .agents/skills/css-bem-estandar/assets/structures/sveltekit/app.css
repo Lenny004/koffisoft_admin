@@ -1,0 +1,21 @@
+/* SvelteKit global entry: Tailwind 4 tokens, reset and base. */
+@import "tailwindcss";
+
+:root {
+  --color-primary: var(--primary);
+  --color-bg: var(--background);
+  --color-text: var(--foreground);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}

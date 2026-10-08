@@ -1,0 +1,7 @@
+/* Static entry point: import layers in cascade order. */
+@layer tokens, reset, base, components, utilities;
+
+@import url("../tokens.css") layer(tokens);
+@import url("../reset.css") layer(reset);
+@import url("./base.css") layer(base);
+@import url("../../button.css") layer(components);
