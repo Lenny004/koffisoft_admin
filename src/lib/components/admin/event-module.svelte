@@ -9,6 +9,7 @@
 
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
+  import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { formatElSalvadorDateTime, isoToElSalvadorDateTimeLocal } from '$lib/formatting/dates';
   import {
@@ -19,6 +20,7 @@
     quoteStatusLabel,
   } from '$lib/events/types';
   import type { Event, EventPackage } from '$lib/events/types';
+  import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
   import type { PageProps } from '../../../routes/(app)/eventos/$types';
   import { resolve } from '$app/paths';
 
@@ -26,6 +28,19 @@
 
   type Props = Pick<PageProps, 'data' | 'form'>;
   let { data, form }: Props = $props();
+
+  function fieldError(name: string): string {
+    const errors = form?.errors;
+    return errors && typeof errors === 'object' && !Array.isArray(errors)
+      ? ((errors as Record<string, string>)[name] ?? '')
+      : '';
+  }
+
+  function globalErrors(): string[] {
+    const errors = form?.errors;
+    if (!errors) return [];
+    return Array.isArray(errors) ? errors : [];
+  }
   let section = $state<Section>('events');
   let eventOpen = $state(false);
   let packageOpen = $state(false);
@@ -164,6 +179,19 @@
       2,
     );
   }
+
+  function packageLineExample(): string {
+    return JSON.stringify([
+      {
+        lineType: 'Menu',
+        labelEs: 'Bocadillos',
+        labelEn: 'Snacks',
+        quantity: '1',
+        unit: 'persona',
+        unitPrice: '5.00',
+      },
+    ]);
+  }
 </script>
 
 <section class="events" aria-labelledby="events-title">
@@ -196,8 +224,8 @@
     >
   </div>
 
-  {#if form?.errors?.length}<div class="events__error" role="alert">
-      {#each form.errors as message (message)}<p>{message}</p>{/each}
+  {#if globalErrors().length}<div class="events__error" role="alert">
+      {#each globalErrors() as message (message)}<p>{message}</p>{/each}
     </div>{/if}
   {#if data.error}<div class="events__error" role="alert">
       {data.error}
@@ -370,6 +398,9 @@
               method="POST"
               action="?/bookSpace"
             >
+              <p class="form-legend">
+                <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+              </p>
               <input type="hidden" name="eventId" value={data.selectedEvent.id} /><label
                 class="events__field"
                 ><span>Espacio</span><select class="events__input" name="venueSpaceId" required
@@ -377,35 +408,84 @@
                       >{space.nameEs} · {space.seatedCapacity} sentados</option
                     >{/each}</select
                 ></label
-              ><label class="events__field"
-                ><span>Inicio</span><input
+              ><FormField
+                id="event-startsAt-1"
+                label="Inicio"
+                required
+                class="events__field"
+                error={fieldError('startsAt')}
+              >
+                <input
+                  aria-invalid={Boolean(fieldError('startsAt'))}
+                  aria-describedby={fieldError('startsAt') ? 'event-startsAt-1-error' : undefined}
+                  id="event-startsAt-1"
                   class="events__input"
                   type="datetime-local"
                   name="startsAt"
                   required
-                /></label
-              ><label class="events__field"
-                ><span>Fin</span><input
+                /></FormField
+              >
+              <FormField
+                id="event-endsAt-2"
+                label="Fin"
+                required
+                class="events__field"
+                error={fieldError('endsAt')}
+              >
+                <input
+                  aria-invalid={Boolean(fieldError('endsAt'))}
+                  aria-describedby={fieldError('endsAt') ? 'event-endsAt-2-error' : undefined}
+                  id="event-endsAt-2"
                   class="events__input"
                   type="datetime-local"
                   name="endsAt"
                   required
-                /></label
-              ><label class="events__field"
-                ><span>Capacidad</span><input
+                /></FormField
+              >
+              <FormField
+                id="event-capacityReserved-3"
+                label="Capacidad"
+                required
+                class="events__field"
+                error={fieldError('capacityReserved')}
+              >
+                <input
+                  aria-invalid={Boolean(fieldError('capacityReserved'))}
+                  aria-describedby={fieldError('capacityReserved')
+                    ? 'event-capacityReserved-3-error'
+                    : undefined}
+                  id="event-capacityReserved-3"
                   class="events__input"
                   type="number"
                   min="1"
+                  max={FORM_LIMITS.venue.smallIntMax}
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="Ej. 80"
                   name="capacityReserved"
                   required
-                /></label
-              ><label class="events__field"
-                ><span>Estado</span><select class="events__input" name="bookingStatus"
+                /></FormField
+              >
+              <FormField
+                id="event-bookingStatus-4"
+                label="Estado"
+                class="events__field"
+                error={fieldError('bookingStatus')}
+              >
+                <select
+                  aria-invalid={Boolean(fieldError('bookingStatus'))}
+                  aria-describedby={fieldError('bookingStatus')
+                    ? 'event-bookingStatus-4-error'
+                    : undefined}
+                  id="event-bookingStatus-4"
+                  class="events__input"
+                  name="bookingStatus"
                   ><option value="Held">Retenido</option><option value="Confirmed"
                     >Confirmado</option
                   ></select
-                ></label
-              ><Button type="submit"><Plus aria-hidden="true" /> Reservar espacio</Button>
+                ></FormField
+              >
+              <Button type="submit"><Plus aria-hidden="true" /> Reservar espacio</Button>
             </form>{/if}
         </div>
         <div class="events__detail-section">
@@ -420,23 +500,38 @@
                 method="POST"
                 action="?/updateRequirement"
               >
+                <p class="form-legend">
+                  <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+                </p>
                 <input type="hidden" name="requirementId" value={requirement.id} /><label
                   class="events__field"
                   ><span>{requirement.requirementType}</span><textarea
                     class="events__input"
                     name="description"
+                    maxlength={FORM_LIMITS.event.descriptionMaxLength}
                     required>{requirement.description}</textarea
                   ></label
-                ><label class="events__field"
-                  ><span>Estado</span><select class="events__input" name="status"
+                ><FormField
+                  id="event-status-5"
+                  label="Estado"
+                  class="events__field"
+                  error={fieldError('status')}
+                >
+                  <select
+                    aria-invalid={Boolean(fieldError('status'))}
+                    aria-describedby={fieldError('status') ? 'event-status-5-error' : undefined}
+                    id="event-status-5"
+                    class="events__input"
+                    name="status"
                     ><option value="open" selected={requirement.status === 'open'}>Abierto</option
                     ><option value="acknowledged" selected={requirement.status === 'acknowledged'}
                       >Reconocido</option
                     ><option value="resolved" selected={requirement.status === 'resolved'}
                       >Resuelto</option
                     ></select
-                  ></label
-                ><input type="hidden" name="severity" value={requirement.severity} /><Button
+                  ></FormField
+                >
+                <input type="hidden" name="severity" value={requirement.severity} /><Button
                   variant="secondary"
                   size="sm"
                   type="submit"><Check aria-hidden="true" /> Guardar requisito</Button
@@ -448,6 +543,9 @@
               method="POST"
               action="?/saveRequirement"
             >
+              <p class="form-legend">
+                <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+              </p>
               <input type="hidden" name="eventId" value={data.selectedEvent.id} /><label
                 class="events__field"
                 ><span>Tipo</span><select class="events__input" name="requirementType"
@@ -457,19 +555,44 @@
                   ><option value="schedule">Horario</option><option value="other">Otro</option
                   ></select
                 ></label
-              ><label class="events__field"
-                ><span>Descripción</span><input
+              ><FormField
+                id="event-description-6"
+                label="Descripción"
+                required
+                class="events__field"
+                error={fieldError('description')}
+              >
+                <input
+                  aria-invalid={Boolean(fieldError('description'))}
+                  aria-describedby={fieldError('description')
+                    ? 'event-description-6-error'
+                    : undefined}
+                  id="event-description-6"
                   class="events__input"
                   name="description"
+                  maxlength={FORM_LIMITS.event.descriptionMaxLength}
+                  placeholder="Ej. Menú sin nueces para 12 personas."
                   required
-                /></label
-              ><label class="events__field"
-                ><span>Severidad</span><select class="events__input" name="severity"
+                /></FormField
+              >
+              <FormField
+                id="event-severity-7"
+                label="Severidad"
+                class="events__field"
+                error={fieldError('severity')}
+              >
+                <select
+                  aria-invalid={Boolean(fieldError('severity'))}
+                  aria-describedby={fieldError('severity') ? 'event-severity-7-error' : undefined}
+                  id="event-severity-7"
+                  class="events__input"
+                  name="severity"
                   ><option value="important">Importante</option><option value="critical"
                     >Crítica</option
                   ><option value="informational">Informativa</option></select
-                ></label
-              ><input type="hidden" name="status" value="open" /><Button type="submit"
+                ></FormField
+              >
+              <input type="hidden" name="status" value="open" /><Button type="submit"
                 ><Plus aria-hidden="true" /> Agregar</Button
               >
             </form>{/if}
@@ -510,6 +633,7 @@
                       method="POST"
                       action="?/updateQuoteStatus"
                     >
+                      <p class="form-legend">Actualización de estado</p>
                       <input type="hidden" name="quoteId" value={quote.id} /><select
                         class="events__input"
                         name="status"
@@ -533,6 +657,9 @@
               method="POST"
               action="?/createQuote"
             >
+              <p class="form-legend">
+                <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+              </p>
               <input type="hidden" name="eventId" value={data.selectedEvent.id} /><label
                 class="events__field"
                 ><span>Paquete opcional</span><select class="events__input" name="eventPackageId"
@@ -541,22 +668,44 @@
                       value={packageItem.id}>{packageItem.nameEs}</option
                     >{/each}</select
                 ></label
-              ><label class="events__field"
-                ><span>Válida hasta</span><input
+              ><FormField
+                id="event-validUntil-8"
+                label="Válida hasta"
+                required
+                class="events__field"
+                error={fieldError('validUntil')}
+              >
+                <input
+                  aria-invalid={Boolean(fieldError('validUntil'))}
+                  aria-describedby={fieldError('validUntil')
+                    ? 'event-validUntil-8-error'
+                    : undefined}
+                  id="event-validUntil-8"
                   class="events__input"
                   type="date"
                   name="validUntil"
                   required
-                /></label
-              ><label class="events__field events__field--wide"
-                ><span>Líneas JSON</span><textarea
+                /></FormField
+              >
+              <FormField
+                id="event-lines-9"
+                label="Líneas JSON"
+                required
+                class="events__field events__field--wide"
+                error={fieldError('lines')}
+              >
+                <textarea
+                  aria-invalid={Boolean(fieldError('lines'))}
+                  aria-describedby={fieldError('lines') ? 'event-lines-9-error' : undefined}
+                  id="event-lines-9"
                   class="events__input events__textarea"
                   name="lines"
                   rows="6"
                   required
                   placeholder={quoteLineExample()}>{quoteLineExample()}</textarea
-                ></label
-              ><Button type="submit"><Plus aria-hidden="true" /> Crear cotización</Button>
+                ></FormField
+              >
+              <Button type="submit"><Plus aria-hidden="true" /> Crear cotización</Button>
             </form>{/if}
         </div>
       </section>
@@ -645,109 +794,294 @@
         ></Dialog.Header
       >
       <form class="events__form" method="POST" action="?/saveEvent">
+        <p class="form-legend">
+          <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+        </p>
         <input type="hidden" name="id" value={eventId} /><input
           type="hidden"
           name="locationId"
           value={data.locationId}
         />
         <div class="events__form-grid">
-          <label class="events__field"
-            ><span>Tipo</span><select class="events__input" name="eventType" bind:value={eventType}
+          <FormField
+            id="event-eventType-10"
+            label="Tipo"
+            class="events__field"
+            error={fieldError('eventType')}
+          >
+            <select
+              aria-invalid={Boolean(fieldError('eventType'))}
+              aria-describedby={fieldError('eventType') ? 'event-eventType-10-error' : undefined}
+              id="event-eventType-10"
+              class="events__input"
+              name="eventType"
+              bind:value={eventType}
               >{#each Object.entries(EVENT_TYPE_LABELS) as [value, label] (value)}<option {value}
                   >{label}</option
                 >{/each}</select
-            ></label
-          ><label class="events__field"
-            ><span>Estado</span><select class="events__input" name="status" bind:value={eventStatus}
+            ></FormField
+          >
+          <FormField
+            id="event-status-11"
+            label="Estado"
+            class="events__field"
+            error={fieldError('status')}
+          >
+            <select
+              aria-invalid={Boolean(fieldError('status'))}
+              aria-describedby={fieldError('status') ? 'event-status-11-error' : undefined}
+              id="event-status-11"
+              class="events__input"
+              name="status"
+              bind:value={eventStatus}
               >{#each Object.entries(EVENT_STATUS_LABELS) as [value, label] (value)}<option {value}
                   >{label}</option
                 >{/each}</select
-            ></label
-          ><label class="events__field events__field--wide"
-            ><span>Título</span><input
+            ></FormField
+          >
+          <FormField
+            id="event-title-12"
+            label="Título"
+            required
+            class="events__field events__field--wide"
+            error={fieldError('title')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('title'))}
+              aria-describedby={fieldError('title') ? 'event-title-12-error' : undefined}
+              id="event-title-12"
               class="events__input"
               name="title"
               bind:value={title}
+              maxlength={FORM_LIMITS.event.titleMaxLength}
+              placeholder="Ej. Boda de Ana y Luis"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Contacto</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-contactName-13"
+            label="Contacto"
+            required
+            class="events__field"
+            error={fieldError('contactName')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('contactName'))}
+              aria-describedby={fieldError('contactName')
+                ? 'event-contactName-13-error'
+                : undefined}
+              id="event-contactName-13"
               class="events__input"
               name="contactName"
               bind:value={contactName}
+              maxlength={FORM_LIMITS.event.contactNameMaxLength}
+              placeholder="Ej. Ana Martínez"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Teléfono</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-contactPhone-14"
+            label="Teléfono"
+            required
+            class="events__field"
+            error={fieldError('contactPhone')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('contactPhone'))}
+              aria-describedby={fieldError('contactPhone')
+                ? 'event-contactPhone-14-error'
+                : undefined}
+              id="event-contactPhone-14"
               class="events__input"
               name="contactPhone"
               bind:value={contactPhone}
+              inputmode="tel"
+              maxlength={FORM_LIMITS.event.contactPhoneMaxLength}
+              placeholder="Ej. +503 7000 0000"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Correo</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-contactEmail-15"
+            label="Correo"
+            class="events__field"
+            error={fieldError('contactEmail')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('contactEmail'))}
+              aria-describedby={fieldError('contactEmail')
+                ? 'event-contactEmail-15-error'
+                : undefined}
+              id="event-contactEmail-15"
               class="events__input"
               type="email"
               name="contactEmail"
               bind:value={contactEmail}
-            /></label
-          ><label class="events__field"
-            ><span>Inicio</span><input
+              maxlength={FORM_LIMITS.event.contactEmailMaxLength}
+              placeholder="Ej. ana@correo.com"
+            /></FormField
+          >
+          <FormField
+            id="event-startsAt-16"
+            label="Inicio"
+            required
+            class="events__field"
+            error={fieldError('startsAt')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('startsAt'))}
+              aria-describedby={fieldError('startsAt') ? 'event-startsAt-16-error' : undefined}
+              id="event-startsAt-16"
               class="events__input"
               type="datetime-local"
               name="startsAt"
               bind:value={startsAt}
               required
-            /></label
-          ><label class="events__field"
-            ><span>Fin</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-endsAt-17"
+            label="Fin"
+            required
+            class="events__field"
+            error={fieldError('endsAt')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('endsAt'))}
+              aria-describedby={fieldError('endsAt') ? 'event-endsAt-17-error' : undefined}
+              id="event-endsAt-17"
               class="events__input"
               type="datetime-local"
               name="endsAt"
               bind:value={endsAt}
               required
-            /></label
-          ><label class="events__field"
-            ><span>Inicio de montaje</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-setupStartsAt-18"
+            label="Inicio de montaje"
+            class="events__field"
+            error={fieldError('setupStartsAt')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('setupStartsAt'))}
+              aria-describedby={fieldError('setupStartsAt')
+                ? 'event-setupStartsAt-18-error'
+                : undefined}
+              id="event-setupStartsAt-18"
               class="events__input"
               type="datetime-local"
               name="setupStartsAt"
               bind:value={setupStartsAt}
-            /></label
-          ><label class="events__field"
-            ><span>Invitados estimados</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-estimatedGuestCount-19"
+            label="Invitados estimados"
+            required
+            class="events__field"
+            error={fieldError('estimatedGuestCount')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('estimatedGuestCount'))}
+              aria-describedby={fieldError('estimatedGuestCount')
+                ? 'event-estimatedGuestCount-19-error'
+                : undefined}
+              id="event-estimatedGuestCount-19"
               class="events__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.event.estimatedGuestCountMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 80"
               name="estimatedGuestCount"
               bind:value={estimatedGuestCount}
               required
-            /></label
-          ><label class="events__field"
-            ><span>Invitados confirmados</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-confirmedGuestCount-20"
+            label="Invitados confirmados"
+            class="events__field"
+            error={fieldError('confirmedGuestCount')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('confirmedGuestCount'))}
+              aria-describedby={fieldError('confirmedGuestCount')
+                ? 'event-confirmedGuestCount-20-error'
+                : undefined}
+              id="event-confirmedGuestCount-20"
               class="events__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.event.estimatedGuestCountMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 80"
               name="confirmedGuestCount"
               bind:value={confirmedGuestCount}
-            /></label
-          ><label class="events__field"
-            ><span>Presupuesto</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-budgetTarget-21"
+            label="Presupuesto"
+            class="events__field"
+            error={fieldError('budgetTarget')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('budgetTarget'))}
+              aria-describedby={fieldError('budgetTarget')
+                ? 'event-budgetTarget-21-error'
+                : undefined}
+              id="event-budgetTarget-21"
               class="events__input"
               inputmode="decimal"
               name="budgetTarget"
+              type="number"
+              min="0"
+              max={FORM_LIMITS.event.budgetMax}
+              step="0.01"
+              pattern={FORM_PATTERNS.decimal2.source}
+              placeholder="Ej. 2500.00"
               bind:value={budgetTarget}
-            /></label
-          ><label class="events__field events__field--wide"
-            ><span>Requerimientos especiales</span><textarea
+            /></FormField
+          >
+          <FormField
+            id="event-specialRequirements-22"
+            label="Requerimientos especiales"
+            class="events__field events__field--wide"
+            error={fieldError('specialRequirements')}
+          >
+            <textarea
+              aria-invalid={Boolean(fieldError('specialRequirements'))}
+              aria-describedby={fieldError('specialRequirements')
+                ? 'event-specialRequirements-22-error'
+                : undefined}
+              id="event-specialRequirements-22"
               class="events__input"
               name="specialRequirements"
-              bind:value={specialRequirements}></textarea></label
-          ><label class="events__field events__field--wide"
-            ><span>Notas internas</span><textarea
+              maxlength={FORM_LIMITS.event.specialRequirementsMaxLength}
+              placeholder="Ej. Menú vegetariano y espacio para fotografías."
+              bind:value={specialRequirements}></textarea></FormField
+          >
+          <FormField
+            id="event-internalNotes-23"
+            label="Notas internas"
+            class="events__field events__field--wide"
+            error={fieldError('internalNotes')}
+          >
+            <textarea
+              aria-invalid={Boolean(fieldError('internalNotes'))}
+              aria-describedby={fieldError('internalNotes')
+                ? 'event-internalNotes-23-error'
+                : undefined}
+              id="event-internalNotes-23"
               class="events__input"
               name="internalNotes"
-              bind:value={internalNotes}></textarea></label
+              maxlength={FORM_LIMITS.event.internalNotesMaxLength}
+              placeholder="Ej. Confirmar montaje con coordinación."
+              bind:value={internalNotes}></textarea></FormField
           >
         </div>
         <input type="hidden" name="preferredLanguage" value="es" /><Dialog.Footer
@@ -766,86 +1100,220 @@
         ></Dialog.Header
       >
       <form class="events__form" method="POST" action="?/savePackage">
+        <p class="form-legend">
+          <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+        </p>
         <input type="hidden" name="id" value={packageId} /><input
           type="hidden"
           name="locationId"
           value={data.locationId}
         />
         <div class="events__form-grid">
-          <label class="events__field"
-            ><span>Código</span><input
+          <FormField
+            id="event-packageCode-24"
+            label="Código"
+            required
+            class="events__field"
+            error={fieldError('packageCode')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('packageCode'))}
+              aria-describedby={fieldError('packageCode')
+                ? 'event-packageCode-24-error'
+                : undefined}
+              id="event-packageCode-24"
               class="events__input"
               name="packageCode"
               bind:value={packageCode}
+              maxlength={FORM_LIMITS.event.packageCodeMaxLength}
+              placeholder="Ej. BODA-CAFE-01"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Modelo</span><select
+            /></FormField
+          >
+          <FormField
+            id="event-pricingModel-25"
+            label="Modelo"
+            class="events__field"
+            error={fieldError('pricingModel')}
+          >
+            <select
+              aria-invalid={Boolean(fieldError('pricingModel'))}
+              aria-describedby={fieldError('pricingModel')
+                ? 'event-pricingModel-25-error'
+                : undefined}
+              id="event-pricingModel-25"
               class="events__input"
               name="pricingModel"
               bind:value={pricingModel}
               ><option value="per_person">Por persona</option><option value="flat"
                 >Precio fijo</option
               ><option value="hourly">Por hora</option></select
-            ></label
-          ><label class="events__field"
-            ><span>Nombre en español</span><input
+            ></FormField
+          >
+          <FormField
+            id="event-nameEs-26"
+            label="Nombre en español"
+            required
+            class="events__field"
+            error={fieldError('nameEs')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('nameEs'))}
+              aria-describedby={fieldError('nameEs') ? 'event-nameEs-26-error' : undefined}
+              id="event-nameEs-26"
               class="events__input"
               name="nameEs"
               bind:value={packageNameEs}
+              maxlength={FORM_LIMITS.event.packageNameMaxLength}
+              placeholder="Ej. Paquete celebración"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Nombre en inglés</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-nameEn-27"
+            label="Nombre en inglés"
+            required
+            class="events__field"
+            error={fieldError('nameEn')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('nameEn'))}
+              aria-describedby={fieldError('nameEn') ? 'event-nameEn-27-error' : undefined}
+              id="event-nameEn-27"
               class="events__input"
               name="nameEn"
               bind:value={packageNameEn}
+              maxlength={FORM_LIMITS.event.packageNameMaxLength}
+              placeholder="Ej. Celebration package"
               required
-            /></label
-          ><label class="events__field"
-            ><span>Precio base</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-basePrice-28"
+            label="Precio base"
+            required
+            class="events__field"
+            error={fieldError('basePrice')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('basePrice'))}
+              aria-describedby={fieldError('basePrice') ? 'event-basePrice-28-error' : undefined}
+              id="event-basePrice-28"
               class="events__input"
               name="basePrice"
+              type="number"
               inputmode="decimal"
+              min="0"
+              max={FORM_LIMITS.event.packagePriceMax}
+              step="0.01"
+              pattern={FORM_PATTERNS.decimal2.source}
+              placeholder="Ej. 35.00"
               bind:value={basePrice}
               required
-            /></label
-          ><label class="events__field"
-            ><span>Mínimo de invitados</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-minGuestCount-29"
+            label="Mínimo de invitados"
+            class="events__field"
+            error={fieldError('minGuestCount')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('minGuestCount'))}
+              aria-describedby={fieldError('minGuestCount')
+                ? 'event-minGuestCount-29-error'
+                : undefined}
+              id="event-minGuestCount-29"
               class="events__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.event.estimatedGuestCountMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 20"
               name="minGuestCount"
               bind:value={minGuestCount}
-            /></label
-          ><label class="events__field"
-            ><span>Máximo de invitados</span><input
+            /></FormField
+          >
+          <FormField
+            id="event-maxGuestCount-30"
+            label="Máximo de invitados"
+            class="events__field"
+            error={fieldError('maxGuestCount')}
+          >
+            <input
+              aria-invalid={Boolean(fieldError('maxGuestCount'))}
+              aria-describedby={fieldError('maxGuestCount')
+                ? 'event-maxGuestCount-30-error'
+                : undefined}
+              id="event-maxGuestCount-30"
               class="events__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.event.estimatedGuestCountMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 100"
               name="maxGuestCount"
               bind:value={maxGuestCount}
-            /></label
-          ><label class="events__field events__field--wide"
-            ><span>Descripción en español</span><textarea
+            /></FormField
+          >
+          <FormField
+            id="event-descriptionEs-31"
+            label="Descripción en español"
+            class="events__field events__field--wide"
+            error={fieldError('descriptionEs')}
+          >
+            <textarea
+              aria-invalid={Boolean(fieldError('descriptionEs'))}
+              aria-describedby={fieldError('descriptionEs')
+                ? 'event-descriptionEs-31-error'
+                : undefined}
+              id="event-descriptionEs-31"
               class="events__input"
               name="descriptionEs"
-              bind:value={packageDescriptionEs}></textarea></label
-          ><label class="events__field events__field--wide"
-            ><span>Descripción en inglés</span><textarea
+              maxlength={FORM_LIMITS.event.packageDescriptionMaxLength}
+              placeholder="Ej. Incluye café, alimentos y montaje básico."
+              bind:value={packageDescriptionEs}></textarea></FormField
+          >
+          <FormField
+            id="event-descriptionEn-32"
+            label="Descripción en inglés"
+            class="events__field events__field--wide"
+            error={fieldError('descriptionEn')}
+          >
+            <textarea
+              aria-invalid={Boolean(fieldError('descriptionEn'))}
+              aria-describedby={fieldError('descriptionEn')
+                ? 'event-descriptionEn-32-error'
+                : undefined}
+              id="event-descriptionEn-32"
               class="events__input"
               name="descriptionEn"
-              bind:value={packageDescriptionEn}></textarea></label
-          ><label class="events__field events__field--wide"
-            ><span>Líneas JSON</span><textarea
+              maxlength={FORM_LIMITS.event.packageDescriptionMaxLength}
+              placeholder="Ej. Includes coffee, food and basic setup."
+              bind:value={packageDescriptionEn}></textarea></FormField
+          >
+          <FormField
+            id="event-lines-33"
+            label="Líneas JSON"
+            required
+            class="events__field events__field--wide"
+            error={fieldError('lines')}
+          >
+            <textarea
+              aria-invalid={Boolean(fieldError('lines'))}
+              aria-describedby={fieldError('lines') ? 'event-lines-33-error' : undefined}
+              id="event-lines-33"
               class="events__input events__textarea"
               name="lines"
               bind:value={packageLines}
               rows="10"
+              placeholder={packageLineExample()}
               required></textarea><small class="events__helper"
               >Usa `lineType`, `labelEs`, `labelEn`, `quantity`, `unit`, `unitPrice`, `sortOrder` y
               `active`.</small
-            ></label
+            ></FormField
           >
         </div>
         <input type="hidden" name="active" value="false" /><label class="events__checkbox"

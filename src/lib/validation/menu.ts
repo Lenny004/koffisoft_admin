@@ -1,18 +1,28 @@
 import { z } from 'zod';
 
-const optionalText = z.string().trim().optional();
+import { FORM_LIMITS, FORM_PATTERNS } from './limits';
+
+const optionalText = (maxLength: number) => z.string().trim().max(maxLength).optional();
 
 export const categorySchema = z.object({
   slug: z
     .string()
     .trim()
     .min(1, 'El slug es obligatorio.')
-    .max(120, 'El slug no puede superar 120 caracteres.')
-    .regex(/^[a-z0-9-]+$/u, 'Usa minúsculas, números y guiones en el slug.'),
-  nameEs: z.string().trim().min(1, 'El nombre en español es obligatorio.').max(120),
-  nameEn: z.string().trim().min(1, 'El nombre en inglés es obligatorio.').max(120),
-  descriptionEs: optionalText,
-  descriptionEn: optionalText,
+    .max(FORM_LIMITS.menu.categorySlugMaxLength, 'El slug no puede superar 120 caracteres.')
+    .regex(FORM_PATTERNS.slug, 'Usa minúsculas, números y guiones en el slug.'),
+  nameEs: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en español es obligatorio.')
+    .max(FORM_LIMITS.menu.categoryNameMaxLength),
+  nameEn: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en inglés es obligatorio.')
+    .max(FORM_LIMITS.menu.categoryNameMaxLength),
+  descriptionEs: optionalText(FORM_LIMITS.menu.categoryDescriptionMaxLength),
+  descriptionEn: optionalText(FORM_LIMITS.menu.categoryDescriptionMaxLength),
   displayOrder: z.coerce.number().int().min(0),
   active: z.boolean(),
 });
@@ -27,18 +37,26 @@ const itemTypes = ['Food', 'Beverage', 'Dessert', 'Service'] as const;
 
 export const itemSchema = z.object({
   categoryId: z.string().uuid('Selecciona una categoría.'),
-  sku: z.string().trim().min(1, 'El SKU es obligatorio.').max(50),
+  sku: z.string().trim().min(1, 'El SKU es obligatorio.').max(FORM_LIMITS.menu.productSkuMaxLength),
   slug: z
     .string()
     .trim()
     .min(1, 'El slug es obligatorio.')
-    .max(160)
-    .regex(/^[a-z0-9-]+$/u, 'Usa minúsculas, números y guiones en el slug.'),
+    .max(FORM_LIMITS.menu.productSlugMaxLength)
+    .regex(FORM_PATTERNS.slug, 'Usa minúsculas, números y guiones en el slug.'),
   itemType: z.enum(itemTypes),
-  nameEs: z.string().trim().min(1, 'El nombre en español es obligatorio.').max(160),
-  nameEn: z.string().trim().min(1, 'El nombre en inglés es obligatorio.').max(160),
-  descriptionEs: optionalText,
-  descriptionEn: optionalText,
+  nameEs: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en español es obligatorio.')
+    .max(FORM_LIMITS.menu.productNameMaxLength),
+  nameEn: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en inglés es obligatorio.')
+    .max(FORM_LIMITS.menu.productNameMaxLength),
+  descriptionEs: optionalText(FORM_LIMITS.menu.productDescriptionMaxLength),
+  descriptionEn: optionalText(FORM_LIMITS.menu.productDescriptionMaxLength),
   publicVisible: z.boolean(),
   active: z.boolean(),
 });
@@ -47,7 +65,10 @@ export const priceSchema = z.object({
   variantId: z.string().uuid('Selecciona una variante.'),
   locationId: z.string().uuid('La sede no es válida.'),
   channel: z.enum(['Pos', 'Web', 'Event', 'Takeaway']),
-  price: z.coerce.number().min(0, 'El precio no puede ser negativo.'),
+  price: z.coerce
+    .number()
+    .min(FORM_LIMITS.menu.priceMin, 'El precio no puede ser negativo.')
+    .max(FORM_LIMITS.menu.priceMax, 'El precio supera el máximo permitido.'),
   taxRateId: z.string().uuid('El impuesto no es válido.'),
   validFrom: z.string().date('La fecha inicial no es válida.'),
   validTo: z.string().date().optional().or(z.literal('')),
@@ -69,9 +90,13 @@ export const availabilitySchema = z.object({
   variantId: z.string().uuid('Selecciona una variante.'),
   locationId: z.string().uuid('La sede no es válida.'),
   channel: z.enum(['Pos', 'Web', 'Event', 'Takeaway']),
-  dayOfWeek: z.coerce.number().int().min(1).max(7),
-  startsAt: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/u, 'Usa HH:mm.'),
-  endsAt: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/u, 'Usa HH:mm.'),
+  dayOfWeek: z.coerce
+    .number()
+    .int()
+    .min(FORM_LIMITS.menu.dayOfWeekMin)
+    .max(FORM_LIMITS.menu.dayOfWeekMax),
+  startsAt: z.string().regex(FORM_PATTERNS.time, 'Usa HH:mm.'),
+  endsAt: z.string().regex(FORM_PATTERNS.time, 'Usa HH:mm.'),
   crossesMidnight: z.boolean(),
   validFrom: z.string().date().optional().or(z.literal('')),
   validTo: z.string().date().optional().or(z.literal('')),

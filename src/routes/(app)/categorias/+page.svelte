@@ -9,7 +9,9 @@
 
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
+  import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
+  import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
   import type { CategoryRow } from '$lib/menu/types';
   import type { PageProps } from './$types';
 
@@ -25,6 +27,19 @@
   let displayOrder = $state(0);
   let active = $state(true);
   let search = $state('');
+
+  function fieldError(name: string): string {
+    const errors = form?.errors;
+    return errors && typeof errors === 'object' && !Array.isArray(errors)
+      ? ((errors as Record<string, string>)[name] ?? '')
+      : '';
+  }
+
+  function globalErrors(): string[] {
+    const errors = form?.errors;
+    if (!errors) return [];
+    return Array.isArray(errors) ? errors : [];
+  }
 
   $effect(() => {
     categories = [...data.categories];
@@ -125,9 +140,9 @@
 
     {#if data.error}
       <p class="categories__error" role="alert">{data.error}</p>
-    {:else if form?.errors?.length}
+    {:else if globalErrors().length}
       <div class="categories__error" role="alert">
-        {#each form.errors as message (message)}<p>{message}</p>{/each}
+        {#each globalErrors() as message (message)}<p>{message}</p>{/each}
       </div>
     {/if}
 
@@ -280,52 +295,104 @@
       >
     </Dialog.Header>
     <form class="categories__form" method="POST" action="?/save">
+      <p class="form-legend">
+        <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+      </p>
       {#if editingId}<input type="hidden" name="id" value={editingId} />{/if}
-      <div class="categories__field">
-        <label for="category-slug">Slug</label><input
+      <FormField id="category-slug" label="Slug" required error={fieldError('slug')}>
+        <input
           id="category-slug"
           name="slug"
           bind:value={slug}
+          maxlength={FORM_LIMITS.menu.categorySlugMaxLength}
+          pattern={FORM_PATTERNS.slug.source}
+          placeholder="Ej. bebidas-calientes"
           required
+          aria-invalid={Boolean(fieldError('slug'))}
+          aria-describedby={fieldError('slug') ? 'category-slug-error' : undefined}
         />
-      </div>
-      <div class="categories__field">
-        <label for="category-name-es">Nombre en español</label><input
+      </FormField>
+      <FormField
+        id="category-name-es"
+        label="Nombre en español"
+        required
+        error={fieldError('nameEs')}
+      >
+        <input
           id="category-name-es"
           name="nameEs"
           bind:value={nameEs}
+          maxlength={FORM_LIMITS.menu.categoryNameMaxLength}
+          placeholder="Ej. Bebidas calientes"
           required
+          aria-invalid={Boolean(fieldError('nameEs'))}
+          aria-describedby={fieldError('nameEs') ? 'category-name-es-error' : undefined}
         />
-      </div>
-      <div class="categories__field">
-        <label for="category-name-en">Nombre en inglés</label><input
+      </FormField>
+      <FormField
+        id="category-name-en"
+        label="Nombre en inglés"
+        required
+        error={fieldError('nameEn')}
+      >
+        <input
           id="category-name-en"
           name="nameEn"
           bind:value={nameEn}
+          maxlength={FORM_LIMITS.menu.categoryNameMaxLength}
+          placeholder="Ej. Hot drinks"
           required
+          aria-invalid={Boolean(fieldError('nameEn'))}
+          aria-describedby={fieldError('nameEn') ? 'category-name-en-error' : undefined}
         />
-      </div>
-      <div class="categories__field">
-        <label for="category-description-es">Descripción en español</label><textarea
+      </FormField>
+      <FormField
+        id="category-description-es"
+        label="Descripción en español"
+        error={fieldError('descriptionEs')}
+        maxLength={FORM_LIMITS.menu.categoryDescriptionMaxLength}
+      >
+        <textarea
           id="category-description-es"
           name="descriptionEs"
-          bind:value={descriptionEs}></textarea>
-      </div>
-      <div class="categories__field">
-        <label for="category-description-en">Descripción en inglés</label><textarea
+          bind:value={descriptionEs}
+          maxlength={FORM_LIMITS.menu.categoryDescriptionMaxLength}
+          placeholder="Ej. Café, chocolate y bebidas para una pausa tranquila."
+          aria-invalid={Boolean(fieldError('descriptionEs'))}
+          aria-describedby={fieldError('descriptionEs')
+            ? 'category-description-es-error'
+            : undefined}></textarea>
+      </FormField>
+      <FormField
+        id="category-description-en"
+        label="Descripción en inglés"
+        error={fieldError('descriptionEn')}
+        maxLength={FORM_LIMITS.menu.categoryDescriptionMaxLength}
+      >
+        <textarea
           id="category-description-en"
           name="descriptionEn"
-          bind:value={descriptionEn}></textarea>
-      </div>
-      <div class="categories__field">
-        <label for="category-order">Orden</label><input
+          bind:value={descriptionEn}
+          maxlength={FORM_LIMITS.menu.categoryDescriptionMaxLength}
+          placeholder="Ej. Coffee, chocolate and drinks for a quiet pause."
+          aria-invalid={Boolean(fieldError('descriptionEn'))}
+          aria-describedby={fieldError('descriptionEn')
+            ? 'category-description-en-error'
+            : undefined}></textarea>
+      </FormField>
+      <FormField id="category-order" label="Orden" required error={fieldError('displayOrder')}>
+        <input
           id="category-order"
           name="displayOrder"
           type="number"
           min="0"
+          step="1"
           bind:value={displayOrder}
+          required
+          aria-invalid={Boolean(fieldError('displayOrder'))}
+          aria-describedby={fieldError('displayOrder') ? 'category-order-error' : undefined}
         />
-      </div>
+      </FormField>
       <input type="hidden" name="active" value={String(active)} />
       <label class="categories__checkbox"
         ><input type="checkbox" bind:checked={active} /> Categoría activa</label

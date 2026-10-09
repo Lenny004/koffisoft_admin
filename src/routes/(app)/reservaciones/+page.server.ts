@@ -3,12 +3,12 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 import { formText } from '$lib/validation/menu';
+import { formValues, validationErrors } from '$lib/validation/errors';
 import {
   assignTablesSchema,
   createReservationSchema,
   diningTableSchema,
   reservationFilterSchema,
-  validationMessages,
   venueSpaceSchema,
 } from '$lib/validation/reservations';
 import {
@@ -196,7 +196,11 @@ export const actions: Actions = {
       tableIds: parsedTables.value,
     });
     if (!result.success)
-      return fail(400, { action: 'createReservation', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'createReservation',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       await createReservationsClient(event, env.API_BASE_URL ?? '').createAdminReservation({
         ...result.data,
@@ -256,7 +260,11 @@ export const actions: Actions = {
       tableIds: parsedTables.value,
     });
     if (!result.success)
-      return fail(400, { action: 'assignTables', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'assignTables',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       await createReservationsClient(event, env.API_BASE_URL ?? '').assignTables(
         result.data.reservationId,
@@ -289,7 +297,11 @@ export const actions: Actions = {
       active: booleanValue(formData, 'active', true),
     });
     if (!result.success)
-      return fail(400, { action: 'saveSpace', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'saveSpace',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       const { id, locationId, standingCapacity, ...payload } = result.data;
       const normalizedPayload = {
@@ -338,7 +350,11 @@ export const actions: Actions = {
       active: booleanValue(formData, 'active', true),
     });
     if (!result.success)
-      return fail(400, { action: 'saveTable', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'saveTable',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       const { id, ...payload } = result.data;
       const client = createReservationsClient(event, env.API_BASE_URL ?? '');

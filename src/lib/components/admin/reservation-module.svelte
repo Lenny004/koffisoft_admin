@@ -19,6 +19,7 @@
 
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
+  import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { formatElSalvadorDateTime } from '$lib/formatting/dates';
   import {
@@ -29,6 +30,7 @@
     TABLE_SHAPES,
   } from '$lib/reservations/types';
   import type { DiningTable, Reservation, VenueSpace } from '$lib/reservations/types';
+  import { FORM_LIMITS } from '$lib/validation/limits';
   import type { PageProps } from '../../../routes/(app)/reservaciones/$types';
   import { resolve } from '$app/paths';
 
@@ -36,6 +38,19 @@
 
   type Props = Pick<PageProps, 'data' | 'form'>;
   let { data, form }: Props = $props();
+
+  function fieldError(name: string): string {
+    const errors = form?.errors;
+    return errors && typeof errors === 'object' && !Array.isArray(errors)
+      ? ((errors as Record<string, string>)[name] ?? '')
+      : '';
+  }
+
+  function globalErrors(): string[] {
+    const errors = form?.errors;
+    if (!errors) return [];
+    return Array.isArray(errors) ? errors : [];
+  }
   let section = $state<Section>('list');
   let view = $state<'table' | 'day'>('table');
   let detailOpen = $state(false);
@@ -218,9 +233,9 @@
     </button>
   </div>
 
-  {#if form?.errors?.length}
+  {#if globalErrors().length}
     <div class="reservations__error" role="alert">
-      {#each form.errors as message (message)}<p>{message}</p>{/each}
+      {#each globalErrors() as message (message)}<p>{message}</p>{/each}
     </div>
   {/if}
 
@@ -240,76 +255,183 @@
       </div>
       {#if canManage}
         <form class="reservations__form" method="POST" action="?/createReservation">
+          <p class="form-legend">
+            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+          </p>
           <input type="hidden" name="locationId" value={data.locationId} />
           <input type="hidden" name="tableIds" value={JSON.stringify(createTableIds)} />
           <div class="reservations__form-grid">
-            <label class="reservations__field"
-              ><span>ID de cliente (opcional)</span><input
+            <FormField
+              id="create-customer-id"
+              label="ID de cliente"
+              class="reservations__field"
+              error={fieldError('customerId')}
+              helpText="Opcional"
+            >
+              <input
+                id="create-customer-id"
                 class="reservations__input"
                 name="customerId"
                 bind:value={createCustomerId}
                 placeholder="UUID del cliente"
-              /></label
-            ><label class="reservations__field"
-              ><span>Nombre de contacto</span><input
+                aria-invalid={Boolean(fieldError('customerId'))}
+                aria-describedby={fieldError('customerId') ? 'create-customer-id-error' : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-contact-name"
+              label="Nombre de contacto"
+              class="reservations__field"
+              error={fieldError('contactName')}
+            >
+              <input
+                id="create-contact-name"
                 class="reservations__input"
                 name="contactName"
                 bind:value={createContactName}
-                placeholder="Nombre o razón social"
-              /></label
-            ><label class="reservations__field"
-              ><span>Teléfono</span><input
+                maxlength={FORM_LIMITS.reservation.contactNameMaxLength}
+                placeholder="Ej. Ana Martínez"
+                aria-invalid={Boolean(fieldError('contactName'))}
+                aria-describedby={fieldError('contactName')
+                  ? 'create-contact-name-error'
+                  : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-contact-phone"
+              label="Teléfono"
+              class="reservations__field"
+              error={fieldError('contactPhone')}
+            >
+              <input
+                id="create-contact-phone"
                 class="reservations__input"
                 name="contactPhone"
                 bind:value={createContactPhone}
-                placeholder="+503 ..."
-              /></label
-            ><label class="reservations__field"
-              ><span>Correo (opcional)</span><input
+                type="tel"
+                inputmode="tel"
+                maxlength={FORM_LIMITS.reservation.contactPhoneMaxLength}
+                placeholder="Ej. +503 7000 0000"
+                aria-invalid={Boolean(fieldError('contactPhone'))}
+                aria-describedby={fieldError('contactPhone')
+                  ? 'create-contact-phone-error'
+                  : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-contact-email"
+              label="Correo"
+              class="reservations__field"
+              error={fieldError('contactEmail')}
+              helpText="Opcional"
+            >
+              <input
+                id="create-contact-email"
                 class="reservations__input"
                 type="email"
                 name="contactEmail"
                 bind:value={createContactEmail}
-              /></label
-            ><label class="reservations__field"
-              ><span>Fecha</span><input
+                maxlength={FORM_LIMITS.reservation.contactEmailMaxLength}
+                placeholder="Ej. ana@correo.com"
+                aria-invalid={Boolean(fieldError('contactEmail'))}
+                aria-describedby={fieldError('contactEmail')
+                  ? 'create-contact-email-error'
+                  : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-date"
+              label="Fecha"
+              required
+              class="reservations__field"
+              error={fieldError('date')}
+            >
+              <input
+                id="create-date"
                 class="reservations__input"
                 type="date"
                 name="date"
                 bind:value={createDate}
                 required
-              /></label
-            ><label class="reservations__field"
-              ><span>Hora local</span><input
+                aria-invalid={Boolean(fieldError('date'))}
+                aria-describedby={fieldError('date') ? 'create-date-error' : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-time"
+              label="Hora local"
+              required
+              class="reservations__field"
+              error={fieldError('time')}
+            >
+              <input
+                id="create-time"
                 class="reservations__input"
                 type="time"
                 name="time"
                 bind:value={createTime}
                 required
-              /></label
-            ><label class="reservations__field"
-              ><span>Personas</span><input
+                aria-invalid={Boolean(fieldError('time'))}
+                aria-describedby={fieldError('time') ? 'create-time-error' : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-party-size"
+              label="Personas"
+              required
+              class="reservations__field"
+              error={fieldError('partySize')}
+            >
+              <input
+                id="create-party-size"
                 class="reservations__input"
                 type="number"
-                min="1"
-                max="100"
+                min={FORM_LIMITS.reservation.partySizeMin}
+                max={FORM_LIMITS.reservation.partySizeMax}
+                step="1"
+                inputmode="numeric"
+                placeholder="Ej. 4"
                 name="partySize"
                 bind:value={createPartySize}
                 required
-              /></label
-            ><label class="reservations__field"
-              ><span>Duración (minutos)</span><input
+                aria-invalid={Boolean(fieldError('partySize'))}
+                aria-describedby={fieldError('partySize') ? 'create-party-size-error' : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-duration"
+              label="Duración (minutos)"
+              required
+              class="reservations__field"
+              error={fieldError('durationMinutes')}
+            >
+              <input
+                id="create-duration"
                 class="reservations__input"
                 type="number"
-                min="30"
-                max="360"
+                min={FORM_LIMITS.reservation.durationMinutesMin}
+                max={FORM_LIMITS.reservation.durationMinutesMax}
                 step="30"
+                inputmode="numeric"
+                placeholder="Ej. 120"
                 name="durationMinutes"
                 bind:value={createDurationMinutes}
                 required
-              /></label
-            ><label class="reservations__field"
-              ><span>Espacio (opcional)</span><select
+                aria-invalid={Boolean(fieldError('durationMinutes'))}
+                aria-describedby={fieldError('durationMinutes')
+                  ? 'create-duration-error'
+                  : undefined}
+              />
+            </FormField>
+            ><FormField
+              id="create-space"
+              label="Espacio"
+              class="reservations__field"
+              error={fieldError('preferredSpaceId')}
+              helpText="Opcional"
+            >
+              <select
+                id="create-space"
                 class="reservations__input"
                 name="preferredSpaceId"
                 bind:value={createSpaceId}
@@ -317,25 +439,47 @@
                 >{#each data.spaces.filter((space) => space.active && space.allowsTableReservation) as space (space.id)}<option
                     value={space.id}>{space.nameEs}</option
                   >{/each}</select
-              ></label
-            ><label class="reservations__field"
-              ><span>Estado inicial</span><select
+              >
+            </FormField>
+            ><FormField
+              id="create-status"
+              label="Estado inicial"
+              required
+              class="reservations__field"
+              error={fieldError('status')}
+            >
+              <select
+                id="create-status"
                 class="reservations__input"
                 name="status"
                 bind:value={createStatus}
                 ><option value="PendingConfirmation">Pendiente de confirmar</option><option
                   value="Confirmed">Confirmada</option
                 ></select
-              ></label
+              >
+            </FormField>
             >
           </div>
-          <label class="reservations__field"
-            ><span>Notas internas (opcional)</span><textarea
+          <FormField
+            id="create-notes"
+            label="Notas internas"
+            class="reservations__field"
+            error={fieldError('internalNotes')}
+            helpText="Opcional"
+            maxLength={FORM_LIMITS.reservation.specialRequestsMaxLength}
+          >
+            <textarea
+              id="create-notes"
               class="reservations__input"
               name="internalNotes"
               rows="3"
-              bind:value={createNotes}></textarea></label
-          >
+              maxlength={FORM_LIMITS.reservation.specialRequestsMaxLength}
+              placeholder="Ej. Confirmar disponibilidad de silla infantil."
+              bind:value={createNotes}
+              aria-invalid={Boolean(fieldError('internalNotes'))}
+              aria-describedby={fieldError('internalNotes') ? 'create-notes-error' : undefined}
+            ></textarea>
+          </FormField>
           <div class="reservations__detail-section">
             <h3>Mesas opcionales</h3>
             <p class="reservations__helper">
@@ -376,6 +520,7 @@
             name="search"
             value={data.search}
             placeholder="Código, cliente o teléfono"
+            maxlength={FORM_LIMITS.menu.searchMaxLength}
           />
           <label class="reservations__label" for="reservation-date-from">Desde</label>
           <input
@@ -783,58 +928,136 @@
         ></Dialog.Header
       >
       <form class="reservations__form" method="POST" action="?/saveSpace">
+        <p class="form-legend">
+          <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+        </p>
         <input type="hidden" name="id" value={spaceId} /><input
           type="hidden"
           name="locationId"
           value={data.locationId}
         />
         <div class="reservations__form-grid">
-          <label class="reservations__field"
-            ><span>Código</span><input
+          <FormField
+            id="space-code"
+            label="Código"
+            required
+            class="reservations__field"
+            error={fieldError('code')}
+          >
+            <input
+              id="space-code"
               class="reservations__input"
               name="code"
               bind:value={spaceCode}
+              maxlength={FORM_LIMITS.venue.spaceCodeMaxLength}
+              placeholder="Ej. TERRAZA"
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Nombre en español</span><input
+              aria-invalid={Boolean(fieldError('code'))}
+              aria-describedby={fieldError('code') ? 'space-code-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="space-name-es"
+            label="Nombre en español"
+            required
+            class="reservations__field"
+            error={fieldError('nameEs')}
+          >
+            <input
+              id="space-name-es"
               class="reservations__input"
               name="nameEs"
               bind:value={spaceNameEs}
+              maxlength={FORM_LIMITS.venue.spaceNameMaxLength}
+              placeholder="Ej. Terraza principal"
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Nombre en inglés</span><input
+              aria-invalid={Boolean(fieldError('nameEs'))}
+              aria-describedby={fieldError('nameEs') ? 'space-name-es-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="space-name-en"
+            label="Nombre en inglés"
+            required
+            class="reservations__field"
+            error={fieldError('nameEn')}
+          >
+            <input
+              id="space-name-en"
               class="reservations__input"
               name="nameEn"
               bind:value={spaceNameEn}
+              maxlength={FORM_LIMITS.venue.spaceNameMaxLength}
+              placeholder="Ej. Main terrace"
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Tipo</span><select
+              aria-invalid={Boolean(fieldError('nameEn'))}
+              aria-describedby={fieldError('nameEn') ? 'space-name-en-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="space-type"
+            label="Tipo"
+            required
+            class="reservations__field"
+            error={fieldError('spaceType')}
+          >
+            <select
+              id="space-type"
               class="reservations__input"
               name="spaceType"
               bind:value={spaceType}
               >{#each SPACE_TYPES as [value, label] (value)}<option {value}>{label}</option
                 >{/each}</select
-            ></label
-          ><label class="reservations__field"
-            ><span>Capacidad sentada</span><input
+            >
+          </FormField>
+          ><FormField
+            id="space-seated-capacity"
+            label="Capacidad sentada"
+            required
+            class="reservations__field"
+            error={fieldError('seatedCapacity')}
+          >
+            <input
+              id="space-seated-capacity"
               class="reservations__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.venue.smallIntMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 40"
               name="seatedCapacity"
               bind:value={seatedCapacity}
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Capacidad de pie</span><input
+              aria-invalid={Boolean(fieldError('seatedCapacity'))}
+              aria-describedby={fieldError('seatedCapacity')
+                ? 'space-seated-capacity-error'
+                : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="space-standing-capacity"
+            label="Capacidad de pie"
+            class="reservations__field"
+            error={fieldError('standingCapacity')}
+          >
+            <input
+              id="space-standing-capacity"
               class="reservations__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.venue.smallIntMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 60"
               name="standingCapacity"
               bind:value={standingCapacity}
-            /></label
+              aria-invalid={Boolean(fieldError('standingCapacity'))}
+              aria-describedby={fieldError('standingCapacity')
+                ? 'space-standing-capacity-error'
+                : undefined}
+            />
+          </FormField>
           >
         </div>
         <input type="hidden" name="allowsTableReservation" value="false" /><label
@@ -880,10 +1103,20 @@
         ></Dialog.Header
       >
       <form class="reservations__form" method="POST" action="?/saveTable">
+        <p class="form-legend">
+          <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+        </p>
         <input type="hidden" name="id" value={tableId} />
         <div class="reservations__form-grid">
-          <label class="reservations__field"
-            ><span>Espacio</span><select
+          <FormField
+            id="table-space"
+            label="Espacio"
+            required
+            class="reservations__field"
+            error={fieldError('spaceId')}
+          >
+            <select
+              id="table-space"
               class="reservations__input"
               name="spaceId"
               bind:value={selectedSpaceId}
@@ -891,35 +1124,81 @@
               >{#each data.spaces as space (space.id)}<option value={space.id}
                   >{space.nameEs}</option
                 >{/each}</select
-            ></label
-          ><label class="reservations__field"
-            ><span>Código</span><input
+            >
+          </FormField>
+          ><FormField
+            id="table-code"
+            label="Código"
+            required
+            class="reservations__field"
+            error={fieldError('tableCode')}
+          >
+            <input
+              id="table-code"
               class="reservations__input"
               name="tableCode"
               bind:value={tableCode}
+              maxlength={FORM_LIMITS.venue.tableCodeMaxLength}
+              placeholder="Ej. MESA-01"
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Nombre</span><input
+              aria-invalid={Boolean(fieldError('tableCode'))}
+              aria-describedby={fieldError('tableCode') ? 'table-code-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="table-name"
+            label="Nombre"
+            required
+            class="reservations__field"
+            error={fieldError('name')}
+          >
+            <input
+              id="table-name"
               class="reservations__input"
               name="name"
               bind:value={tableName}
+              maxlength={FORM_LIMITS.venue.tableNameMaxLength}
+              placeholder="Ej. Mesa junto a la ventana"
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Asientos</span><input
+              aria-invalid={Boolean(fieldError('name'))}
+              aria-describedby={fieldError('name') ? 'table-name-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="table-seat-count"
+            label="Asientos"
+            required
+            class="reservations__field"
+            error={fieldError('seatCount')}
+          >
+            <input
+              id="table-seat-count"
               class="reservations__input"
               type="number"
               min="1"
+              max={FORM_LIMITS.venue.smallIntMax}
+              step="1"
+              inputmode="numeric"
+              placeholder="Ej. 4"
               name="seatCount"
               bind:value={seatCount}
               required
-            /></label
-          ><label class="reservations__field"
-            ><span>Forma</span><select class="reservations__input" name="shape" bind:value={shape}
+              aria-invalid={Boolean(fieldError('seatCount'))}
+              aria-describedby={fieldError('seatCount') ? 'table-seat-count-error' : undefined}
+            />
+          </FormField>
+          ><FormField
+            id="table-shape"
+            label="Forma"
+            required
+            class="reservations__field"
+            error={fieldError('shape')}
+          >
+            <select id="table-shape" class="reservations__input" name="shape" bind:value={shape}
               >{#each TABLE_SHAPES as [value, label] (value)}<option {value}>{label}</option
                 >{/each}</select
-            ></label
+            >
+          </FormField>
           >
         </div>
         <input type="hidden" name="active" value="false" /><label class="reservations__checkbox"

@@ -35,6 +35,12 @@ Los estados usan `is-*` o modificadores BEM (`admin-status--success`). El respon
 
 Todos los controles interactivos tienen nombre accesible, foco visible y estados de teclado. Las imágenes decorativas usan `alt=""`; logos e ilustraciones informativas tienen texto alternativo. Se respeta `prefers-reduced-motion` y no se depende del color para comunicar el estado.
 
+## Componentes y formularios
+
+`Button`, `Dialog`, `Card`, `Table`, `Badge`, `Alert` y `FormField` son la única fuente de UI compartida con `koffisoft_web`. Sus variantes, tamaños, radios, colores y estados se consumen desde tokens; las rutas no deben recrearlos con clases o estilos propios.
+
+Todo formulario muestra la leyenda `* Campo obligatorio`. Cada campo usa `FormField`, etiqueta con `*` cuando corresponde, placeholder realista en español, mensaje de error junto al control y los límites documentados en `src/lib/validation/limits.ts`, que deben coincidir con la API y los esquemas Zod. Los modales respetan header, body desplazable y footer con cancelar `outline` y confirmar `primary` o `destructive`.
+
 ## Assets
 
 Los assets de prueba se encuentran en `static/brand/` y `static/fixtures/`. Son copias con nombres en inglés del logo, la taza, fotos de productos, categorías y un avatar del legacy. Las fotos no son un contrato de medios de la API; se usan solo para la composición de la Fase 0.

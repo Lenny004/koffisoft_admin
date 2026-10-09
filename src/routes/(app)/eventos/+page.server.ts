@@ -14,9 +14,9 @@ import {
   requirementSchema,
   spaceBookingSchema,
   updateRequirementSchema,
-  validationMessages,
 } from '$lib/validation/events';
 import { localElSalvadorDateTimeToIso } from '$lib/formatting/dates';
+import { formValues, validationErrors } from '$lib/validation/errors';
 
 const PAGE_SIZE = 20;
 const EVENT_STATUSES = [
@@ -168,7 +168,11 @@ export const actions: Actions = {
     const formData = await event.request.formData();
     const result = eventSchema.safeParse(eventForm(formData));
     if (!result.success)
-      return fail(400, { action: 'saveEvent', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'saveEvent',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { id, locationId, ...data } = result.data;
     const payload = {
       ...data,
@@ -230,7 +234,11 @@ export const actions: Actions = {
       holdExpiresAt: localElSalvadorDateTimeToIso(formText(formData.get('holdExpiresAt'))),
     });
     if (!result.success)
-      return fail(400, { action: 'bookSpace', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'bookSpace',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { eventId, ...payload } = result.data;
     try {
       await createEventsClient(event, env.API_BASE_URL ?? '').createSpaceBooking(eventId, {
@@ -290,7 +298,11 @@ export const actions: Actions = {
       lines: lines.value,
     });
     if (!result.success)
-      return fail(400, { action: 'savePackage', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'savePackage',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       const {
         id,
@@ -357,7 +369,11 @@ export const actions: Actions = {
       lines: lines.value,
     });
     if (!result.success)
-      return fail(400, { action: 'createQuote', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'createQuote',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { eventId, lines: quoteLines, ...payload } = result.data;
     const normalizedLines = quoteLines.map(
       ({ eventPackageLineId, menuItemVariantId, ...line }) => ({
@@ -392,7 +408,11 @@ export const actions: Actions = {
       status: formText(formData.get('status')),
     });
     if (!result.success)
-      return fail(400, { action: 'updateQuoteStatus', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'updateQuoteStatus',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       await createEventsClient(event, env.API_BASE_URL ?? '').updateQuoteStatus(
         result.data.quoteId,
@@ -420,7 +440,11 @@ export const actions: Actions = {
       status: formText(formData.get('status')),
     });
     if (!result.success)
-      return fail(400, { action: 'saveRequirement', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'saveRequirement',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { eventId, ...payload } = result.data;
     try {
       await createEventsClient(event, env.API_BASE_URL ?? '').createRequirement(eventId, {
@@ -449,7 +473,11 @@ export const actions: Actions = {
       resolvedAt: localElSalvadorDateTimeToIso(formText(formData.get('resolvedAt'))),
     });
     if (!result.success)
-      return fail(400, { action: 'updateRequirement', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'updateRequirement',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { requirementId, ...payload } = result.data;
     try {
       await createEventsClient(event, env.API_BASE_URL ?? '').updateRequirement(requirementId, {

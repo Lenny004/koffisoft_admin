@@ -11,9 +11,9 @@ import {
   formText,
   itemSchema,
   priceSchema,
-  validationMessages,
 } from '$lib/validation/menu';
 import { MenuApiError, createMenuClient } from '$lib/server/menu';
+import { formValues, validationErrors } from '$lib/validation/errors';
 
 const PAGE_SIZE = 20;
 
@@ -159,7 +159,11 @@ export const actions: Actions = {
     const formData = await event.request.formData();
     const result = itemSchema.safeParse(itemForm(formData));
     if (!result.success)
-      return fail(400, { action: 'save', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'save',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
 
     try {
       const client = createMenuClient(event, env.API_BASE_URL ?? '');
@@ -225,7 +229,11 @@ export const actions: Actions = {
       includesTax: formBoolean(formData.get('includesTax'), true),
     });
     if (!result.success)
-      return fail(400, { action: 'price', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'price',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { variantId, ...payload } = result.data;
     try {
       await createMenuClient(event, env.API_BASE_URL ?? '').createPrice(variantId, {
@@ -256,7 +264,11 @@ export const actions: Actions = {
       allergens,
     });
     if (!result.success)
-      return fail(400, { action: 'allergens', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'allergens',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     try {
       const { variantId, allergens: payload } = result.data;
       await createMenuClient(event, env.API_BASE_URL ?? '').replaceVariantAllergens(
@@ -288,7 +300,11 @@ export const actions: Actions = {
       validTo: formText(formData.get('validTo')),
     });
     if (!result.success)
-      return fail(400, { action: 'availability', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'availability',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const { variantId, ...payload } = result.data;
     try {
       await createMenuClient(event, env.API_BASE_URL ?? '').createAvailability(variantId, {

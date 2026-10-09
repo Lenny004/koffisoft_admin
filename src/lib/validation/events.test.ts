@@ -40,4 +40,8 @@ describe('validaciones Zod de eventos', () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it('rechaza presupuesto con más de dos decimales', () => {
+    expect(eventSchema.safeParse({ ...validEvent, budgetTarget: '1200.999' }).success).toBe(false);
+  });
 });

@@ -4,13 +4,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 import { mapCategory } from '$lib/menu/mappers';
 import { MenuApiError, createMenuClient } from '$lib/server/menu';
-import {
-  categoryReorderSchema,
-  categorySchema,
-  formBoolean,
-  formText,
-  validationMessages,
-} from '$lib/validation/menu';
+import { formValues, validationErrors } from '$lib/validation/errors';
+import { categoryReorderSchema, categorySchema, formBoolean, formText } from '$lib/validation/menu';
 
 function configurationError(): string {
   return 'No se pudieron cargar las categorías: configura API_BASE_URL y DEFAULT_LOCATION_ID para conectar el panel con la API.';
@@ -78,7 +73,11 @@ export const actions: Actions = {
     const formData = await event.request.formData();
     const result = categorySchema.safeParse(categoryForm(formData));
     if (!result.success)
-      return fail(400, { action: 'save', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'save',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const locationId = env.DEFAULT_LOCATION_ID ?? '';
     if (!locationId) return fail(503, { action: 'save', errors: [configurationError()] });
 
@@ -152,7 +151,11 @@ export const actions: Actions = {
     }
     const result = categoryReorderSchema.safeParse({ categories });
     if (!result.success)
-      return fail(400, { action: 'reorder', errors: validationMessages(result.error) });
+      return fail(400, {
+        action: 'reorder',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
     const locationId = env.DEFAULT_LOCATION_ID ?? '';
     if (!locationId) return fail(503, { action: 'reorder', errors: [configurationError()] });
     try {

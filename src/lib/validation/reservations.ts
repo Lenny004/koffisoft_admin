@@ -1,7 +1,14 @@
 import { z } from 'zod';
 
+import { FORM_LIMITS } from './limits';
+
 const uuid = z.string().uuid('El identificador no es válido.');
-const optionalNumber = z.coerce.number().int().min(1).optional().or(z.literal(''));
+const optionalNumber = z.coerce
+  .number()
+  .int()
+  .min(FORM_LIMITS.venue.capacityMin)
+  .optional()
+  .or(z.literal(''));
 
 export const reservationFilterSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -26,11 +33,26 @@ export const reservationFilterSchema = z.object({
 export const venueSpaceSchema = z.object({
   id: uuid.optional().or(z.literal('')),
   locationId: uuid,
-  code: z.string().trim().min(1, 'El código es obligatorio.').max(40),
-  nameEs: z.string().trim().min(1, 'El nombre en español es obligatorio.').max(120),
-  nameEn: z.string().trim().min(1, 'El nombre en inglés es obligatorio.').max(120),
+  code: z
+    .string()
+    .trim()
+    .min(1, 'El código es obligatorio.')
+    .max(FORM_LIMITS.venue.spaceCodeMaxLength),
+  nameEs: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en español es obligatorio.')
+    .max(FORM_LIMITS.venue.spaceNameMaxLength),
+  nameEn: z
+    .string()
+    .trim()
+    .min(1, 'El nombre en inglés es obligatorio.')
+    .max(FORM_LIMITS.venue.spaceNameMaxLength),
   spaceType: z.enum(['indoor', 'terrace', 'viewpoint', 'private_room', 'garden', 'other']),
-  seatedCapacity: z.coerce.number().int().min(1, 'La capacidad debe ser mayor que cero.'),
+  seatedCapacity: z.coerce
+    .number()
+    .int()
+    .min(FORM_LIMITS.venue.capacityMin, 'La capacidad debe ser mayor que cero.'),
   standingCapacity: optionalNumber,
   allowsTableReservation: z.boolean(),
   allowsPrivateEvent: z.boolean(),
@@ -40,9 +62,20 @@ export const venueSpaceSchema = z.object({
 export const diningTableSchema = z.object({
   id: uuid.optional().or(z.literal('')),
   spaceId: uuid,
-  tableCode: z.string().trim().min(1, 'El código de mesa es obligatorio.').max(30),
-  name: z.string().trim().min(1, 'El nombre de mesa es obligatorio.').max(80),
-  seatCount: z.coerce.number().int().min(1, 'Los asientos deben ser mayores que cero.'),
+  tableCode: z
+    .string()
+    .trim()
+    .min(1, 'El código de mesa es obligatorio.')
+    .max(FORM_LIMITS.venue.tableCodeMaxLength),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'El nombre de mesa es obligatorio.')
+    .max(FORM_LIMITS.venue.tableNameMaxLength),
+  seatCount: z.coerce
+    .number()
+    .int()
+    .min(FORM_LIMITS.venue.capacityMin, 'Los asientos deben ser mayores que cero.'),
   shape: z.enum(['round', 'square', 'rectangular', 'communal']),
   active: z.boolean(),
 });
@@ -56,15 +89,43 @@ export const createReservationSchema = z
   .object({
     locationId: uuid,
     customerId: uuid.optional().or(z.literal('')),
-    contactName: z.string().trim().max(200).optional().or(z.literal('')),
-    contactPhone: z.string().trim().max(40).optional().or(z.literal('')),
-    contactEmail: z.string().trim().max(200).optional().or(z.literal('')),
+    contactName: z
+      .string()
+      .trim()
+      .max(FORM_LIMITS.reservation.contactNameMaxLength)
+      .optional()
+      .or(z.literal('')),
+    contactPhone: z
+      .string()
+      .trim()
+      .max(FORM_LIMITS.reservation.contactPhoneMaxLength)
+      .optional()
+      .or(z.literal('')),
+    contactEmail: z
+      .string()
+      .trim()
+      .max(FORM_LIMITS.reservation.contactEmailMaxLength)
+      .optional()
+      .or(z.literal('')),
     date: z.string().date('La fecha no es válida.'),
     time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/u, 'La hora no es válida.'),
-    partySize: z.coerce.number().int().min(1).max(100),
-    durationMinutes: z.coerce.number().int().min(30).max(360),
+    partySize: z.coerce
+      .number()
+      .int()
+      .min(FORM_LIMITS.reservation.partySizeMin)
+      .max(FORM_LIMITS.reservation.partySizeMax),
+    durationMinutes: z.coerce
+      .number()
+      .int()
+      .min(FORM_LIMITS.reservation.durationMinutesMin)
+      .max(FORM_LIMITS.reservation.durationMinutesMax),
     preferredSpaceId: uuid.optional().or(z.literal('')),
-    internalNotes: z.string().trim().max(10_000).optional().or(z.literal('')),
+    internalNotes: z
+      .string()
+      .trim()
+      .max(FORM_LIMITS.reservation.specialRequestsMaxLength)
+      .optional()
+      .or(z.literal('')),
     status: z.enum(['PendingConfirmation', 'Confirmed']),
     tableIds: z.array(uuid),
   })

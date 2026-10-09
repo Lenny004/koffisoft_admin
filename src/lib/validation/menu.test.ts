@@ -49,6 +49,20 @@ describe('validación Zod del menú', () => {
     ).toBe(true);
   });
 
+  it('rechaza un precio fuera de Decimal(14,2)', () => {
+    expect(
+      priceSchema.safeParse({
+        variantId: '550e8400-e29b-41d4-a716-446655440000',
+        locationId: '550e8400-e29b-41d4-a716-446655440001',
+        channel: 'Web',
+        price: '10000000000.00',
+        taxRateId: '550e8400-e29b-41d4-a716-446655440002',
+        validFrom: '2026-01-01',
+        includesTax: true,
+      }).success,
+    ).toBe(false);
+  });
+
   it('acepta disponibilidad que cruza medianoche con horario HH:mm', () => {
     expect(
       availabilitySchema.safeParse({

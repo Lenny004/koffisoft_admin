@@ -14,10 +14,11 @@ import { needsPasswordChange, type AuthenticatedUser } from '$lib/types/auth';
 import {
   changePasswordSchema,
   loginSchema,
+  mfaSetupSchema,
   recoveryCodeSchema,
   totpSchema,
-  validationMessages,
 } from '$lib/validation/auth';
+import { validationErrors } from '$lib/validation/errors';
 
 /** Form actions del acceso: validan en servidor, llaman a auth y trasladan solo cookies seguras. */
 interface LoginResponse {
@@ -69,8 +70,8 @@ export const actions: Actions = {
     if (!result.success) {
       return fail(400, {
         action: 'login',
-        errors: validationMessages(result.error),
-        email: String(values.email ?? ''),
+        errors: validationErrors(result.error),
+        values: { email: String(values.email ?? '') },
       });
     }
 
@@ -114,7 +115,7 @@ export const actions: Actions = {
       return fail(400, {
         action: 'verifyMfa',
         step: 'totp' as const,
-        errors: validationMessages(result.error),
+        errors: validationErrors(result.error),
       });
 
     const response = await apiRequest(event, '/auth/mfa/verify', env.API_BASE_URL ?? '', {
@@ -140,7 +141,7 @@ export const actions: Actions = {
       return fail(400, {
         action: 'recoverMfa',
         step: 'recovery' as const,
-        errors: validationMessages(result.error),
+        errors: validationErrors(result.error),
       });
 
     const response = await apiRequest(event, '/auth/mfa/recovery', env.API_BASE_URL ?? '', {
@@ -159,8 +160,15 @@ export const actions: Actions = {
 
   setupMfa: async (event) => {
     const values = Object.fromEntries(await event.request.formData());
-    const label =
-      typeof values.label === 'string' && values.label.trim() ? values.label.trim() : undefined;
+    const result = mfaSetupSchema.safeParse({ label: values.label || undefined });
+    if (!result.success)
+      return fail(400, {
+        action: 'setupMfa',
+        step: 'setup' as const,
+        errors: validationErrors(result.error),
+        values: { label: String(values.label ?? '') },
+      });
+    const label = result.data.label;
     const response = await apiRequest(event, '/auth/mfa/totp/setup', env.API_BASE_URL ?? '', {
       method: 'POST',
       json: label ? { label } : {},
@@ -187,7 +195,8 @@ export const actions: Actions = {
       return fail(400, {
         action: 'confirmMfa',
         step: 'confirm' as const,
-        errors: validationMessages(result.error),
+        errors: validationErrors(result.error),
+        values: { uri: String(values.uri ?? '') },
         uri: values.uri,
       });
 
@@ -218,7 +227,7 @@ export const actions: Actions = {
       return fail(400, {
         action: 'changePassword',
         step: 'password' as const,
-        errors: validationMessages(result.error),
+        errors: validationErrors(result.error),
       });
 
     const response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {

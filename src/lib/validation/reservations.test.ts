@@ -65,4 +65,24 @@ describe('validaciones Zod de reservaciones', () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it('rechaza nombres que superan el VarChar de la reserva', () => {
+    expect(
+      createReservationSchema.safeParse({
+        locationId,
+        customerId: '',
+        contactName: 'a'.repeat(201),
+        contactPhone: '+503 0000-0000',
+        contactEmail: '',
+        date: '2026-10-24',
+        time: '18:30',
+        partySize: 2,
+        durationMinutes: 120,
+        preferredSpaceId: '',
+        internalNotes: '',
+        status: 'PendingConfirmation',
+        tableIds: [],
+      }).success,
+    ).toBe(false);
+  });
 });

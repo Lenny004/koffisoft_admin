@@ -3,15 +3,18 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 import { apiErrorMessage, apiRequest, forwardSessionCookies } from '$lib/server/api';
-import { changePasswordSchema, validationMessages } from '$lib/validation/auth';
+import { changePasswordSchema } from '$lib/validation/auth';
+import { formValues, validationErrors } from '$lib/validation/errors';
 
 export const load: PageServerLoad = ({ locals }) => ({ user: locals.user });
 
 export const actions: Actions = {
   changePassword: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const formData = await event.request.formData();
+    const values = Object.fromEntries(formData);
     const result = changePasswordSchema.safeParse(values);
-    if (!result.success) return fail(400, { errors: validationMessages(result.error) });
+    if (!result.success)
+      return fail(400, { errors: validationErrors(result.error), values: formValues(formData) });
 
     const response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {
       method: 'POST',
