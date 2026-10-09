@@ -28,4 +28,8 @@ Variables relevantes:
 - `SESSION_COOKIE_NAME`: nombre base de la cookie de sesión de la API.
 - `COOKIE_SECURE`: usa `true` detrás de HTTPS; en local HTTP puede ser `false`.
 
-`DEFAULT_LOCATION_ID` es opcional y permite que dashboard/productos consulten los listados administrativos ligados a una sede. Sin esa variable se muestran fixtures claramente marcados.
+`DEFAULT_LOCATION_ID` es opcional para el shell y permite que dashboard y
+catálogo consulten los listados administrativos ligados a una sede. Sin esa
+variable, el dashboard conserva sus fixtures claramente marcados; categorías y
+productos muestran un error de configuración y no sustituyen el catálogo real
+con fixtures.

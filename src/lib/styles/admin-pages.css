@@ -284,6 +284,224 @@
   background: color-mix(in oklab, var(--status-danger) 10%, transparent);
 }
 
+.products__filters,
+.categories__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.products__filter-label,
+.categories__search-label {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.products__select,
+.categories__search,
+.categories__field input,
+.categories__field textarea,
+.categories__field select,
+.products__field input,
+.products__field select,
+.products__field textarea,
+.products__advanced-form select {
+  min-block-size: 2.75rem;
+  inline-size: 100%;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--foreground);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+}
+
+.products__filters .products__search,
+.products__filters .products__select {
+  inline-size: min(100%, 18rem);
+}
+
+.products__form-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.products__checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.products__dialog {
+  max-block-size: min(90dvh, 56rem);
+  overflow-y: auto;
+}
+
+.products__variant-panel {
+  display: grid;
+  gap: var(--space-md);
+  margin-block-start: var(--space-lg);
+  padding-block-start: var(--space-lg);
+  border-block-start: 1px solid var(--border);
+}
+
+.products__variant-panel h3,
+.products__advanced-form h4 {
+  margin: 0;
+}
+
+.products__helper {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.products__advanced-form {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.products__allergen-presence {
+  display: grid;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.products__pagination,
+.categories__reorder {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-block-start: var(--space-lg);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.products__pagination-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.products__page-link {
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.products__page-link:hover,
+.products__page-link:focus-visible {
+  background: var(--secondary);
+}
+
+.categories__card {
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.categories__toolbar {
+  margin-block-end: var(--space-lg);
+}
+
+.categories__search {
+  inline-size: min(100%, 22rem);
+}
+
+.categories__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.categories__table-head {
+  color: var(--table-header-text);
+  background: var(--table-header);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.categories__name-cell {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.categories__name-cell span {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.categories__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.categories__reorder {
+  padding: var(--space-sm) var(--space-md);
+  border-inline-start: 0.25rem solid var(--status-info);
+  background: var(--secondary);
+}
+
+.categories__form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.categories__field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.categories__field label,
+.products__field label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.categories__field textarea,
+.products__field textarea {
+  min-block-size: 5rem;
+  resize: vertical;
+}
+
+.categories__checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.categories__error {
+  margin-block-end: var(--space-lg);
+  padding: var(--space-md);
+  color: var(--status-danger);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--status-danger) 10%, transparent);
+}
+
+.categories__error p {
+  margin: 0;
+}
+
+@media (width >= 48rem) {
+  .products__form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .placeholder-page {
   display: grid;
   min-block-size: 22rem;

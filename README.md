@@ -35,7 +35,7 @@
 
 - **Shell responsive:** sidebar con permisos, offcanvas móvil, topbar, tema oscuro y enlace al sitio público.
 - **Autenticación server-side:** sesiones HttpOnly, TOTP, recuperación, cambio obligatorio de contraseña y defensa CSRF por origen.
-- **Catálogo verificable:** productos con TanStack Svelte Table, validación Zod y lectura opcional de `/menu/admin/items`.
+- **Catálogo conectado:** categorías y productos con form actions, permisos, paginación, búsqueda, validación Zod y cliente server-side para `/menu/admin`.
 - **Diseño compartido:** Fraunces + Manrope, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
 <!-- section:overview -->
@@ -109,11 +109,12 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 
 ```text
 .
-├── docs/                         # Diseño y autenticación del panel
+├── docs/                         # Diseño, autenticación y catálogo del panel
 ├── src/lib/components/admin/     # Shell, login, tabla y placeholders
 ├── src/lib/config/               # Navegación y permisos
 ├── src/lib/fixtures/              # Datos de prueba claramente marcados
-├── src/lib/server/                # BFF de API y hook de autenticación
+├── src/lib/server/                # BFF de API, auth hook y cliente de menú
+├── src/lib/menu/                  # Tipos y mapeos del contrato administrativo
 ├── src/lib/styles/                # Bloques BEM del shell y pantallas
 ├── src/routes/(app)/              # Layout y rutas protegidas
 ├── src/routes/+page.server.ts    # Form actions de login y MFA
@@ -136,7 +137,7 @@ pnpm typecheck
 pnpm build
 ```
 
-La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md) y el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md).
+La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md) y la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md).
 
 <!-- section:testing -->
 
@@ -148,7 +149,7 @@ pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Vitest cubre validación del login, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
+Vitest cubre validación del login y menú, mapeos del catálogo, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
 
 <!-- section:roadmap -->
 
@@ -157,7 +158,8 @@ Vitest cubre validación del login, navegación por permisos y hook server-side.
 - [x] Shell privado, tema, navegación por permisos y login server-side.
 - [x] Integración de sesión, TOTP y cambio de contraseña contra los endpoints documentados.
 - [x] Dashboard con reservas opcionales y fixtures de ventas marcados.
-- [ ] Completar CRUDs cuando existan los contratos administrativos correspondientes.
+- [x] CRUD administrativo de categorías y productos contra el contrato de menú.
+- [x] Gestión inicial de precios, alérgenos y disponibilidad por variante según permisos.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->
