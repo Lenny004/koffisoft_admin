@@ -38,7 +38,7 @@
 - **Catálogo conectado:** categorías y productos con form actions, permisos, paginación, búsqueda, validación Zod y cliente server-side para `/menu/admin`.
 - **Diseño compartido:** Fraunces + Manrope, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
-- **Reservaciones y eventos conectados:** agenda, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
+- **Reservaciones y eventos conectados:** agenda, creación interna, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
 
 <!-- section:overview -->
 

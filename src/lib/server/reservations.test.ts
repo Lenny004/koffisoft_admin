@@ -55,6 +55,31 @@ describe('cliente server-side de reservaciones', () => {
     expect(init.body).toBe(JSON.stringify({ tableIds: ['table-1'] }));
   });
 
+  it('crea una reserva interna con POST y cabeceras CSRF del cliente compartido', async () => {
+    const { event, fetch } = eventFor(new Response('{}', { status: 201 }));
+    await createReservationsClient(event, 'http://api.test').createAdminReservation({
+      locationId: 'location-1',
+      date: '2026-10-24',
+      time: '18:30',
+      partySize: 2,
+      tableIds: [],
+    });
+    const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://api.test/reservations/admin');
+    expect(init.method).toBe('POST');
+    expect(init.body).toBe(
+      JSON.stringify({
+        locationId: 'location-1',
+        date: '2026-10-24',
+        time: '18:30',
+        partySize: 2,
+        tableIds: [],
+      }),
+    );
+    expect((init.headers as Headers).get('origin')).toBe('http://admin.test');
+    expect((init.headers as Headers).get('referer')).toBe('http://admin.test/reservaciones');
+  });
+
   it('expone los errores HTTP como ReservationsApiError', async () => {
     const { event } = eventFor(
       new Response(JSON.stringify({ message: 'La mesa se cruza con otra reserva.' }), {

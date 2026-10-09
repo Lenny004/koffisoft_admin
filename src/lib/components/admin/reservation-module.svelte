@@ -44,6 +44,19 @@
   let editingSpace = $state<VenueSpace | null>(null);
   let editingTable = $state<DiningTable | null>(null);
   let selectedTableIds = $state<string[]>([]);
+  let createTableIds = $state<string[]>([]);
+
+  let createCustomerId = $state('');
+  let createContactName = $state('');
+  let createContactPhone = $state('');
+  let createContactEmail = $state('');
+  let createDate = $state('');
+  let createTime = $state('');
+  let createPartySize = $state('2');
+  let createDurationMinutes = $state('120');
+  let createSpaceId = $state('');
+  let createNotes = $state('');
+  let createStatus = $state('PendingConfirmation');
 
   let spaceId = $state('');
   let spaceCode = $state('');
@@ -140,6 +153,13 @@
       : selectedTableIds.filter((tableId) => tableId !== id);
   }
 
+  function toggleCreateTable(event: Event, id: string) {
+    const checked = (event.currentTarget as HTMLInputElement).checked;
+    createTableIds = checked
+      ? [...createTableIds, id]
+      : createTableIds.filter((tableId) => tableId !== id);
+  }
+
   function statusClass(status: string): string {
     if (['Confirmed', 'Seated', 'Completed'].includes(status))
       return 'admin-status admin-status--success';
@@ -207,14 +227,141 @@
   {#if data.error}
     <div class="reservations__error" role="alert">{data.error}</div>
   {:else if section === 'create'}
-    <section class="reservations__notice" role="note" aria-labelledby="reservation-create-title">
-      <h3 id="reservation-create-title">Creación interna pendiente de contrato</h3>
-      <p>
-        La API actual no expone <code>POST /reservations/admin</code>. La pantalla no usará el
-        endpoint público porque crearía una reserva con origen web y sin los campos internos. Cuando
-        el contrato administrativo lo agregue, este tab podrá incorporar el formulario sin cambiar
-        el flujo de sesión.
-      </p>
+    <section class="reservations__card" aria-labelledby="reservation-create-title">
+      <div class="reservations__toolbar">
+        <div>
+          <h3 class="reservations__section-title" id="reservation-create-title">
+            Crear reservación interna
+          </h3>
+          <p class="reservations__helper">
+            La API valida capacidad y cruces de mesas antes de guardar.
+          </p>
+        </div>
+      </div>
+      {#if canManage}
+        <form class="reservations__form" method="POST" action="?/createReservation">
+          <input type="hidden" name="locationId" value={data.locationId} />
+          <input type="hidden" name="tableIds" value={JSON.stringify(createTableIds)} />
+          <div class="reservations__form-grid">
+            <label class="reservations__field"
+              ><span>ID de cliente (opcional)</span><input
+                class="reservations__input"
+                name="customerId"
+                bind:value={createCustomerId}
+                placeholder="UUID del cliente"
+              /></label
+            ><label class="reservations__field"
+              ><span>Nombre de contacto</span><input
+                class="reservations__input"
+                name="contactName"
+                bind:value={createContactName}
+                placeholder="Nombre o razón social"
+              /></label
+            ><label class="reservations__field"
+              ><span>Teléfono</span><input
+                class="reservations__input"
+                name="contactPhone"
+                bind:value={createContactPhone}
+                placeholder="+503 ..."
+              /></label
+            ><label class="reservations__field"
+              ><span>Correo (opcional)</span><input
+                class="reservations__input"
+                type="email"
+                name="contactEmail"
+                bind:value={createContactEmail}
+              /></label
+            ><label class="reservations__field"
+              ><span>Fecha</span><input
+                class="reservations__input"
+                type="date"
+                name="date"
+                bind:value={createDate}
+                required
+              /></label
+            ><label class="reservations__field"
+              ><span>Hora local</span><input
+                class="reservations__input"
+                type="time"
+                name="time"
+                bind:value={createTime}
+                required
+              /></label
+            ><label class="reservations__field"
+              ><span>Personas</span><input
+                class="reservations__input"
+                type="number"
+                min="1"
+                max="100"
+                name="partySize"
+                bind:value={createPartySize}
+                required
+              /></label
+            ><label class="reservations__field"
+              ><span>Duración (minutos)</span><input
+                class="reservations__input"
+                type="number"
+                min="30"
+                max="360"
+                step="30"
+                name="durationMinutes"
+                bind:value={createDurationMinutes}
+                required
+              /></label
+            ><label class="reservations__field"
+              ><span>Espacio (opcional)</span><select
+                class="reservations__input"
+                name="preferredSpaceId"
+                bind:value={createSpaceId}
+                ><option value="">Cualquier espacio disponible</option
+                >{#each data.spaces.filter((space) => space.active && space.allowsTableReservation) as space (space.id)}<option
+                    value={space.id}>{space.nameEs}</option
+                  >{/each}</select
+              ></label
+            ><label class="reservations__field"
+              ><span>Estado inicial</span><select
+                class="reservations__input"
+                name="status"
+                bind:value={createStatus}
+                ><option value="PendingConfirmation">Pendiente de confirmar</option><option
+                  value="Confirmed">Confirmada</option
+                ></select
+              ></label
+            >
+          </div>
+          <label class="reservations__field"
+            ><span>Notas internas (opcional)</span><textarea
+              class="reservations__input"
+              name="internalNotes"
+              rows="3"
+              bind:value={createNotes}></textarea></label
+          >
+          <div class="reservations__detail-section">
+            <h3>Mesas opcionales</h3>
+            <p class="reservations__helper">
+              Si no eliges mesas, quedarán pendientes de asignación y se validará la capacidad del
+              horario.
+            </p>
+            <div class="reservations__table-picker">
+              {#each data.tables.filter((table) => table.active) as table (table.id)}<label
+                  class="reservations__checkbox"
+                  ><input
+                    type="checkbox"
+                    checked={createTableIds.includes(table.id)}
+                    onchange={(event) => toggleCreateTable(event, table.id)}
+                  /><span>{table.tableCode} · {table.name} · {table.seatCount} asientos</span><small
+                    >{spaceName(table.spaceId)}</small
+                  ></label
+                >{/each}
+            </div>
+          </div>
+          <div class="reservations__actions"><Button type="submit">Crear reservación</Button></div>
+        </form>
+      {:else}
+        <p class="reservations__notice" role="note">
+          Necesitas el permiso <code>reservations.manage</code> para crear una reservación.
+        </p>
+      {/if}
     </section>
   {:else if section === 'list'}
     <section class="reservations__card" aria-label="Listado de reservaciones">

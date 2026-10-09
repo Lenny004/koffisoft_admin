@@ -57,6 +57,9 @@ export function createReservationsClient(event: RequestEvent, apiBaseUrl: string
     getReservation(id: string) {
       return request<Reservation>(`/reservations/admin/${encodeURIComponent(id)}`);
     },
+    createAdminReservation(payload: unknown) {
+      return request<Reservation>('/reservations/admin', { method: 'POST', json: payload });
+    },
     transitionReservation(
       id: string,
       action: 'confirm' | 'seat' | 'complete' | 'cancel' | 'no-show',

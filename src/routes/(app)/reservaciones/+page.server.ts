@@ -5,6 +5,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { formText } from '$lib/validation/menu';
 import {
   assignTablesSchema,
+  createReservationSchema,
   diningTableSchema,
   reservationFilterSchema,
   validationMessages,
@@ -38,6 +39,10 @@ function booleanValue(formData: FormData, name: string, defaultValue = false): b
   const values = formData.getAll(name);
   const value = values.at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
+}
+
+function optional(value: string | undefined): string | undefined {
+  return value || undefined;
 }
 
 function parseJson(value: string, message: string): { value?: unknown; error?: string } {
@@ -162,6 +167,52 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
+  createReservation: async (event) => {
+    if (!event.locals.permissions.includes('reservations.manage'))
+      return fail(403, {
+        action: 'createReservation',
+        errors: ['No tienes permiso para crear reservas.'],
+      });
+    const formData = await event.request.formData();
+    const parsedTables = parseJson(
+      formText(formData.get('tableIds')) || '[]',
+      'La selección de mesas no tiene un formato válido.',
+    );
+    if (parsedTables.error)
+      return fail(400, { action: 'createReservation', errors: [parsedTables.error] });
+    const result = createReservationSchema.safeParse({
+      locationId: formText(formData.get('locationId')),
+      customerId: formText(formData.get('customerId')),
+      contactName: formText(formData.get('contactName')),
+      contactPhone: formText(formData.get('contactPhone')),
+      contactEmail: formText(formData.get('contactEmail')),
+      date: formText(formData.get('date')),
+      time: formText(formData.get('time')),
+      partySize: formText(formData.get('partySize')),
+      durationMinutes: formText(formData.get('durationMinutes')),
+      preferredSpaceId: formText(formData.get('preferredSpaceId')),
+      internalNotes: formText(formData.get('internalNotes')),
+      status: formText(formData.get('status')),
+      tableIds: parsedTables.value,
+    });
+    if (!result.success)
+      return fail(400, { action: 'createReservation', errors: validationMessages(result.error) });
+    try {
+      await createReservationsClient(event, env.API_BASE_URL ?? '').createAdminReservation({
+        ...result.data,
+        customerId: optional(result.data.customerId),
+        contactName: optional(result.data.contactName),
+        contactPhone: optional(result.data.contactPhone),
+        contactEmail: optional(result.data.contactEmail),
+        preferredSpaceId: optional(result.data.preferredSpaceId),
+        internalNotes: optional(result.data.internalNotes),
+      });
+      return { success: true, action: 'createReservation' };
+    } catch (error) {
+      const response = actionError(error, 'No se pudo crear la reserva interna.');
+      return fail(response.status, { action: 'createReservation', errors: response.errors });
+    }
+  },
   transition: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {

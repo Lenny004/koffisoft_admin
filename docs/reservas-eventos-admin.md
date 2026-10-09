@@ -27,10 +27,16 @@ La asignación o reasignación usa `PUT /reservations/admin/{id}/tables`. La API
 valida pertenencia a la sede, capacidad y solapamientos; el mensaje HTTP se
 conserva y se muestra en la respuesta de la form action.
 
-El tab de creación interna queda explícitamente deshabilitado porque el
-contrato actual no contiene `POST /reservations/admin`. El endpoint público
-`POST /reservations` no se reutiliza: crearía una solicitud con origen `web` y
-no acepta notas internas ni la semántica de una creación administrativa.
+El tab de creación interna usa `POST /reservations/admin` mediante una form
+action protegida por `reservations.manage`. El formulario valida con Zod la
+fecha, hora, grupo, contacto o cliente, duración, estado inicial, espacio,
+notas y mesas opcionales. El cliente server-side reutiliza `apiRequest`, que
+reenvía la sesión HttpOnly y `Origin`/`Referer` para la defensa CSRF.
+
+La API conserva los mensajes de capacidad o solapamiento en la respuesta de la
+form action, por lo que se muestran en el alerta de la página. Las mesas
+enviadas se validan y asignan en la misma transacción que la reserva; si se
+omiten, la API valida la capacidad y deja la asignación para el detalle.
 
 ## Espacios y mesas
 

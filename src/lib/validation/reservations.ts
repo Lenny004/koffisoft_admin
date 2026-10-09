@@ -52,6 +52,32 @@ export const assignTablesSchema = z.object({
   tableIds: z.array(uuid),
 });
 
+export const createReservationSchema = z
+  .object({
+    locationId: uuid,
+    customerId: uuid.optional().or(z.literal('')),
+    contactName: z.string().trim().max(200).optional().or(z.literal('')),
+    contactPhone: z.string().trim().max(40).optional().or(z.literal('')),
+    contactEmail: z.string().trim().max(200).optional().or(z.literal('')),
+    date: z.string().date('La fecha no es válida.'),
+    time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/u, 'La hora no es válida.'),
+    partySize: z.coerce.number().int().min(1).max(100),
+    durationMinutes: z.coerce.number().int().min(30).max(360),
+    preferredSpaceId: uuid.optional().or(z.literal('')),
+    internalNotes: z.string().trim().max(10_000).optional().or(z.literal('')),
+    status: z.enum(['PendingConfirmation', 'Confirmed']),
+    tableIds: z.array(uuid),
+  })
+  .superRefine((value, context) => {
+    if (!value.customerId && !value.contactName) {
+      context.addIssue({
+        code: 'custom',
+        path: ['contactName'],
+        message: 'Indica un cliente o nombre de contacto.',
+      });
+    }
+  });
+
 export function validationMessages(error: z.ZodError): string[] {
   return error.issues.map((issue) => issue.message);
 }
