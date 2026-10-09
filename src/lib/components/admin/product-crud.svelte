@@ -33,8 +33,8 @@
   let products = $derived(data.products);
   let open = $state(false);
   let editingProduct = $state<MenuRow | null>(null);
-  let search = $state(data.search);
-  let categoryId = $state(data.categoryId);
+  let search = $state('');
+  let categoryId = $state('');
   let selectedVariantId = $state('');
   let sku = $state('');
   let slug = $state('');
@@ -47,6 +47,11 @@
   let active = $state(true);
   let selectedAllergenIds = $state<string[]>([]);
   let allergenPresence = $state<Record<string, 'contains' | 'may_contain'>>({});
+
+  $effect(() => {
+    search = data.search;
+    categoryId = data.categoryId;
+  });
 
   const canManage = $derived(data.permissions.includes('catalog.manage'));
   const canManagePrices = $derived(data.permissions.includes('menu_prices.manage'));

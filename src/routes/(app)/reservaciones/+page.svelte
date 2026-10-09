@@ -1,10 +1,9 @@
 <script lang="ts">
-  import UnderConstruction from '$lib/components/admin/under-construction.svelte';
+  import ReservationModule from '$lib/components/admin/reservation-module.svelte';
+  import type { PageProps } from './$types';
+
+  let { data, form }: PageProps = $props();
 </script>
 
 <svelte:head><title>Reservaciones | Koffi-Soft Admin</title></svelte:head>
-<UnderConstruction
-  title="Reservaciones"
-  permission="reservations.read"
-  description="La API ya expone listado, detalle, estados y mesas; la pantalla operativa se construirá sobre ese contrato."
-/>
+<ReservationModule {data} {form} />

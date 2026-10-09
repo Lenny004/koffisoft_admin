@@ -38,6 +38,8 @@
 - **Catálogo conectado:** categorías y productos con form actions, permisos, paginación, búsqueda, validación Zod y cliente server-side para `/menu/admin`.
 - **Diseño compartido:** Fraunces + Manrope, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
+- **Reservaciones y eventos conectados:** agenda, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
+
 <!-- section:overview -->
 
 ## ℹ️ Descripción
@@ -137,7 +139,7 @@ pnpm typecheck
 pnpm build
 ```
 
-La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md) y la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md).
+La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md) y el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md).
 
 <!-- section:testing -->
 
@@ -160,6 +162,8 @@ Vitest cubre validación del login y menú, mapeos del catálogo, cliente server
 - [x] Dashboard con reservas opcionales y fixtures de ventas marcados.
 - [x] CRUD administrativo de categorías y productos contra el contrato de menú.
 - [x] Gestión inicial de precios, alérgenos y disponibilidad por variante según permisos.
+- [x] Integración administrativa de reservaciones, espacios, mesas y agenda.
+- [x] Integración de eventos, bloqueos de espacios, paquetes, cotizaciones y requisitos.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->

@@ -14,7 +14,7 @@
   import type { PageProps } from './$types';
 
   let { data, form }: PageProps = $props();
-  let categories = $state<CategoryRow[]>([...data.categories]);
+  let categories = $state<CategoryRow[]>([]);
   let open = $state(false);
   let editingId = $state<string | null>(null);
   let slug = $state('');
@@ -24,7 +24,12 @@
   let descriptionEn = $state('');
   let displayOrder = $state(0);
   let active = $state(true);
-  let search = $state(data.search);
+  let search = $state('');
+
+  $effect(() => {
+    categories = [...data.categories];
+    search = data.search;
+  });
 
   const canManage = $derived(data.permissions.includes('catalog.manage'));
   const features = tableFeatures({});
