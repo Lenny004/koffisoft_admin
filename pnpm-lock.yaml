@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/fraunces':
+        specifier: 5.2.5
+        version: 5.2.5
+      '@fontsource-variable/manrope':
+        specifier: 5.2.5
+        version: 5.2.5
       '@lucide/svelte':
         specifier: 1.51.0
         version: 1.51.0(svelte@5.57.1(@typescript-eslint/types@8.71.0))
@@ -345,6 +351,12 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
+  '@fontsource-variable/fraunces@5.2.5':
+    resolution: {integrity: sha512-fALBYzdKp2NXCSHT9F8akYQGUWCjoF0+nX/ksFjo/Qnz9RwYBYWdJxXIcvNalBoeTxa5g6b28gQDQzqzLbZW8A==}
+
+  '@fontsource-variable/manrope@5.2.5':
+    resolution: {integrity: sha512-6Mo3ldtgAhxvSSyy+bLbFRjkiYhVo6RLcasJfj9Du5k2nX16/RwjQdBbZJfvsofVt6GqQ+O6AVkazmS3Xw5R9A==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2179,6 +2191,10 @@ snapshots:
       '@floating-ui/utils': 0.2.12
 
   '@floating-ui/utils@0.2.12': {}
+
+  '@fontsource-variable/fraunces@5.2.5': {}
+
+  '@fontsource-variable/manrope@5.2.5': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

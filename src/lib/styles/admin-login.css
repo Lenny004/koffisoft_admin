@@ -1,0 +1,170 @@
+/* Login y estados de autenticación: card dividida inspirada en el acceso legacy. */
+.login-page {
+  display: grid;
+  min-block-size: 100dvh;
+  place-items: center;
+  padding: var(--space-lg);
+  background: var(--surface-warm);
+}
+
+.login-card {
+  display: grid;
+  inline-size: min(100%, 62rem);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+
+.login-card__visual {
+  display: grid;
+  min-block-size: 14rem;
+  place-items: center;
+  padding: var(--space-xl);
+  background: var(--surface-sidebar);
+}
+
+.login-card__cup {
+  inline-size: min(100%, 22rem);
+  max-block-size: 20rem;
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+
+.login-card__content {
+  padding: clamp(var(--space-lg), 5vw, var(--space-2xl));
+}
+
+.login-card__brand {
+  inline-size: 7rem;
+  margin-block-end: var(--space-lg);
+}
+
+.login-card__eyebrow,
+.page-header__eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.login-card__title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.login-card__description {
+  margin: var(--space-sm) 0 var(--space-xl);
+  color: var(--text-muted);
+}
+
+.login-card__form,
+.login-card__fields {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.login-card__field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.login-card__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.login-card__input {
+  inline-size: 100%;
+  min-block-size: 3rem;
+  padding-inline: var(--space-md);
+  color: var(--foreground);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+}
+
+.login-card__input:focus-visible {
+  border-color: var(--ring);
+}
+
+.login-card__error,
+.login-card__notice {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.login-card__error {
+  color: var(--status-danger);
+  border: 1px solid color-mix(in oklab, var(--status-danger) 45%, transparent);
+  background: color-mix(in oklab, var(--status-danger) 10%, transparent);
+}
+
+.login-card__notice {
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+  background: var(--secondary);
+}
+
+.login-card__submit,
+.login-card__secondary {
+  min-block-size: 3rem;
+  padding-inline: var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.login-card__submit {
+  color: var(--primary-foreground);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+}
+
+.login-card__secondary {
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  background: var(--surface-panel);
+  text-decoration: none;
+  text-align: center;
+}
+
+.login-card__submit:hover,
+.login-card__submit:focus-visible,
+.login-card__secondary:hover,
+.login-card__secondary:focus-visible {
+  filter: brightness(1.08);
+}
+
+.login-card__actions {
+  display: grid;
+  gap: var(--space-sm);
+  margin-block-start: var(--space-md);
+}
+
+.login-card__recovery-codes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  color: var(--foreground);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  font-family: ui-monospace, monospace;
+  font-size: var(--font-size-sm);
+  list-style: none;
+}
+
+@media (width >= 48rem) {
+  .login-card {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+
+  .login-card__visual {
+    min-block-size: 34rem;
+  }
+}

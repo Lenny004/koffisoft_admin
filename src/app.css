@@ -1,43 +1,142 @@
-/* Koffi-Soft admin: Tailwind 4 tokens, shadcn theme, reset and accessible base. */
+@import url('@fontsource-variable/fraunces/wght.css');
+@import url('@fontsource-variable/manrope/wght.css');
 @import url('tailwindcss');
 @import url('tw-animate-css');
+@import url('./lib/styles/admin-shell.css');
+@import url('./lib/styles/admin-login.css');
+@import url('./lib/styles/admin-pages.css');
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, [data-theme='dark'] *));
 
 :root {
-  /* Primitive tokens: the palette is defined once. */
-  --white: oklch(100% 0 0deg);
-  --slate-50: oklch(98.5% 0.01 260deg);
-  --slate-100: oklch(94% 0.02 260deg);
-  --slate-200: oklch(93% 0.03 260deg);
-  --slate-300: oklch(86% 0.03 260deg);
-  --indigo-700: oklch(42% 0.15 260deg);
-  --indigo-900: oklch(23% 0.03 260deg);
-  --danger-500: oklch(58% 0.2 25deg);
+  /* Primitivos de marca compartidos con koffisoft_web. */
+  --cream-50: #fffaf1;
+  --cream-100: #f7efdf;
+  --cream-200: #eadbc3;
+  --coffee-950: #241811;
+  --coffee-900: #342219;
+  --coffee-800: #4b3023;
+  --coffee-700: #694532;
+  --coffee-500: #936246;
+  --mountain-900: #173a2a;
+  --mountain-800: #1f5139;
+  --mountain-700: #286247;
+  --mountain-300: #8fb39b;
+  --clay-700: #8b472f;
+  --clay-500: #b86f4e;
+  --success-700: #17613f;
+  --danger-700: #a33d32;
+  --white: #fff;
 
-  /* Semantic tokens consumed by shadcn-svelte. */
-  --radius: 0.625rem;
-  --background: var(--slate-50);
-  --foreground: var(--indigo-900);
+  /* Primitivos del panel: heredan el lenguaje cálido del legacy sin copiar su CSS. */
+  --brand-burgundy-900: #4c070a;
+  --brand-brown-700: #70393b;
+  --brand-brown-600: #503c3d;
+  --brand-tan-500: #c69378;
+  --brand-tan-400: #cea690;
+  --brand-peach-200: #f3c6a5;
+  --state-success: #057554;
+  --state-info: #4f9b99;
+  --state-warning: #edab4a;
+  --state-danger: #a33d32;
+  --night-950: #211914;
+  --night-900: #2d211b;
+  --night-800: #3a2a21;
+  --night-700: #604837;
+  --night-600: #6b513e;
+  --night-500: #674733;
+  --night-400: #483224;
+  --night-300: #1b1410;
+  --night-brand: #132f22;
+  --cream-dark: #fff8ec;
+  --cream-dark-soft: #fff1dc;
+  --cream-dark-muted: #dccbb6;
+  --sage-dark: #8fbd9f;
+  --sage-dark-bright: #a8d1b5;
+  --sage-dark-success: #9bd3b0;
+  --danger-dark: #f08b7c;
+  --warning-dark: #f0b878;
+
+  /* Tokens semánticos consumidos por shadcn-svelte. */
+  --radius: 0.75rem;
+  --background: var(--cream-50);
+  --foreground: var(--coffee-950);
   --card: var(--white);
-  --card-foreground: var(--indigo-900);
+  --card-foreground: var(--coffee-950);
   --popover: var(--white);
-  --popover-foreground: var(--indigo-900);
-  --primary: var(--indigo-700);
-  --primary-foreground: oklch(98% 0.01 260deg);
-  --secondary: var(--slate-200);
-  --secondary-foreground: oklch(30% 0.06 260deg);
-  --muted: var(--slate-100);
-  --muted-foreground: oklch(50% 0.05 260deg);
-  --accent: oklch(90% 0.06 260deg);
-  --accent-foreground: oklch(30% 0.06 260deg);
-  --destructive: var(--danger-500);
-  --border: var(--slate-300);
-  --input: var(--slate-300);
-  --ring: oklch(55% 0.15 260deg);
-  --font-family-base: ui-sans-serif, system-ui, sans-serif;
-  --focus-ring: 2px solid var(--ring);
-  --transition-fast: 150ms ease;
+  --popover-foreground: var(--coffee-950);
+  --primary: var(--mountain-800);
+  --primary-foreground: var(--white);
+  --secondary: var(--cream-100);
+  --secondary-foreground: var(--coffee-900);
+  --muted: var(--cream-100);
+  --muted-foreground: #654e40;
+  --accent: var(--brand-tan-500);
+  --accent-foreground: var(--coffee-950);
+  --destructive: var(--state-danger);
+  --border: #d9c7ad;
+  --input: #cdb99e;
+  --ring: var(--mountain-700);
+
+  /* Semántica propia del shell, tabla y estados. */
+  --surface-sidebar: var(--brand-burgundy-900);
+  --surface-sidebar-inner: var(--brand-brown-700);
+  --surface-panel: var(--white);
+  --surface-raised: var(--white);
+  --surface-sunken: var(--cream-100);
+  --surface-brand: var(--mountain-900);
+  --surface-warm: #f0dfc8;
+  --text-on-brand: var(--white);
+  --text-muted: var(--muted-foreground);
+  --table-header: var(--brand-brown-600);
+  --table-header-text: var(--white);
+  --status-success: var(--state-success);
+  --status-info: var(--state-info);
+  --status-warning: var(--state-warning);
+  --status-danger: var(--state-danger);
+
+  /* Escala base de 16px: todos los tamaños se expresan en rem. */
+  --font-family-base: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: 'Fraunces Variable', 'Fraunces', georgia, serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: clamp(1.75rem, 4vw, 2.5rem);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --space-xs: 0.375rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.5rem;
+  --radius-feature: 2.1875rem;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 0.25rem 1rem color-mix(in oklab, var(--coffee-950) 8%, transparent);
+  --shadow-md: 0 0.75rem 2rem color-mix(in oklab, var(--coffee-950) 14%, transparent);
+  --shadow-lg: 0 1.5rem 4rem color-mix(in oklab, var(--coffee-950) 18%, transparent);
+  --container-max: 76rem;
+  --sidebar-width: 16rem;
+  --topbar-height: 5.625rem;
+  --header-height: 5.625rem;
+  --icon-size-sm: 1rem;
+  --icon-size-md: 1.25rem;
+  --icon-size-lg: 1.5rem;
+  --focus-ring: 0.1875rem solid var(--ring);
+  --transition-fast: 160ms ease;
+  --transition-base: 240ms ease;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-modal: 40;
 }
 
 @theme inline {
@@ -60,14 +159,14 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --font-sans: var(--font-family-base);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-display: var(--font-family-display);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.75rem);
+  --radius-xl: calc(var(--radius) + 1.25rem);
 }
 
 @layer base {
-  /* Reset: loaded once for the application. */
   *,
   *::before,
   *::after {
@@ -79,22 +178,37 @@
   }
 
   html {
+    color-scheme: light;
     font-family: var(--font-family-base);
+    font-size: 1rem;
     text-size-adjust: 100%;
+  }
+
+  html[data-theme='dark'],
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground;
-    min-height: 100dvh;
+    min-block-size: 100dvh;
     margin: 0;
-    line-height: 1.5;
+    line-height: var(--line-height-base);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-family-display);
+    line-height: 1.05;
   }
 
   img,
   svg,
   video {
     display: block;
-    max-width: 100%;
+    max-inline-size: 100%;
   }
 
   button,
@@ -106,14 +220,31 @@
 
   :focus-visible {
     outline: var(--focus-ring);
-    outline-offset: 2px;
+    outline-offset: 0.1875rem;
+  }
+
+  ::selection {
+    color: var(--primary-foreground);
+    background: var(--primary);
+  }
+
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
     *,
     *::before,
     *::after {
-      scroll-behavior: auto;
       animation-duration: 0.01ms;
       animation-iteration-count: 1;
       transition-duration: 0.01ms;
@@ -121,25 +252,39 @@
   }
 }
 
-/* Explicit dark theme: redefine semantic tokens only. */
-.dark,
-[data-theme='dark'] {
-  --background: oklch(18% 0.03 260deg);
-  --foreground: oklch(98% 0.01 260deg);
-  --card: oklch(23% 0.03 260deg);
-  --card-foreground: oklch(98% 0.01 260deg);
-  --popover: oklch(23% 0.03 260deg);
-  --popover-foreground: oklch(98% 0.01 260deg);
-  --primary: oklch(72% 0.14 260deg);
-  --primary-foreground: oklch(18% 0.03 260deg);
-  --secondary: oklch(30% 0.04 260deg);
-  --secondary-foreground: oklch(95% 0.01 260deg);
-  --muted: oklch(30% 0.03 260deg);
-  --muted-foreground: oklch(75% 0.04 260deg);
-  --accent: oklch(35% 0.06 260deg);
-  --accent-foreground: oklch(95% 0.01 260deg);
-  --destructive: oklch(68% 0.18 25deg);
-  --border: oklch(38% 0.04 260deg);
-  --input: oklch(38% 0.04 260deg);
-  --ring: oklch(72% 0.14 260deg);
+/* El tema oscuro redefine semántica, no reglas de componentes. */
+[data-theme='dark'],
+.dark {
+  --background: var(--night-950);
+  --foreground: var(--cream-dark);
+  --card: var(--night-900);
+  --card-foreground: var(--cream-dark);
+  --popover: var(--night-900);
+  --popover-foreground: var(--cream-dark);
+  --primary: var(--sage-dark);
+  --primary-foreground: var(--mountain-900);
+  --secondary: var(--night-800);
+  --secondary-foreground: var(--cream-dark-soft);
+  --muted: var(--night-800);
+  --muted-foreground: var(--cream-dark-muted);
+  --accent: var(--night-500);
+  --accent-foreground: var(--cream-dark-soft);
+  --destructive: var(--danger-dark);
+  --border: var(--night-700);
+  --input: var(--night-600);
+  --ring: var(--sage-dark-bright);
+  --surface-sidebar: var(--night-brand);
+  --surface-sidebar-inner: var(--mountain-800);
+  --surface-panel: var(--night-900);
+  --surface-raised: var(--night-900);
+  --surface-sunken: var(--night-300);
+  --surface-brand: var(--night-brand);
+  --surface-warm: var(--night-400);
+  --text-on-brand: var(--cream-dark);
+  --text-muted: var(--cream-dark-muted);
+  --table-header: var(--night-700);
+  --table-header-text: var(--cream-dark);
+  --status-success: var(--sage-dark-success);
+  --status-warning: var(--warning-dark);
+  --status-danger: var(--danger-dark);
 }

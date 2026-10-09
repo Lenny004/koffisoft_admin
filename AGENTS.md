@@ -42,6 +42,13 @@ Si se modifica una ruta, tabla o formulario, ejecutar también `pnpm test:e2e` d
 
 ## Commits y control del repositorio
 
+## Implementación actual del shell
+
+- El panel usa `src/hooks.server.ts` para consultar `GET /auth/me`, poblar `locals` y proteger las rutas del grupo `src/routes/(app)/`.
+- Las form actions de `src/routes/+page.server.ts` llaman únicamente a los endpoints documentados en `koffisoft_api/docs/auth.md`; reenvían `Origin`/`Referer` y mantienen la sesión en cookies HttpOnly.
+- `API_BASE_URL`, `ORIGIN`, `PUBLIC_SITE_URL`, `DEFAULT_LOCATION_ID`, `SESSION_COOKIE_NAME` y `COOKIE_SECURE` se documentan en `.env.example` y nunca deben contener secretos versionados.
+- La ruta `prueba-protegida` fue retirada; el login raíz es la entrada pública y el dashboard es la primera ruta protegida.
+
 Usar gitmoji con Conventional Commits: `✨ feat`, `🐛 fix`, `♻️ refactor`, `📝 docs`, `🔧 config`, `✅ tests`, `🔒️ seguridad` y `🗃️ base de datos`. Preferir commits grandes, coherentes y fáciles de revisar.
 
 El agente **NUNCA crea ramas, hace commits ni hace push** sin aprobación explícita del dueño. Debe dejar los cambios sin commitear para revisión.
