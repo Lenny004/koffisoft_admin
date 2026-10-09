@@ -13,7 +13,11 @@ Estas reglas aplican a Codex, Cursor, Claude y cualquier otro agente que modifiq
 
 ## Documentación
 
+Al crear o modificar CSS o estilos, aplica la skill `css-bem-estandar`.
+
 Leer [docs/reglas-documentacion.md](docs/reglas-documentacion.md) antes de documentar. Los comentarios son en español y explican propósito, flujo de datos y decisiones no evidentes. Las recetas en `.agents/skills/` son parte de la guía operativa para agentes.
+
+Cuando cambies dependencias, scripts, variables de entorno, estructura de carpetas o funcionalidades, aplica el estándar `readme-standard` (`.agents/skills/readme-standard/SKILL.md`) en modo Actualizar sobre `README.md`. Edita solo las secciones afectadas; no reescribas el archivo.
 
 ## Límites y seguridad
 
@@ -37,6 +41,20 @@ pnpm build
 Si se modifica una ruta, tabla o formulario, ejecutar también `pnpm test:e2e` después de instalar Chromium.
 
 ## Commits y control del repositorio
+
+## Regla permanente de componentes y formularios
+
+- Usar siempre los componentes base de `src/lib/components/ui/`: `Button`, `Dialog`, `Card`, `Table`, `Badge`, `Alert` y `FormField`. No crear variantes ad hoc de botones, modales, tarjetas, tablas o estados.
+- Cada campo debe tener placeholder de ejemplo en español, tipo/inputmode/autocomplete correcto, límites de `src/lib/validation/limits.ts` alineados con la API, validación Zod visible junto al campo y `maxlength`, `min`, `max`, `step` o `pattern` cuando aplique.
+- Los campos obligatorios deben usar `FormField` con `required`, mostrar `*` en la etiqueta y presentar la leyenda `* Campo obligatorio` en cada formulario.
+- Los modales deben usar la estructura base: header con título y cierre, body con scroll, footer alineado a la derecha con cancelar en `outline` y confirmar en `primary` o `destructive`; no usar colores o radios hardcodeados.
+
+## Implementación actual del shell
+
+- El panel usa `src/hooks.server.ts` para consultar `GET /auth/me`, poblar `locals` y proteger las rutas del grupo `src/routes/(app)/`.
+- Las form actions de `src/routes/+page.server.ts` llaman únicamente a los endpoints documentados en `koffisoft_api/docs/auth.md`; reenvían `Origin`/`Referer` y mantienen la sesión en cookies HttpOnly.
+- `API_BASE_URL`, `ORIGIN`, `PUBLIC_SITE_URL`, `DEFAULT_LOCATION_ID`, `SESSION_COOKIE_NAME` y `COOKIE_SECURE` se documentan en `.env.example` y nunca deben contener secretos versionados.
+- La ruta `prueba-protegida` fue retirada; el login raíz es la entrada pública y el dashboard es la primera ruta protegida.
 
 Usar gitmoji con Conventional Commits: `✨ feat`, `🐛 fix`, `♻️ refactor`, `📝 docs`, `🔧 config`, `✅ tests`, `🔒️ seguridad` y `🗃️ base de datos`. Preferir commits grandes, coherentes y fáciles de revisar.
 

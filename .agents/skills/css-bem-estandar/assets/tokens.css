@@ -1,0 +1,30 @@
+/* Global design tokens: primitives first, semantic aliases second. */
+:root {
+  --blue-600: oklch(0.55 0.18 250);
+  --gray-50: oklch(0.98 0 0);
+  --gray-900: oklch(0.2 0 0);
+
+  --color-primary: var(--blue-600);
+  --color-bg: var(--gray-50);
+  --color-surface: var(--gray-50);
+  --color-text: var(--gray-900);
+  --color-border: oklch(0.8 0 0);
+  --font-family-base: ui-sans-serif, system-ui, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --radius-md: 0.5rem;
+  --border-width: 1px;
+  --border: var(--border-width) solid var(--color-border);
+  --transition-fast: 150ms ease;
+  --focus-ring: 2px solid var(--color-primary);
+}
+
+[data-theme="dark"] {
+  --color-bg: var(--gray-900);
+  --color-surface: oklch(0.26 0 0);
+  --color-text: var(--gray-50);
+}

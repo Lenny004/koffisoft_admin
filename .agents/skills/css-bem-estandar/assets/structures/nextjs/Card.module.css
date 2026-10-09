@@ -1,0 +1,14 @@
+/* Card module: the component is the style owner. */
+.card {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius-md);
+}
+
+.card__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}

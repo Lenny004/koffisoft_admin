@@ -1,0 +1,14 @@
+{
+  "skill": "css-bem-estandar",
+  "language": "es",
+  "cases": [
+    {"id": 1, "prompt": "Hazme el CSS de una card de producto con imagen, título, precio y botón, con variante destacada y modo oscuro.", "expect": "BEM, tokens semánticos, variante y tema sin duplicar reglas."},
+    {"id": 2, "prompt": "Limpia este CSS con !important, IDs, colores hardcodeados y .card .title .text.", "expect": "Audita y convierte a bloques/elementos BEM con tokens."},
+    {"id": 3, "prompt": "Crea el sistema de variables para un proyecto nuevo con tema claro y oscuro.", "expect": "Primitivas, semánticos, foco, movimiento y temas en un único lugar global."},
+    {"id": 4, "prompt": "Audita este archivo CSS y dime qué incumple el estándar.", "expect": "Usa checklist y reporta archivo, línea, regla y severidad."},
+    {"id": 5, "prompt": "Estilos para un componente Card en Next.js con CSS Modules.", "expect": "Crea Card.module.css junto al componente y no una carpeta global de componentes."},
+    {"id": 6, "prompt": "Estilos para un componente en Angular.", "expect": "Usa :host y un archivo por componente."},
+    {"id": 7, "prompt": "Este proyecto tiene mobile.css, tablet.css y desktop.css; agrega un navbar.", "expect": "Respeta la estructura y sobrescribe solo lo mínimo por breakpoint."},
+    {"id": 8, "prompt": "Proyecto nuevo, sitio estático de 3 páginas.", "expect": "Elige la estructura simple con tokens, reset, base y componentes; no ITCSS completo."}
+  ]
+}

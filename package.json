@@ -16,6 +16,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "pnpm check",
     "lint": "eslint . --max-warnings=0 && prettier --check .",
+    "lint:css": "stylelint \"src/**/*.css\"",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:unit": "vitest run",
@@ -23,6 +24,8 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "5.2.5",
+    "@fontsource-variable/manrope": "5.2.5",
     "@lucide/svelte": "1.51.0",
     "@tanstack/svelte-table": "9.2.4",
     "bits-ui": "2.19.5",
@@ -43,6 +46,8 @@
     "prettier": "3.9.9",
     "prettier-plugin-svelte": "4.1.1",
     "shadcn-svelte": "1.7.0",
+    "stylelint": "17.16.0",
+    "stylelint-config-standard": "40.0.0",
     "svelte": "5.57.1",
     "svelte-check": "4.7.6",
     "tailwindcss": "4.3.3",

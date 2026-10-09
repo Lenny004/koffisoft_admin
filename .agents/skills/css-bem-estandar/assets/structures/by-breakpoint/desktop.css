@@ -1,0 +1,6 @@
+/* Desktop additions: only the change from the tablet layout. */
+@media (min-width: 1024px) {
+  .navbar {
+    gap: var(--space-md);
+  }
+}

@@ -1,15 +1,27 @@
+import type { AuthenticatedUser } from '$lib/types/auth';
+
 declare global {
   namespace App {
     interface Error {
       message: string;
     }
 
-    // SvelteKit define these extension points; this scaffold does not add application fields yet.
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface Locals {}
+    interface Locals {
+      user?: AuthenticatedUser;
+      roles: string[];
+      permissions: string[];
+      mfa?: {
+        enabled?: boolean;
+        required?: boolean;
+        verified?: boolean;
+        [key: string]: unknown;
+      };
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface PageData {}
+    interface PageData {
+      user?: AuthenticatedUser;
+      permissions?: string[];
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface PageState {}
