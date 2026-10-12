@@ -1,13 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 
 import { createMenuClient, MenuApiError } from './menu';
+
+const adminOrigin = env.ORIGIN || 'http://admin.test';
 
 function eventFor(response: Response): { event: RequestEvent; fetch: ReturnType<typeof vi.fn> } {
   const fetch = vi.fn(async () => response);
   const event = {
-    url: new URL('http://admin.test/productos'),
-    request: new Request('http://admin.test/productos', { headers: { cookie: 'session=abc' } }),
+    url: new URL(`${adminOrigin}/productos`),
+    request: new Request(`${adminOrigin}/productos`, { headers: { cookie: 'session=abc' } }),
     cookies: { getAll: () => [{ name: 'session', value: 'abc' }] },
     fetch,
   } as unknown as RequestEvent;
@@ -38,7 +41,7 @@ describe('cliente server-side del menú', () => {
     expect(url).toContain('locationId=location-1');
     expect(url).toContain('search=caf%C3%A9');
     expect((init.headers as Headers).get('cookie')).toBe('session=abc');
-    expect((init.headers as Headers).get('origin')).toBe('http://admin.test');
+    expect((init.headers as Headers).get('origin')).toBe(adminOrigin);
   });
 
   it('envía JSON al crear una categoría', async () => {

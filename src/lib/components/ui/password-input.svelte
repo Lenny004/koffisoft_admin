@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Eye, EyeOff } from '@lucide/svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
 
   let {
     id,
@@ -17,7 +18,7 @@
     name: string;
     value?: string;
     placeholder?: string;
-    autocomplete?: string;
+    autocomplete?: HTMLInputAttributes['autocomplete'];
     minlength?: number;
     maxlength?: number;
     required?: boolean;
@@ -26,11 +27,7 @@
   } = $props();
 
   let visible = $state(false);
-  let current = $state(value);
-
-  $effect(() => {
-    current = value;
-  });
+  let current = $derived(value);
 </script>
 
 <div class="login-card__password">

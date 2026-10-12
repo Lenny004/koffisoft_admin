@@ -284,7 +284,10 @@
                     }}
                   >
                     <input type="hidden" name="id" value={row.original.id} />
-                    <Button variant="ghost" size="icon" aria-label={`Desactivar ${row.original.name}`}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Desactivar ${row.original.name}`}
                       ><Trash2 class="size-4 text-destructive" aria-hidden="true" /></Button
                     >
                   </form>
@@ -349,7 +352,6 @@
       >
     </Dialog.Header>
     <form class="products__form" method="POST" action="?/save">
-
       {#if editingProduct}<input type="hidden" name="id" value={editingProduct.id} />{/if}
       <div class="products__form-grid">
         <FormField

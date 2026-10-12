@@ -7,6 +7,7 @@
     ChartNoAxesCombined,
     LayoutDashboard,
     LogOut,
+    Megaphone,
     Tags,
     Truck,
     UserRoundCog,
@@ -42,6 +43,7 @@
     users: Users,
     'chart-no-axes-combined': ChartNoAxesCombined,
     'user-round-cog': UserRoundCog,
+    megaphone: Megaphone,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 
   const items = $derived(filterNavigation(permissions));

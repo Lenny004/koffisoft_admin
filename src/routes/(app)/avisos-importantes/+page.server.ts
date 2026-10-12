@@ -34,7 +34,16 @@ function announcementForm(formData: FormData) {
   };
 }
 
-function apiPayload(data: ReturnType<typeof announcementForm>) {
+function apiPayload(data: {
+  title: string;
+  message: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  startsAt?: string;
+  endsAt?: string;
+  displayOrder: number;
+  active: boolean;
+}) {
   return {
     title: data.title,
     message: data.message,

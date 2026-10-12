@@ -167,7 +167,9 @@
                 autocomplete="new-password"
                 required
                 invalid={Boolean(fieldError('confirmPassword'))}
-                describedBy={fieldError('confirmPassword') ? 'setup-confirm-password-error' : undefined}
+                describedBy={fieldError('confirmPassword')
+                  ? 'setup-confirm-password-error'
+                  : undefined}
               />
             </FormField>
           </div>
