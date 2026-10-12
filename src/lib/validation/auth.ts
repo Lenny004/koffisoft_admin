@@ -57,6 +57,36 @@ export const changePasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const initialSetupSchema = z
+  .object({
+    firstName: z
+      .string()
+      .trim()
+      .min(1, 'Escribe el nombre.')
+      .max(FORM_LIMITS.auth.personNameMaxLength, 'El nombre no puede superar 80 caracteres.'),
+    lastName: z
+      .string()
+      .trim()
+      .min(1, 'Escribe el apellido.')
+      .max(FORM_LIMITS.auth.personNameMaxLength, 'El apellido no puede superar 80 caracteres.'),
+    email: z
+      .string()
+      .trim()
+      .email('Escribe un correo electrónico válido.')
+      .max(FORM_LIMITS.auth.emailMaxLength, 'El correo no puede superar 200 caracteres.'),
+    password: z
+      .string()
+      .min(FORM_LIMITS.auth.passwordMinLength, 'La contraseña debe tener al menos 12 caracteres.')
+      .max(FORM_LIMITS.auth.passwordMaxLength, 'La contraseña no puede superar 128 caracteres.'),
+    confirmPassword: z
+      .string()
+      .max(FORM_LIMITS.auth.passwordMaxLength, 'La contraseña no puede superar 128 caracteres.'),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: 'Las contraseñas no coinciden.',
+    path: ['confirmPassword'],
+  });
+
 export const mfaSetupSchema = z.object({
   label: z
     .string()

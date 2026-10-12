@@ -6,12 +6,32 @@ export interface ApiRequestOptions extends RequestInit {
   json?: unknown;
 }
 
+export class ApiNotConfiguredError extends Error {
+  constructor() {
+    super('El panel no tiene configurada la API. Sin API_BASE_URL no es posible iniciar sesión.');
+    this.name = 'ApiNotConfiguredError';
+  }
+}
+
+/** Los fallos de formulario solo aceptan 4xx o 5xx; una redirección no es un error de la API. */
+export function actionErrorStatus(status: number): number {
+  return status >= 400 && status <= 599 ? status : 502;
+}
+
+export function connectionErrorMessage(error: unknown): string {
+  if (error instanceof ApiNotConfiguredError) return error.message;
+  return 'No fue posible conectar con la API de autenticación.';
+}
+
 export async function apiRequest(
   event: RequestEvent,
   path: string,
   apiBaseUrl: string,
   options: ApiRequestOptions = {},
 ): Promise<Response> {
+  const baseUrl = apiBaseUrl.replace(/\/$/u, '');
+  if (!baseUrl) throw new ApiNotConfiguredError();
+
   const headers = new Headers(options.headers);
   headers.set('accept', 'application/json');
 
@@ -33,7 +53,7 @@ export async function apiRequest(
 
   const requestOptions = { ...options };
   delete requestOptions.json;
-  return event.fetch(`${apiBaseUrl.replace(/\/$/u, '')}${path}`, {
+  return event.fetch(`${baseUrl}${path}`, {
     ...requestOptions,
     body,
     headers,
@@ -43,13 +63,22 @@ export async function apiRequest(
 export async function apiErrorMessage(response: Response): Promise<string> {
   try {
     const payload = (await response.json()) as { message?: string | string[] };
-    if (Array.isArray(payload.message)) return payload.message.join(' ');
-    if (payload.message) return payload.message;
+    if (Array.isArray(payload.message) && payload.message.length) return payload.message.join(' ');
+    if (typeof payload.message === 'string' && payload.message.trim()) return payload.message;
   } catch {
-    // El cuerpo puede estar vacío en respuestas de error del proxy.
+    // El cuerpo puede estar vacío cuando la respuesta es una redirección o HTML.
   }
 
-  return `La API respondió con el estado ${response.status}.`;
+  if (response.status >= 300 && response.status < 400) {
+    return 'La solicitud no llegó a la API. Revisa que API_BASE_URL apunte a koffisoft_api y no al propio panel.';
+  }
+  if (response.status === 401) return 'El correo o la contraseña no son correctos.';
+  if (response.status === 403) return 'No tienes permiso para continuar.';
+  if (response.status === 429)
+    return 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
+  if (response.status >= 500)
+    return 'El servicio de autenticación no está disponible en este momento.';
+  return 'No se pudo completar la solicitud. Inténtalo de nuevo.';
 }
 
 export async function readJson<T>(response: Response): Promise<T | null> {

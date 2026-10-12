@@ -4,20 +4,24 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 import {
+  actionErrorStatus,
   apiErrorMessage,
   apiRequest,
   clearSessionCookie,
+  connectionErrorMessage,
   forwardSessionCookies,
   readJson,
 } from '$lib/server/api';
 import { needsPasswordChange, type AuthenticatedUser } from '$lib/types/auth';
 import {
   changePasswordSchema,
+  initialSetupSchema,
   loginSchema,
   mfaSetupSchema,
   recoveryCodeSchema,
   totpSchema,
 } from '$lib/validation/auth';
+import { formValues } from '$lib/validation/errors';
 import { validationErrors } from '$lib/validation/errors';
 
 /** Form actions del acceso: validan en servidor, llaman a auth y trasladan solo cookies seguras. */
@@ -57,9 +61,84 @@ async function authenticatedStep(event: RequestEvent): Promise<'password' | unde
     : undefined;
 }
 
-export const load: PageServerLoad = () => ({});
+export const load: PageServerLoad = async (event) => {
+  let setupRequired = false;
+  if (env.API_BASE_URL) {
+    try {
+      const response = await apiRequest(event, '/auth/setup', env.API_BASE_URL);
+      if (response.ok) {
+        const payload = await readJson<{ required?: boolean }>(response);
+        setupRequired = payload?.required === true;
+      }
+    } catch {
+      setupRequired = false;
+    }
+  }
+
+  return {
+    setupRequired,
+    showForgot: event.url.searchParams.get('recuperar') === '1',
+  };
+};
 
 export const actions: Actions = {
+  bootstrap: async (event) => {
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const result = initialSetupSchema.safeParse({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    });
+    const safeValues = formValues(submitted);
+
+    if (!result.success) {
+      return fail(400, {
+        action: 'bootstrap',
+        step: 'bootstrap' as const,
+        errors: validationErrors(result.error),
+        values: safeValues,
+      });
+    }
+
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/setup', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: {
+          firstName: result.data.firstName,
+          lastName: result.data.lastName,
+          email: result.data.email,
+          password: result.data.password,
+        },
+      });
+      forwardSessionCookies(event, response, secureCookie(event));
+    } catch (error) {
+      return fail(502, {
+        action: 'bootstrap',
+        step: 'bootstrap' as const,
+        errors: [connectionErrorMessage(error)],
+        values: safeValues,
+      });
+    }
+
+    if (!response.ok) {
+      return fail(actionErrorStatus(response.status), {
+        action: 'bootstrap',
+        step: 'bootstrap' as const,
+        errors: [await apiErrorMessage(response)],
+        values: safeValues,
+      });
+    }
+
+    const payload = (await readJson<LoginResponse>(response)) ?? {};
+    if (payload.requiresMfa) return { action: 'bootstrap', step: 'totp' as const };
+    if (payload.requiresMfaSetup) return { action: 'bootstrap', step: 'setup' as const };
+    redirect(303, returnTo(event));
+  },
+
   login: async (event) => {
     const values = Object.fromEntries(await event.request.formData());
     const result = loginSchema.safeParse({
@@ -82,16 +161,16 @@ export const actions: Actions = {
         json: result.data,
       });
       forwardSessionCookies(event, response, secureCookie(event));
-    } catch {
+    } catch (error) {
       return fail(502, {
         action: 'login',
-        errors: ['No fue posible conectar con la API de autenticación.'],
+        errors: [connectionErrorMessage(error)],
         email: result.data.email,
       });
     }
 
     if (!response.ok) {
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'login',
         errors: [await apiErrorMessage(response)],
         email: result.data.email,
@@ -124,7 +203,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'verifyMfa',
         step: 'totp' as const,
         errors: [await apiErrorMessage(response)],
@@ -150,7 +229,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'recoverMfa',
         step: 'recovery' as const,
         errors: [await apiErrorMessage(response)],
@@ -174,7 +253,7 @@ export const actions: Actions = {
       json: label ? { label } : {},
     });
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'setupMfa',
         step: 'setup' as const,
         errors: [await apiErrorMessage(response)],
@@ -206,7 +285,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'confirmMfa',
         step: 'confirm' as const,
         errors: [await apiErrorMessage(response)],
@@ -236,7 +315,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'changePassword',
         step: 'password' as const,
         errors: [await apiErrorMessage(response)],
@@ -255,7 +334,7 @@ export const actions: Actions = {
     } catch {
       // El logout local también debe limpiar la copia aunque la API no responda.
     }
-    clearSessionCookie(event, env.SESSION_COOKIE_NAME ?? 'session');
+    clearSessionCookie(event, env.SESSION_COOKIE_NAME ?? 'koffisoft_session');
     redirect(303, '/');
   },
 };

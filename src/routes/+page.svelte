@@ -2,9 +2,11 @@
   import { resolve } from '$app/paths';
   import { Button } from '$lib/components/ui/button/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import PasswordInput from '$lib/components/ui/password-input.svelte';
   import { FORM_LIMITS } from '$lib/validation/limits';
 
-  type LoginStep = 'login' | 'totp' | 'setup' | 'confirm' | 'recovery' | 'password';
+  type LoginStep =
+    'bootstrap' | 'login' | 'forgot' | 'totp' | 'setup' | 'confirm' | 'recovery' | 'password';
   interface LoginForm {
     step?: LoginStep;
     errors?: Record<string, string> | string[];
@@ -14,8 +16,13 @@
     recoveryCodes?: string[];
   }
 
-  let { form }: { form?: LoginForm | null } = $props();
-  const step = $derived(form?.step ?? 'login');
+  let {
+    data,
+    form,
+  }: { data: { setupRequired: boolean; showForgot: boolean }; form?: LoginForm | null } = $props();
+  const step = $derived<LoginStep>(
+    form?.step ?? (data.setupRequired ? 'bootstrap' : data.showForgot ? 'forgot' : 'login'),
+  );
 
   function fieldError(name: string): string {
     return form?.errors && !Array.isArray(form.errors) ? (form.errors[name] ?? '') : '';
@@ -32,7 +39,13 @@
 </script>
 
 <svelte:head>
-  <title>Koffi-Soft | Iniciar sesión</title>
+  <title>
+    Koffi-Soft | {step === 'bootstrap'
+      ? 'Primer uso'
+      : step === 'forgot'
+        ? 'Contraseña'
+        : 'Iniciar sesión'}
+  </title>
   <meta name="description" content="Acceso seguro al panel privado de Koffi-Soft." />
 </svelte:head>
 
@@ -48,16 +61,141 @@
     <div class="login-card__content">
       <img class="login-card__brand" src="/brand/logo-primary.png" alt="Koffi-Soft" />
 
-      {#if step === 'login'}
+      {#if step === 'bootstrap'}
+        <p class="login-card__eyebrow">Primer uso</p>
+        <h1 class="login-card__title" id="login-title">Configura el propietario</h1>
+        <p class="login-card__description">
+          Esta cuenta se crea una sola vez. Después el panel solo muestra el inicio de sesión.
+        </p>
+        <form class="login-card__form" method="POST" action="?/bootstrap" autocomplete="on">
+          <div class="login-card__fields">
+            <FormField
+              id="setup-first-name"
+              label="Nombre"
+              required
+              class="login-card__field"
+              error={fieldError('firstName')}
+            >
+              <input
+                class="login-card__input"
+                id="setup-first-name"
+                name="firstName"
+                value={formValue('firstName')}
+                maxlength={FORM_LIMITS.auth.personNameMaxLength}
+                placeholder="Ej. Ana"
+                autocomplete="given-name"
+                required
+                aria-invalid={Boolean(fieldError('firstName'))}
+                aria-describedby={fieldError('firstName') ? 'setup-first-name-error' : undefined}
+              />
+            </FormField>
+            <FormField
+              id="setup-last-name"
+              label="Apellido"
+              required
+              class="login-card__field"
+              error={fieldError('lastName')}
+            >
+              <input
+                class="login-card__input"
+                id="setup-last-name"
+                name="lastName"
+                value={formValue('lastName')}
+                maxlength={FORM_LIMITS.auth.personNameMaxLength}
+                placeholder="Ej. López"
+                autocomplete="family-name"
+                required
+                aria-invalid={Boolean(fieldError('lastName'))}
+                aria-describedby={fieldError('lastName') ? 'setup-last-name-error' : undefined}
+              />
+            </FormField>
+            <FormField
+              id="setup-email"
+              label="Correo electrónico"
+              required
+              class="login-card__field"
+              error={fieldError('email')}
+            >
+              <input
+                class="login-card__input"
+                id="setup-email"
+                name="email"
+                type="email"
+                value={formValue('email')}
+                placeholder="Ej. ana@koffisoft.com"
+                maxlength={FORM_LIMITS.auth.emailMaxLength}
+                autocomplete="username"
+                required
+                aria-invalid={Boolean(fieldError('email'))}
+                aria-describedby={fieldError('email') ? 'setup-email-error' : undefined}
+              />
+            </FormField>
+            <FormField
+              id="setup-password"
+              label="Contraseña"
+              required
+              class="login-card__field"
+              error={fieldError('password')}
+            >
+              <PasswordInput
+                id="setup-password"
+                name="password"
+                value={formValue('password')}
+                minlength={FORM_LIMITS.auth.passwordMinLength}
+                maxlength={FORM_LIMITS.auth.passwordMaxLength}
+                placeholder="Mínimo 12 caracteres"
+                autocomplete="new-password"
+                required
+                invalid={Boolean(fieldError('password'))}
+                describedBy={fieldError('password') ? 'setup-password-error' : undefined}
+              />
+            </FormField>
+            <FormField
+              id="setup-confirm-password"
+              label="Confirma la contraseña"
+              required
+              class="login-card__field"
+              error={fieldError('confirmPassword')}
+            >
+              <PasswordInput
+                id="setup-confirm-password"
+                name="confirmPassword"
+                value={formValue('confirmPassword')}
+                minlength={FORM_LIMITS.auth.passwordMinLength}
+                maxlength={FORM_LIMITS.auth.passwordMaxLength}
+                placeholder="Repite la contraseña"
+                autocomplete="new-password"
+                required
+                invalid={Boolean(fieldError('confirmPassword'))}
+                describedBy={fieldError('confirmPassword')
+                  ? 'setup-confirm-password-error'
+                  : undefined}
+              />
+            </FormField>
+          </div>
+          {#if globalErrors().length}<div class="login-card__error" role="alert">
+              {#each globalErrors() as message (message)}<p>{message}</p>{/each}
+            </div>{/if}
+          <Button class="login-card__submit" type="submit">Crear propietario</Button>
+        </form>
+      {:else if step === 'forgot'}
+        <p class="login-card__eyebrow">Acceso</p>
+        <h1 class="login-card__title" id="login-title">Olvidé mi contraseña</h1>
+        <p class="login-card__description">
+          El panel todavía no envía correos de restablecimiento. Un propietario con sesión debe
+          cambiar el acceso. Los códigos de recuperación sirven para el segundo factor, después de
+          escribir la contraseña.
+        </p>
+        <div class="login-card__actions">
+          <a class="login-card__secondary" href={resolve('/')}>Volver al inicio de sesión</a>
+        </div>
+      {:else if step === 'login'}
         <p class="login-card__eyebrow">Panel privado</p>
         <h1 class="login-card__title" id="login-title">Iniciar sesión</h1>
         <p class="login-card__description">
           Administra el catálogo y la operación diaria de Koffi-Soft.
         </p>
         <form class="login-card__form" method="POST" action="?/login" autocomplete="on">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <div class="login-card__fields">
             <FormField
               id="login-email"
@@ -87,18 +225,17 @@
               class="login-card__field"
               error={fieldError('password')}
             >
-              <input
-                class="login-card__input"
+              <PasswordInput
                 id="login-password"
                 name="password"
-                type="password"
+                value={formValue('password')}
                 minlength={FORM_LIMITS.auth.passwordMinLength}
                 maxlength={FORM_LIMITS.auth.passwordMaxLength}
                 placeholder="Escribe tu contraseña"
                 autocomplete="current-password"
                 required
-                aria-invalid={Boolean(fieldError('password'))}
-                aria-describedby={fieldError('password') ? 'login-password-error' : undefined}
+                invalid={Boolean(fieldError('password'))}
+                describedBy={fieldError('password') ? 'login-password-error' : undefined}
               />
             </FormField>
           </div>
@@ -107,6 +244,11 @@
             </div>{/if}
           <Button class="login-card__submit" type="submit">Continuar</Button>
         </form>
+        <form class="login-card__actions" method="GET" action={resolve('/')}>
+          <input type="hidden" name="recuperar" value="1" />
+          <Button class="login-card__link" variant="link" type="submit">Olvidé mi contraseña</Button
+          >
+        </form>
       {:else if step === 'totp'}
         <p class="login-card__eyebrow">Segundo factor</p>
         <h1 class="login-card__title" id="login-title">Verifica tu acceso</h1>
@@ -114,9 +256,6 @@
           Escribe el código de seis dígitos de tu aplicación autenticadora.
         </p>
         <form class="login-card__form" method="POST" action="?/verifyMfa">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <FormField
             id="totp-code"
             label="Código TOTP"
@@ -146,9 +285,6 @@
           <Button class="login-card__submit" type="submit">Verificar código</Button>
         </form>
         <form class="login-card__actions" method="POST" action="?/recoverMfa">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <FormField
             id="recovery-code"
             label="¿No tienes tu aplicación?"
@@ -216,9 +352,6 @@
         </p>
         <div class="login-card__notice" role="status">{form?.uri}</div>
         <form class="login-card__form" method="POST" action="?/confirmMfa">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <input type="hidden" name="uri" value={form?.uri ?? ''} />
           <FormField
             id="confirm-code"
@@ -267,9 +400,6 @@
           La API indicó que necesitas cambiar tu contraseña antes de continuar.
         </p>
         <form class="login-card__form" method="POST" action="?/changePassword">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <FormField
             id="current-password"
             label="Contraseña actual"

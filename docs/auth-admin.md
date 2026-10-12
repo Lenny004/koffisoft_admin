@@ -4,12 +4,14 @@ El panel usa SvelteKit como BFF server-side frente a `koffisoft_api`. La impleme
 
 ## Flujo
 
-1. `/` muestra el login. La form action `login` valida email y contraseña con Zod y llama a `POST /auth/login`.
-2. La respuesta se procesa en el servidor. Su `Set-Cookie` se copia a la respuesta de SvelteKit como cookie HttpOnly, `Path=/` y `SameSite=Lax`; el token nunca se serializa al cliente.
-3. Si la API devuelve `requiresMfa`, la action `verifyMfa` llama a `POST /auth/mfa/verify`. También se ofrece `POST /auth/mfa/recovery` para un código de recuperación.
-4. Si devuelve `requiresMfaSetup`, las actions `setupMfa` y `confirmMfa` usan `POST /auth/mfa/totp/setup` y `POST /auth/mfa/totp/confirm`. Los códigos de recuperación solo se muestran en esa respuesta.
-5. Si la respuesta o `/auth/me` indica `mustChangePassword`/`passwordChangeRequired`, se muestra el cambio obligatorio y se llama a `POST /auth/password`.
-6. `logout` llama a `POST /auth/logout`, reenvía la limpieza de cookie y elimina la copia local del nombre configurado.
+1. `/` consulta `GET /auth/setup`. Si `required` es verdadero, muestra el alta del propietario y la action `bootstrap` llama a `POST /auth/setup`. La API solo acepta esa alta una vez. Si ya se completó, `/` muestra el login.
+2. El enlace «Olvidé mi contraseña» abre `/?recuperar=1`. No restablece la clave: el correo de recuperación aún no existe.
+3. La form action `login` valida email y contraseña con Zod y llama a `POST /auth/login`.
+4. La respuesta se procesa en el servidor. Su `Set-Cookie` se copia a la respuesta de SvelteKit como cookie HttpOnly, `Path=/` y `SameSite=Lax`; el token nunca se serializa al cliente.
+5. Si la API devuelve `requiresMfa`, la action `verifyMfa` llama a `POST /auth/mfa/verify`. También se ofrece `POST /auth/mfa/recovery` para un código de recuperación.
+6. Si devuelve `requiresMfaSetup`, las actions `setupMfa` y `confirmMfa` usan `POST /auth/mfa/totp/setup` y `POST /auth/mfa/totp/confirm`. Los códigos de recuperación solo se muestran en esa respuesta.
+7. Si la respuesta o `/auth/me` indica `mustChangePassword`/`passwordChangeRequired`, se muestra el cambio obligatorio y se llama a `POST /auth/password`.
+8. `logout` llama a `POST /auth/logout`, reenvía la limpieza de cookie y elimina la copia local del nombre configurado.
 
 ## Hook y permisos
 

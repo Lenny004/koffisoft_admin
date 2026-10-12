@@ -8,7 +8,7 @@ El panel conserva la composición del privado legacy —sidebar, topbar, tarjeta
 
 ## Tipografía e iconografía
 
-`Fraunces Variable` se usa en encabezados y `Manrope Variable` en controles y texto corrido. Ambas familias llegan desde `@fontsource-variable/*`, con `font-display` gestionado por los paquetes. Las acciones y la navegación usan `@lucide/svelte`; no se agregan iconos PNG del legacy.
+`Helvetica Neue Light` se usa en encabezados, controles y texto corrido. El archivo está en `static/fonts/helvetica-neue-light.ttf` y se declara con `@font-face` en `src/app.css`. Las acciones y la navegación usan `@lucide/svelte`; no se agregan iconos PNG del legacy.
 
 La base tipográfica continúa en `16px`. Los tamaños, espacios, radios y capas se expresan en `rem` mediante tokens.
 

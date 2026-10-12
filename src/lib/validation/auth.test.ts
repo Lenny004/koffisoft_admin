@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { changePasswordSchema, loginSchema, mfaSetupSchema, totpSchema } from './auth';
+import {
+  changePasswordSchema,
+  initialSetupSchema,
+  loginSchema,
+  mfaSetupSchema,
+  totpSchema,
+} from './auth';
 
 describe('validación de autenticación', () => {
   it('acepta correo y contraseña con el contrato mínimo de la API', () => {
@@ -21,6 +27,27 @@ describe('validación de autenticación', () => {
       }).success,
     ).toBe(false);
     expect(mfaSetupSchema.safeParse({ label: 'a'.repeat(101) }).success).toBe(false);
+  });
+
+  it('exige que el alta inicial confirme la misma contraseña', () => {
+    expect(
+      initialSetupSchema.safeParse({
+        firstName: 'Ana',
+        lastName: 'López',
+        email: 'ana@example.com',
+        password: 'a-secure-password',
+        confirmPassword: 'a-secure-password',
+      }).success,
+    ).toBe(true);
+    expect(
+      initialSetupSchema.safeParse({
+        firstName: 'Ana',
+        lastName: 'López',
+        email: 'ana@example.com',
+        password: 'a-secure-password',
+        confirmPassword: 'otra-clave-distinta',
+      }).success,
+    ).toBe(false);
   });
 
   it('exige confirmar la nueva contraseña', () => {

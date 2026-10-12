@@ -495,7 +495,7 @@ export const actions: Actions = {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
         action: 'deleteRequirement',
-        errors: ['No tienes permiso para eliminar requisitos.'],
+        errors: ['No tienes permiso para desactivar requisitos.'],
       });
     const id = formText((await event.request.formData()).get('id'));
     if (!id)
@@ -504,7 +504,7 @@ export const actions: Actions = {
       await createEventsClient(event, env.API_BASE_URL ?? '').deleteRequirement(id);
       return { success: true };
     } catch (error) {
-      const response = actionError(error, 'No se pudo eliminar el requisito.');
+      const response = actionError(error, 'No se pudo desactivar el requisito.');
       return fail(response.status, { action: 'deleteRequirement', errors: response.errors });
     }
   },

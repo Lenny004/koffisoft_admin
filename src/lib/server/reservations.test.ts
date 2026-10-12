@@ -1,13 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 
 import { createReservationsClient, ReservationsApiError } from './reservations';
+
+const adminOrigin = env.ORIGIN || 'http://admin.test';
 
 function eventFor(response: Response): { event: RequestEvent; fetch: ReturnType<typeof vi.fn> } {
   const fetch = vi.fn(async () => response);
   const event = {
-    url: new URL('http://admin.test/reservaciones'),
-    request: new Request('http://admin.test/reservaciones', {
+    url: new URL(`${adminOrigin}/reservaciones`),
+    request: new Request(`${adminOrigin}/reservaciones`, {
       headers: { cookie: 'session=abc' },
     }),
     cookies: { getAll: () => [{ name: 'session', value: 'abc' }] },
@@ -41,7 +44,7 @@ describe('cliente server-side de reservaciones', () => {
     expect(url).toContain('dateFrom=2026-10-10');
     expect(url).toContain('status=Confirmed');
     expect((init.headers as Headers).get('cookie')).toBe('session=abc');
-    expect((init.headers as Headers).get('origin')).toBe('http://admin.test');
+    expect((init.headers as Headers).get('origin')).toBe(adminOrigin);
   });
 
   it('envía la reasignación de mesas con PUT', async () => {
@@ -76,8 +79,8 @@ describe('cliente server-side de reservaciones', () => {
         tableIds: [],
       }),
     );
-    expect((init.headers as Headers).get('origin')).toBe('http://admin.test');
-    expect((init.headers as Headers).get('referer')).toBe('http://admin.test/reservaciones');
+    expect((init.headers as Headers).get('origin')).toBe(adminOrigin);
+    expect((init.headers as Headers).get('referer')).toBe(`${adminOrigin}/reservaciones`);
   });
 
   it('expone los errores HTTP como ReservationsApiError', async () => {

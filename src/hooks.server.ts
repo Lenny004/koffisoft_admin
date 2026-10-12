@@ -5,5 +5,5 @@ import { createAuthHandle } from '$lib/server/auth-hook';
 export const handle = createAuthHandle({
   apiBaseUrl: env.API_BASE_URL ?? '',
   origin: env.ORIGIN,
-  sessionCookieName: env.SESSION_COOKIE_NAME ?? 'session',
+  sessionCookieName: env.SESSION_COOKIE_NAME ?? 'koffisoft_session',
 });

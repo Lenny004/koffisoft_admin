@@ -73,7 +73,7 @@ async function loadSnapshot(
 
 export function createAuthHandle(options: AuthHookOptions): Handle {
   return async ({ event, resolve }) => {
-    const cookieName = options.sessionCookieName || 'session';
+    const cookieName = options.sessionCookieName || 'koffisoft_session';
     const hasSessionCookie = Boolean(
       event.cookies.get(cookieName) || event.cookies.get(`__Host-${cookieName}`),
     );
