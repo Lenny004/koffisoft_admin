@@ -1,10 +1,9 @@
 <script lang="ts">
-  import UnderConstruction from '$lib/components/admin/under-construction.svelte';
+  import type { PageProps } from './$types';
+  import UserDirectory from '$lib/components/admin/user-directory.svelte';
+
+  let { data, form }: PageProps = $props();
 </script>
 
 <svelte:head><title>Usuarios | Koffi-Soft Admin</title></svelte:head>
-<UnderConstruction
-  title="Usuarios"
-  permission="users.read"
-  description="El módulo queda visible para cuentas con users.read; sus mutaciones esperarán el contrato administrativo de usuarios."
-/>
+<UserDirectory {data} {form} />

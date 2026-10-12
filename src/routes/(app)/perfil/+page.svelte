@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { PageProps } from './$types';
-  import { displayUserName } from '$lib/types/auth';
+  import { Alert } from '$lib/components/ui/alert/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import { displayUserName, needsPasswordChange } from '$lib/types/auth';
   import { FORM_LIMITS } from '$lib/validation/limits';
 
   interface ProfileForm {
@@ -40,6 +41,14 @@
       </p>
     </div>
   </header>
+
+  {#if needsPasswordChange(data.user)}
+    <Alert variant="warning">
+      <p>
+        Tu cuenta requiere cambiar la contraseña antes de continuar con el resto de operaciones.
+      </p>
+    </Alert>
+  {/if}
 
   <article class="profile-page__card">
     <h3>Cambiar contraseña</h3>

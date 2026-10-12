@@ -64,6 +64,18 @@ export const FORM_LIMITS = {
     ctaLabelMaxLength: 80,
     ctaUrlMaxLength: 500,
   },
+  user: {
+    searchMaxLength: 200, // UserListQueryDto.search @MaxLength(200).
+    usernameMinLength: 3, // CreateUserDto/UpdateUserDto @MinLength(3).
+    usernameMaxLength: 100, // User.username @db.VarChar(100), DTO @MaxLength(100).
+    emailMaxLength: 200, // User.email @db.VarChar(200), DTO @MaxLength(200).
+    roleCodeMaxLength: 40, // UserListQueryDto.role @Matches(...{0,39}).
+    employeeCodeMaxLength: 30, // Employee.employee_code @db.VarChar(30), DTO @MaxLength(30).
+    employeeNameMaxLength: 80, // Employee.first_name/last_name @db.VarChar(80).
+    phoneMaxLength: 40, // Employee.phone @db.VarChar(40).
+    passwordMinLength: 12, // CreateUserDto.password @MinLength(12).
+    passwordMaxLength: 128, // CreateUserDto.password @MaxLength(128).
+  },
   menu: {
     categorySlugMaxLength: 120, // MenuCategory.slug @db.VarChar(120), DTO @MaxLength(120).
     categoryNameMaxLength: 120, // MenuCategory.name_* @db.VarChar(120), DTO @MaxLength(120).
@@ -98,6 +110,8 @@ export const FORM_LIMITS = {
 export const FORM_PATTERNS = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/u,
   slug: /^[a-z0-9-]+$/u,
+  username: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u,
+  roleCode: /^[a-z][a-z0-9_.-]{0,39}$/u,
   decimal2: /^\d+(\.\d{1,2})?$/u,
   decimal6: /^\d+(\.\d{1,6})?$/u,
   time: /^([01]\d|2[0-3]):[0-5]\d$/u,
