@@ -2,7 +2,12 @@ import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-import { apiErrorMessage, apiRequest, forwardSessionCookies } from '$lib/server/api';
+import {
+  actionErrorStatus,
+  apiErrorMessage,
+  apiRequest,
+  forwardSessionCookies,
+} from '$lib/server/api';
 import { changePasswordSchema } from '$lib/validation/auth';
 import { formValues, validationErrors } from '$lib/validation/errors';
 
@@ -25,7 +30,10 @@ export const actions: Actions = {
       response,
       event.url.protocol === 'https:' || env.COOKIE_SECURE === 'true',
     );
-    if (!response.ok) return fail(response.status, { errors: [await apiErrorMessage(response)] });
+    if (!response.ok)
+      return fail(actionErrorStatus(response.status), {
+        errors: [await apiErrorMessage(response)],
+      });
     return { success: true };
   },
 };

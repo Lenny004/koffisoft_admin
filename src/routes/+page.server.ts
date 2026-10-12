@@ -4,9 +4,11 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 import {
+  actionErrorStatus,
   apiErrorMessage,
   apiRequest,
   clearSessionCookie,
+  connectionErrorMessage,
   forwardSessionCookies,
   readJson,
 } from '$lib/server/api';
@@ -113,17 +115,17 @@ export const actions: Actions = {
         },
       });
       forwardSessionCookies(event, response, secureCookie(event));
-    } catch {
+    } catch (error) {
       return fail(502, {
         action: 'bootstrap',
         step: 'bootstrap' as const,
-        errors: ['No fue posible conectar con la API de autenticación.'],
+        errors: [connectionErrorMessage(error)],
         values: safeValues,
       });
     }
 
     if (!response.ok) {
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'bootstrap',
         step: 'bootstrap' as const,
         errors: [await apiErrorMessage(response)],
@@ -159,16 +161,16 @@ export const actions: Actions = {
         json: result.data,
       });
       forwardSessionCookies(event, response, secureCookie(event));
-    } catch {
+    } catch (error) {
       return fail(502, {
         action: 'login',
-        errors: ['No fue posible conectar con la API de autenticación.'],
+        errors: [connectionErrorMessage(error)],
         email: result.data.email,
       });
     }
 
     if (!response.ok) {
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'login',
         errors: [await apiErrorMessage(response)],
         email: result.data.email,
@@ -201,7 +203,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'verifyMfa',
         step: 'totp' as const,
         errors: [await apiErrorMessage(response)],
@@ -227,7 +229,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'recoverMfa',
         step: 'recovery' as const,
         errors: [await apiErrorMessage(response)],
@@ -251,7 +253,7 @@ export const actions: Actions = {
       json: label ? { label } : {},
     });
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'setupMfa',
         step: 'setup' as const,
         errors: [await apiErrorMessage(response)],
@@ -283,7 +285,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'confirmMfa',
         step: 'confirm' as const,
         errors: [await apiErrorMessage(response)],
@@ -313,7 +315,7 @@ export const actions: Actions = {
     });
     forwardSessionCookies(event, response, secureCookie(event));
     if (!response.ok)
-      return fail(response.status, {
+      return fail(actionErrorStatus(response.status), {
         action: 'changePassword',
         step: 'password' as const,
         errors: [await apiErrorMessage(response)],
@@ -332,7 +334,7 @@ export const actions: Actions = {
     } catch {
       // El logout local también debe limpiar la copia aunque la API no responda.
     }
-    clearSessionCookie(event, env.SESSION_COOKIE_NAME ?? 'session');
+    clearSessionCookie(event, env.SESSION_COOKIE_NAME ?? 'koffisoft_session');
     redirect(303, '/');
   },
 };

@@ -101,7 +101,7 @@ Abre la URL mostrada por Vite. `/` presenta el login; después de autenticarte, 
 | `ORIGIN`              | Origen del panel que debe coincidir con `CORS_ORIGIN` de la API. | `http://localhost:5174`                | Sí        |
 | `PUBLIC_SITE_URL`     | URL del sitio público enlazado desde el footer.                  | `http://localhost:5173`                | No        |
 | `DEFAULT_LOCATION_ID` | UUID de sede para cargar reservas y menú administrativo.         | `00000000-0000-0000-0000-000000000000` | No        |
-| `SESSION_COOKIE_NAME` | Nombre base de la cookie de sesión.                              | `session`                              | No        |
+| `SESSION_COOKIE_NAME` | Nombre base de la cookie de sesión. Debe coincidir con la API.   | `koffisoft_session`                    | No        |
 | `COOKIE_SECURE`       | Activa cookies Secure detrás de HTTPS.                           | `false`                                | No        |
 
 La sesión nunca se guarda en `localStorage`; la única preferencia local es el tema visual.
