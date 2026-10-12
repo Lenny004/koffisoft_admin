@@ -1,10 +1,16 @@
-@import url('@fontsource-variable/fraunces/wght.css');
-@import url('@fontsource-variable/manrope/wght.css');
 @import url('tailwindcss');
 @import url('tw-animate-css');
 @import url('./lib/styles/admin-shell.css');
 @import url('./lib/styles/admin-login.css');
 @import url('./lib/styles/admin-pages.css');
+
+@font-face {
+  font-family: 'Helvetica Neue Light';
+  src: url('/fonts/helvetica-neue-light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *, [data-theme='dark'] *));
 
@@ -96,14 +102,15 @@
   --status-danger: var(--state-danger);
 
   /* Escala base de 16px: todos los tamaños se expresan en rem. */
-  --font-family-base: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --font-family-display: 'Fraunces Variable', 'Fraunces', georgia, serif;
+  --font-family-base: 'Helvetica Neue Light', ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: var(--font-family-base);
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.5rem;
   --font-size-2xl: clamp(1.75rem, 4vw, 2.5rem);
+  --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -185,6 +192,7 @@
     color-scheme: light;
     font-family: var(--font-family-base);
     font-size: 1rem;
+    font-weight: var(--font-weight-light);
     text-size-adjust: 100%;
   }
 

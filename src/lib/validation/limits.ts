@@ -13,6 +13,7 @@ export const FORM_LIMITS = {
     recoveryCodeMinLength: 20, // RecoveryCodeDto @MinLength(20).
     recoveryCodeMaxLength: 32, // RecoveryCodeDto @MaxLength(32).
     mfaLabelMaxLength: 100, // UserMfaFactor.label @db.VarChar(100), MfaSetupDto @MaxLength(100).
+    personNameMaxLength: 80, // InitialSetupDto firstName/lastName @MaxLength(80), Employee @db.VarChar(80).
   },
   contact: {
     nameMaxLength: 200, // ContactMessage.name_snapshot @db.VarChar(200).
@@ -56,6 +57,12 @@ export const FORM_LIMITS = {
     taxRateMax: 1, // Decimal(7,6), SQL CHECK BETWEEN 0 AND 1.
     descriptionMaxLength: 10_000, // EventRequirement.description @db.Text, DTO @MaxLength(10_000).
     requirementGuestCountMin: 1, // event_requirements.guest_count CHECK (> 0), DTO @Min(1).
+  },
+  announcement: {
+    titleMaxLength: 160,
+    messageMaxLength: 10_000,
+    ctaLabelMaxLength: 80,
+    ctaUrlMaxLength: 500,
   },
   menu: {
     categorySlugMaxLength: 120, // MenuCategory.slug @db.VarChar(120), DTO @MaxLength(120).

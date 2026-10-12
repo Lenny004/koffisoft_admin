@@ -34,11 +34,12 @@
 ## 🌟 Aspectos destacados
 
 - **Shell responsive:** sidebar con permisos, offcanvas móvil, topbar, tema oscuro y enlace al sitio público.
-- **Autenticación server-side:** sesiones HttpOnly, TOTP, recuperación, cambio obligatorio de contraseña y defensa CSRF por origen.
+- **Autenticación server-side:** alta inicial de un solo uso, sesiones HttpOnly, TOTP, recuperación, cambio obligatorio de contraseña y defensa CSRF por origen.
 - **Catálogo conectado:** categorías y productos con form actions, permisos, paginación, búsqueda, validación Zod y cliente server-side para `/menu/admin`.
-- **Diseño compartido:** Fraunces + Manrope, Lucide y tokens café/crema/verde de `koffisoft_web`.
+- **Diseño compartido:** Helvetica Neue Light, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
 - **Reservaciones y eventos conectados:** agenda, creación interna, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
+- **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlace opcional para la landing pública.
 
 <!-- section:overview -->
 
@@ -115,13 +116,14 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 ├── src/lib/components/admin/     # Shell, login, tabla y placeholders
 ├── src/lib/config/               # Navegación y permisos
 ├── src/lib/fixtures/              # Datos de prueba claramente marcados
-├── src/lib/server/                # BFF de API, auth hook y cliente de menú
+├── src/lib/server/                # BFF de API, auth hook y clientes de menú y avisos
+├── src/lib/announcements/         # Tipos del CRUD de avisos importantes
 ├── src/lib/menu/                  # Tipos y mapeos del contrato administrativo
 ├── src/lib/styles/                # Bloques BEM del shell y pantallas
 ├── src/routes/(app)/              # Layout y rutas protegidas
 ├── src/routes/+page.server.ts    # Form actions de login y MFA
 ├── src/app.css                    # Tokens, tema, reset y fuentes
-├── static/                        # Assets de marca y fixtures visuales
+├── static/                        # Assets de marca, fixtures visuales y Helvetica Neue Light
 ├── tests/                         # Pruebas E2E de la pantalla pública
 ├── .env.example                   # Variables de entorno sin secretos
 └── package.json                   # Scripts y dependencias
@@ -158,12 +160,13 @@ Vitest cubre validación del login y menú, mapeos del catálogo, cliente server
 ## 🗺️ Hoja de ruta y estado
 
 - [x] Shell privado, tema, navegación por permisos y login server-side.
-- [x] Integración de sesión, TOTP y cambio de contraseña contra los endpoints documentados.
+- [x] Integración de sesión, TOTP, cambio de contraseña y alta inicial de un solo uso.
 - [x] Dashboard con reservas opcionales y fixtures de ventas marcados.
 - [x] CRUD administrativo de categorías y productos contra el contrato de menú.
 - [x] Gestión inicial de precios, alérgenos y disponibilidad por variante según permisos.
 - [x] Integración administrativa de reservaciones, espacios, mesas y agenda.
 - [x] Integración de eventos, bloqueos de espacios, paquetes, cotizaciones y requisitos.
+- [x] CRUD de avisos importantes conectado a la landing pública.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->

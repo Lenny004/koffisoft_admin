@@ -87,8 +87,68 @@
   background: var(--surface-panel);
 }
 
-.login-card__input:focus-visible {
+.login-card__input:hover,
+.login-card__input:focus-visible,
+.login-card__input:active {
+  border-width: 2px;
   border-color: var(--ring);
+  outline: 0 solid transparent;
+  outline-offset: 0;
+}
+
+.login-card__password {
+  display: flex;
+  align-items: center;
+  min-block-size: 3rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+}
+
+.login-card__password:hover,
+.login-card__password:focus-within,
+.login-card__password:active {
+  border-width: 2px;
+  border-color: var(--ring);
+}
+
+.login-card__input--reveal,
+.login-card__input--reveal:hover,
+.login-card__input--reveal:focus-visible,
+.login-card__input--reveal:active {
+  min-inline-size: 0;
+  min-block-size: 0;
+  align-self: stretch;
+  border-width: 0;
+  background: transparent;
+}
+
+.login-card__input--reveal::-ms-reveal {
+  display: none;
+}
+
+.login-card__reveal {
+  display: grid;
+  flex: 0 0 3rem;
+  align-self: stretch;
+  place-items: center;
+  inline-size: 3rem;
+  padding: 0;
+  color: var(--text-muted);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.login-card__reveal:hover,
+.login-card__reveal:focus-visible {
+  color: var(--foreground);
+}
+
+.login-card__reveal-icon {
+  inline-size: var(--icon-size-sm);
+  block-size: var(--icon-size-sm);
 }
 
 .login-card__error,
@@ -144,6 +204,24 @@
   display: grid;
   gap: var(--space-sm);
   margin-block-start: var(--space-md);
+}
+
+.login-card__link {
+  justify-self: end;
+  color: var(--primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-underline-offset: 0.2em;
+}
+
+.login-card__link:hover,
+.login-card__link:focus-visible {
+  text-decoration: underline;
+}
+
+.login-card__link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .login-card__recovery-codes {

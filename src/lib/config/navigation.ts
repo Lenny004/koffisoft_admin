@@ -9,7 +9,8 @@ export type NavigationIcon =
   | 'briefcase-business'
   | 'users'
   | 'chart-no-axes-combined'
-  | 'user-round-cog';
+  | 'user-round-cog'
+  | 'megaphone';
 
 export interface NavigationItem {
   label: string;
@@ -30,6 +31,12 @@ export const navigationItems: NavigationItem[] = [
     permission: 'reservations.read',
   },
   { label: 'Eventos', href: '/eventos', icon: 'calendar-days', permission: 'events.read' },
+  {
+    label: 'Avisos importantes',
+    href: '/avisos-importantes',
+    icon: 'megaphone',
+    permission: 'important_announcements.read',
+  },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
     label: 'Proveedores',

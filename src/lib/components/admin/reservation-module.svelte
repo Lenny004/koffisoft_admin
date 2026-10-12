@@ -255,9 +255,6 @@
       </div>
       {#if canManage}
         <form class="reservations__form" method="POST" action="?/createReservation">
-          <p class="form-legend">
-            <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
-          </p>
           <input type="hidden" name="locationId" value={data.locationId} />
           <input type="hidden" name="tableIds" value={JSON.stringify(createTableIds)} />
           <div class="reservations__form-grid">
