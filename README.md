@@ -42,6 +42,8 @@
 - **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlace opcional para la landing pública.
 - **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
 
+- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos y validación Zod.
+
 <!-- section:overview -->
 
 ## ℹ️ Descripción
@@ -127,6 +129,7 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 ├── static/                        # Assets de marca, fixtures visuales y Helvetica Neue Light
 ├── tests/                         # Pruebas E2E de la pantalla pública
 ├── .env.example                   # Variables de entorno sin secretos
+├── src/lib/inventory/             # Tipos y datos de pantalla de inventario y proveedores
 └── package.json                   # Scripts y dependencias
 ```
 
@@ -142,6 +145,8 @@ pnpm typecheck
 pnpm build
 ```
 
+El BFF de inventario y proveedores está documentado en [`docs/inventario-admin.md`](docs/inventario-admin.md).
+
 La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md) y el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md).
 
 <!-- section:testing -->
@@ -156,6 +161,8 @@ pnpm test:e2e
 
 Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
 
+Las pruebas de inventario cubren validación de recepciones y mermas, consultas paginadas del BFF, cookies HttpOnly, origen CSRF y errores de permisos.
+
 <!-- section:roadmap -->
 
 ## 🗺️ Hoja de ruta y estado
@@ -169,6 +176,7 @@ Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, clie
 - [x] Integración de eventos, bloqueos de espacios, paquetes, cotizaciones y requisitos.
 - [x] CRUD de avisos importantes conectado a la landing pública.
 - [x] Directorio administrativo de usuarios y empleados con roles, vínculos y controles de seguridad.
+- [x] Inventario, proveedores, recepciones, movimientos, alertas y recetas conectados al contrato administrativo.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->

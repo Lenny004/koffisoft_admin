@@ -101,6 +101,27 @@ export const FORM_LIMITS = {
     tableNameMaxLength: 80, // DiningTable.name @db.VarChar(80), DTO @MaxLength(80).
     shapeMaxLength: 20, // DiningTable.shape @db.VarChar(20), DTO @MaxLength(20).
   },
+  inventory: {
+    supplierCodeMaxLength: 40,
+    supplierNameMaxLength: 200,
+    supplierTaxIdMaxLength: 40,
+    supplierPhoneMaxLength: 40,
+    supplierEmailMaxLength: 200,
+    supplierAddressMaxLength: 10_000,
+    ingredientSkuMaxLength: 50,
+    ingredientNameMaxLength: 160,
+    ingredientDescriptionMaxLength: 10_000,
+    receiptNumberMaxLength: 50,
+    lotCodeMaxLength: 80,
+    notesMaxLength: 10_000,
+    reasonMinLength: 3,
+    reasonMaxLength: 200,
+    decimalMax: 99_999_999.999999,
+    expiryDaysMin: 0,
+    expiryDaysMax: 365,
+    searchMaxLength: 160,
+    pageSizeMax: 100,
+  },
   pagination: {
     pageMin: 1, // DTOs administrativos @Min(1).
     pageSizeMax: 100, // DTOs administrativos @Max(100).

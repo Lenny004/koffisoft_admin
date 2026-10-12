@@ -3,6 +3,7 @@
 @import url('./lib/styles/admin-shell.css');
 @import url('./lib/styles/admin-login.css');
 @import url('./lib/styles/admin-pages.css');
+@import url('./lib/styles/admin-inventory.css');
 
 @font-face {
   font-family: 'Helvetica Neue Light';
