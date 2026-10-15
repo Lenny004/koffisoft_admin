@@ -159,6 +159,9 @@ export const FORM_LIMITS = {
     searchMaxLength: 160,
     pageSizeMax: 100,
   },
+  analytics: {
+    reportRangeMaxDays: 366,
+  },
   pagination: {
     pageMin: 1, // DTOs administrativos @Min(1).
     pageSizeMax: 100, // DTOs administrativos @Max(100).

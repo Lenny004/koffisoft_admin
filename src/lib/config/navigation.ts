@@ -60,6 +60,12 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Empleados', href: '/empleados', icon: 'briefcase-business', permission: 'users.read' },
   { label: 'Usuarios', href: '/usuarios', icon: 'users', permission: 'users.read' },
   {
+    label: 'Estadísticas',
+    href: '/estadisticas',
+    icon: 'chart-no-axes-combined',
+    permission: 'analytics.read',
+  },
+  {
     label: 'Reportes',
     href: '/reportes',
     icon: 'chart-no-axes-combined',

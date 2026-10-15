@@ -31,6 +31,8 @@
 
 <!-- section:highlights -->
 
+- **Estadísticas sin cookies:** `/estadisticas` muestra visitas agregadas por sede, páginas, platos, eventos y dominios con `analytics.read`.
+
 - **Publicacion editorial:** `/publicacion` programa avisos, eventos y platos
   con zona horaria de El Salvador y preview temporal; ve [docs/publicacion-admin.md](docs/publicacion-admin.md).
 
