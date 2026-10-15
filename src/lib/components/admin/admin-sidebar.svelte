@@ -6,6 +6,7 @@
     CalendarCheck,
     CalendarDays,
     ChartNoAxesCombined,
+    Globe2,
     LayoutDashboard,
     Mail,
     LogOut,
@@ -48,6 +49,7 @@
     megaphone: Megaphone,
     mail: Mail,
     'building-2': Building2,
+    'globe-2': Globe2,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 
   const items = $derived(filterNavigation(permissions));

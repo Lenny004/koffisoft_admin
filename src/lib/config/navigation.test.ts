@@ -16,5 +16,6 @@ describe('navigation permissions', () => {
   it('maps nested routes to the module permission', () => {
     expect(requiredPermissionForPath('/productos/123')).toBe('catalog.read');
     expect(requiredPermissionForPath('/dashboard')).toBeUndefined();
+    expect(requiredPermissionForPath('/seo')).toBe('seo.read');
   });
 });

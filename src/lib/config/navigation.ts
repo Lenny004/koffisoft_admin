@@ -12,7 +12,8 @@ export type NavigationIcon =
   | 'user-round-cog'
   | 'megaphone'
   | 'mail'
-  | 'building-2';
+  | 'building-2'
+  | 'globe-2';
 
 export interface NavigationItem {
   label: string;
@@ -41,6 +42,7 @@ export const navigationItems: NavigationItem[] = [
   },
   { label: 'Contacto', href: '/contacto', icon: 'mail', permission: 'contact.read' },
   { label: 'Sitio', href: '/sitio', icon: 'building-2', permission: 'site_content.read' },
+  { label: 'SEO', href: '/seo', icon: 'globe-2', permission: 'seo.read' },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
     label: 'Proveedores',

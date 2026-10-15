@@ -69,6 +69,12 @@ export const FORM_LIMITS = {
     ctaUrlMaxLength: 500,
     displayOrderMax: 100_000,
   },
+  seo: {
+    resourceKeyMaxLength: 160,
+    metaTitleMaxLength: 70,
+    metaDescriptionMaxLength: 160,
+    urlMaxLength: 500,
+  },
   site: {
     addressMaxLength: 1000,
     municipalityMaxLength: 120,
@@ -168,4 +174,6 @@ export const FORM_PATTERNS = {
   decimal6: /^\d+(\.\d{1,6})?$/u,
   time: /^([01]\d|2[0-3]):[0-5]\d$/u,
   uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu,
+  httpUrl: /^https?:\/\/[^\s]+$/iu,
+  seoKey: /^[A-Za-z0-9][A-Za-z0-9/_-]*$/u,
 } as const;

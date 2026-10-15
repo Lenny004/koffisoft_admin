@@ -34,6 +34,7 @@
 - **Bandeja de contacto:** filtra mensajes por sede, gestiona estados y
   conversiones con auditoria y permisos.
 - **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
+- **SEO editorial:** edición protegida de metatítulos, descripciones, imagen OG, canonical y noindex por recurso publicado.
 
 ## 🌟 Aspectos destacados
 
@@ -47,6 +48,7 @@
 - **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
 
 - **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos, alcance por sede y validación Zod.
+- **Descubrimiento público:** la ruta `/seo` administra defaults y overrides de páginas, platos, eventos y avisos mediante BFF.
 
 <!-- section:overview -->
 
@@ -94,7 +96,7 @@ Configura `.env` con los valores locales de la API y del origen del panel. No gu
 pnpm dev
 ```
 
-Abre la URL mostrada por Vite. `/` presenta el login; después de autenticarte, `/dashboard` muestra el shell y los módulos permitidos por la API.
+Abre la URL mostrada por Vite. `/` presenta el login; después de autenticarte, `/dashboard` muestra el shell y los módulos permitidos por la API. Con `seo.read` aparece `/seo`; las acciones se muestran solo con `seo.manage`.
 
 <!-- section:configuration -->
 
@@ -119,13 +121,14 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 
 ```text
 .
-├── docs/                         # Diseño, autenticación, catálogo y usuarios del panel
+├── docs/                         # Diseño, autenticación, catálogo, SEO y usuarios
 ├── src/lib/components/admin/     # Shell, login, tabla y placeholders
 ├── src/lib/config/               # Navegación y permisos
 ├── src/lib/fixtures/              # Datos de prueba claramente marcados
 ├── src/lib/server/                # BFF de API, auth hook y clientes de menú, avisos y usuarios
 ├── src/lib/announcements/         # Tipos del CRUD de avisos importantes
 ├── src/lib/menu/                  # Tipos y mapeos del contrato administrativo
+├── src/lib/seo/                   # Tipos, límites y cliente BFF de SEO
 ├── src/lib/styles/                # Bloques BEM del shell y pantallas
 ├── src/routes/(app)/              # Layout y rutas protegidas
 ├── src/routes/+page.server.ts    # Form actions de login y MFA
@@ -151,7 +154,7 @@ pnpm build
 
 El BFF de inventario y proveedores está documentado en [`docs/inventario-admin.md`](docs/inventario-admin.md).
 
-La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md) y el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md).
+La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md), [SEO editorial](docs/seo-admin.md) y el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md).
 
 <!-- section:testing -->
 
@@ -163,7 +166,7 @@ pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
+Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, SEO, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
 
 Las pruebas de inventario cubren validación de recepciones y mermas, consultas paginadas del BFF, cookies HttpOnly, origen CSRF y errores de permisos.
 
@@ -179,6 +182,7 @@ Las pruebas de inventario cubren validación de recepciones y mermas, consultas 
 - [x] Integración administrativa de reservaciones, espacios, mesas y agenda.
 - [x] Integración de eventos, bloqueos de espacios, paquetes, cotizaciones y requisitos.
 - [x] CRUD de avisos importantes conectado a la landing pública.
+- [x] Bloque 2: pantalla SEO con permisos, límites y BFF server-side.
 - [x] Directorio administrativo de usuarios y empleados con roles, vínculos y controles de seguridad.
 - [x] Inventario, proveedores, recepciones, movimientos, alertas y recetas conectados al contrato administrativo.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
