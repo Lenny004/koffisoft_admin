@@ -221,7 +221,7 @@
             name="title"
             bind:value={title}
             maxlength={FORM_LIMITS.announcement.titleMaxLength}
-            placeholder="Ej. Important Announcement"
+            placeholder="Ej. Horario especial este fin de semana"
             required
             aria-invalid={Boolean(fieldError('title'))}
           />
@@ -290,6 +290,7 @@
             id="announcement-cta-url"
             name="ctaUrl"
             bind:value={ctaUrl}
+            type={ctaUrl.trimStart().startsWith('/') ? 'text' : 'url'}
             maxlength={FORM_LIMITS.announcement.ctaUrlMaxLength}
             placeholder="Ej. /reservas"
             inputmode="url"

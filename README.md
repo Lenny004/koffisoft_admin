@@ -39,10 +39,10 @@
 - **Diseño compartido:** Helvetica Neue Light, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
 - **Reservaciones y eventos conectados:** agenda, creación interna, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
-- **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlace opcional para la landing pública.
+- **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlaces CTA validados por la API para la landing pública.
 - **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
 
-- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos y validación Zod.
+- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos, alcance por sede y validación Zod.
 
 <!-- section:overview -->
 

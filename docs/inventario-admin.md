@@ -37,7 +37,9 @@ usa el borrado lógico de la API y exige confirmación en el navegador.
 
 Las lecturas requieren `inventory.read` y las mutaciones
 `suppliers.manage`. La interfaz oculta botones de mutación si el permiso no
-está presente.
+está presente. La API vuelve a comprobar que la sede enviada por el BFF esté
+dentro del negocio autorizado por la sesión; el panel no puede cambiar el
+`locationId` de una acción para acceder a otra sede.
 
 ## Validación y límites
 

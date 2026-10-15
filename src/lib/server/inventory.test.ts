@@ -60,6 +60,20 @@ describe('cliente server-side de inventario', () => {
     expect(init.body).toBe(JSON.stringify(payload));
   });
 
+  it('mantiene la sede en los detalles y mutaciones por ID', async () => {
+    const { event, fetch } = eventFor(new Response('{}', { status: 200 }));
+    const client = createInventoryClient(event, 'http://api.test');
+
+    await client.getSupplier('supplier-1', 'location-1');
+    await client.updateSupplier('supplier-1', 'location-1', { active: false });
+    await client.deleteSupplier('supplier-1', 'location-1');
+    await client.getReceipt('receipt-1', 'location-1');
+
+    for (const [url] of fetch.mock.calls as Array<[string, RequestInit]>) {
+      expect(url).toContain('locationId=location-1');
+    }
+  });
+
   it('expone el estado HTTP como error del cliente', async () => {
     const { event } = eventFor(
       new Response(JSON.stringify({ message: 'Sin permiso.' }), { status: 403 }),

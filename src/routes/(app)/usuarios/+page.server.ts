@@ -138,6 +138,12 @@ export const actions: Actions = {
             errors: validationErrors(result.error),
             values: formValues(formData),
           });
+        if (result.data.roleIds.length > 0 && !event.locals.permissions.includes('roles.manage'))
+          return fail(403, {
+            action: 'save',
+            errors: ['No tienes permiso para asignar roles durante el alta.'],
+            values: formValues(formData),
+          });
         await client.createUser({
           username: result.data.username,
           email: result.data.email,

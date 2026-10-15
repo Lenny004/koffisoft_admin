@@ -117,6 +117,10 @@
   const canReceive = $derived(data.permissions.includes('inventory.receive'));
   const canAdjust = $derived(data.permissions.includes('inventory.adjust'));
   const canRead = $derived(data.permissions.includes('inventory.read'));
+  const adjustmentLotRequired = $derived(
+    data.filterItems.find((item) => item.id === adjustmentIngredientId)?.trackLots === true &&
+      adjustmentType !== 'adjustment_in',
+  );
   const features = tableFeatures({});
   const itemColumnHelper = createColumnHelper<typeof features, Ingredient>();
   const movementColumnHelper = createColumnHelper<typeof features, InventoryMovement>();
@@ -1036,13 +1040,18 @@
                 >Ajuste negativo</option
               ><option value="waste">Merma</option></select
             ></FormField
-          ><FormField id="adjust-lot" label="Lote (opcional)" error={fieldError('inventoryLotId')}
+          ><FormField
+            id="adjust-lot"
+            label={adjustmentLotRequired ? 'Lote (obligatorio para salidas)' : 'Lote (opcional)'}
+            required={adjustmentLotRequired}
+            error={fieldError('inventoryLotId')}
             ><input
               id="adjust-lot"
               name="inventoryLotId"
               bind:value={adjustmentLotId}
               placeholder="UUID del lote, si aplica"
               autocomplete="off"
+              required={adjustmentLotRequired}
             /></FormField
           ><FormField id="adjust-quantity" label="Cantidad" required error={fieldError('quantity')}
             ><input

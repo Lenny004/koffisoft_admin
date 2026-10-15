@@ -29,6 +29,8 @@ Variables relevantes:
 - `ORIGIN`: origen esperado del panel; la API debe tenerlo en `CORS_ORIGIN`.
 - `SESSION_COOKIE_NAME`: nombre base de la cookie de sesión de la API.
 - `COOKIE_SECURE`: usa `true` detrás de HTTPS; en local HTTP puede ser `false`.
+  En producción la API rechaza el arranque si es `false`, y también exige que
+  todos los orígenes de `CORS_ORIGIN` sean HTTPS.
 
 `DEFAULT_LOCATION_ID` es opcional para el shell y permite que dashboard y
 catálogo consulten los listados administrativos ligados a una sede. Sin esa

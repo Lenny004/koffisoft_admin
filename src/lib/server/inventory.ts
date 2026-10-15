@@ -88,28 +88,38 @@ export function createInventoryClient(event: RequestEvent, apiBaseUrl: string) {
         withQuery('/suppliers/admin', query),
       );
     },
-    getSupplier(id: string) {
-      return request<Supplier>(`/suppliers/admin/${encodeURIComponent(id)}`);
+    getSupplier(id: string, locationId: string) {
+      return request<Supplier>(
+        withQuery(`/suppliers/admin/${encodeURIComponent(id)}`, { locationId }),
+      );
     },
     createSupplier(payload: unknown) {
       return request<Supplier>('/suppliers/admin', { method: 'POST', json: payload });
     },
-    updateSupplier(id: string, payload: unknown) {
-      return request<Supplier>(`/suppliers/admin/${encodeURIComponent(id)}`, {
-        method: 'PATCH',
-        json: payload,
-      });
+    updateSupplier(id: string, locationId: string, payload: unknown) {
+      return request<Supplier>(
+        withQuery(`/suppliers/admin/${encodeURIComponent(id)}`, { locationId }),
+        {
+          method: 'PATCH',
+          json: payload,
+        },
+      );
     },
-    deleteSupplier(id: string) {
-      return request<Supplier>(`/suppliers/admin/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    deleteSupplier(id: string, locationId: string) {
+      return request<Supplier>(
+        withQuery(`/suppliers/admin/${encodeURIComponent(id)}`, { locationId }),
+        { method: 'DELETE' },
+      );
     },
     listReceipts(query: Record<string, QueryValue>) {
       return request<{ data: GoodsReceiptListItem[]; meta: InventoryPageMeta }>(
         withQuery('/inventory/admin/receipts', query),
       );
     },
-    getReceipt(id: string) {
-      return request<GoodsReceipt>(`/inventory/admin/receipts/${encodeURIComponent(id)}`);
+    getReceipt(id: string, locationId: string) {
+      return request<GoodsReceipt>(
+        withQuery(`/inventory/admin/receipts/${encodeURIComponent(id)}`, { locationId }),
+      );
     },
     createReceipt(payload: unknown) {
       return request<GoodsReceipt>('/inventory/admin/receipts', { method: 'POST', json: payload });

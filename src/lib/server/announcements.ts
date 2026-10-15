@@ -46,16 +46,20 @@ export function createAnnouncementsClient(event: RequestEvent, apiBaseUrl: strin
         json: payload,
       });
     },
-    update(id: string, payload: unknown) {
-      return request<ImportantAnnouncement>(`/announcements/admin/${encodeURIComponent(id)}`, {
-        method: 'PATCH',
-        json: payload,
-      });
+    update(id: string, locationId: string, payload: unknown) {
+      return request<ImportantAnnouncement>(
+        withQuery(`/announcements/admin/${encodeURIComponent(id)}`, { locationId }),
+        {
+          method: 'PATCH',
+          json: payload,
+        },
+      );
     },
-    remove(id: string) {
-      return request<ImportantAnnouncement>(`/announcements/admin/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
+    remove(id: string, locationId: string) {
+      return request<ImportantAnnouncement>(
+        withQuery(`/announcements/admin/${encodeURIComponent(id)}`, { locationId }),
+        { method: 'DELETE' },
+      );
     },
   };
 }

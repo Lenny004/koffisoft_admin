@@ -106,7 +106,7 @@ export const actions = {
         addressLine: payload.addressLine || undefined,
       };
       const client = createInventoryClient(event, env.API_BASE_URL ?? '');
-      if (id) await client.updateSupplier(id, normalizedPayload);
+      if (id) await client.updateSupplier(id, locationId, normalizedPayload);
       else await client.createSupplier({ locationId, ...normalizedPayload });
       return { success: true, action: 'save' };
     } catch (error) {
@@ -123,7 +123,9 @@ export const actions = {
     const id = formText((await event.request.formData()).get('id'));
     if (!id) return fail(400, { action: 'delete', errors: ['El proveedor no es válido.'] });
     try {
-      await createInventoryClient(event, env.API_BASE_URL ?? '').deleteSupplier(id);
+      const locationId = env.DEFAULT_LOCATION_ID ?? '';
+      if (!locationId) return fail(503, { action: 'delete', errors: [configurationError()] });
+      await createInventoryClient(event, env.API_BASE_URL ?? '').deleteSupplier(id, locationId);
       return { success: true, action: 'delete' };
     } catch (error) {
       const response = actionError(error);
