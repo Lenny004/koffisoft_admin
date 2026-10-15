@@ -31,6 +31,9 @@
 
 <!-- section:highlights -->
 
+- **Publicacion editorial:** `/publicacion` programa avisos, eventos y platos
+  con zona horaria de El Salvador y preview temporal; ve [docs/publicacion-admin.md](docs/publicacion-admin.md).
+
 - **Bandeja de contacto:** filtra mensajes por sede, gestiona estados y
   conversiones con auditoria y permisos.
 - **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
@@ -117,6 +120,9 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 
 <!-- section:structure -->
 
+La ruta `src/routes/(app)/publicacion/` consume el BFF de publicacion y oculta
+acciones cuando el usuario no tiene `content.publish`.
+
 ## 🗂️ Estructura del proyecto
 
 ```text
@@ -171,6 +177,8 @@ Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, SEO,
 Las pruebas de inventario cubren validación de recepciones y mermas, consultas paginadas del BFF, cookies HttpOnly, origen CSRF y errores de permisos.
 
 <!-- section:roadmap -->
+
+- [x] Bloque 4: programacion, expiracion y vista previa segura de contenido.
 
 ## 🗺️ Hoja de ruta y estado
 

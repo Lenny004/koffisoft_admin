@@ -58,6 +58,10 @@ export interface Event {
   confirmedGuestCount: number | null;
   budgetTarget: string | null;
   status: EventStatus;
+  publicationStatus?: 'Draft' | 'Scheduled' | 'Published';
+  publishedAt?: string | null;
+  scheduledAt?: string | null;
+  expiresAt?: string | null;
   source: string;
   specialRequirements: string | null;
   internalNotes: string | null;

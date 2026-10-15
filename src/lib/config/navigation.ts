@@ -4,6 +4,7 @@ export type NavigationIcon =
   | 'tags'
   | 'calendar-check'
   | 'calendar-days'
+  | 'calendar-clock'
   | 'boxes'
   | 'truck'
   | 'briefcase-business'
@@ -34,6 +35,12 @@ export const navigationItems: NavigationItem[] = [
     permission: 'reservations.read',
   },
   { label: 'Eventos', href: '/eventos', icon: 'calendar-days', permission: 'events.read' },
+  {
+    label: 'Publicación',
+    href: '/publicacion',
+    icon: 'calendar-clock',
+    permission: 'content.publish',
+  },
   {
     label: 'Avisos importantes',
     href: '/avisos-importantes',

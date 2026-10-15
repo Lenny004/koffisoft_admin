@@ -45,6 +45,10 @@ export interface MenuItem {
   descriptionEn: string | null;
   publicVisible: boolean;
   active: boolean;
+  publicationStatus?: 'Draft' | 'Scheduled' | 'Published';
+  publishedAt?: string | null;
+  scheduledAt?: string | null;
+  expiresAt?: string | null;
   variants: MenuVariant[];
   createdAt: string;
   updatedAt: string;
