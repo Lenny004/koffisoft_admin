@@ -31,6 +31,8 @@
 
 <!-- section:highlights -->
 
+- **Bandeja de contacto:** filtra mensajes por sede, gestiona estados y
+  conversiones con auditoria y permisos.
 - **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
 
 ## 🌟 Aspectos destacados

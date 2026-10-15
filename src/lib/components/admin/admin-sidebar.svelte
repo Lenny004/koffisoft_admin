@@ -7,6 +7,7 @@
     CalendarDays,
     ChartNoAxesCombined,
     LayoutDashboard,
+    Mail,
     LogOut,
     Megaphone,
     Tags,
@@ -45,6 +46,7 @@
     'chart-no-axes-combined': ChartNoAxesCombined,
     'user-round-cog': UserRoundCog,
     megaphone: Megaphone,
+    mail: Mail,
     'building-2': Building2,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 

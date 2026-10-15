@@ -16,6 +16,7 @@ export const FORM_LIMITS = {
     personNameMaxLength: 80, // InitialSetupDto firstName/lastName @MaxLength(80), Employee @db.VarChar(80).
   },
   contact: {
+    searchMaxLength: 120,
     nameMaxLength: 200, // ContactMessage.name_snapshot @db.VarChar(200).
     emailMaxLength: 200, // ContactMessage.email @db.VarChar(200).
     phoneMaxLength: 40, // ContactMessage.phone @db.VarChar(40).

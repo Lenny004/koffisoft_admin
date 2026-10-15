@@ -11,6 +11,7 @@ export type NavigationIcon =
   | 'chart-no-axes-combined'
   | 'user-round-cog'
   | 'megaphone'
+  | 'mail'
   | 'building-2';
 
 export interface NavigationItem {
@@ -38,6 +39,7 @@ export const navigationItems: NavigationItem[] = [
     icon: 'megaphone',
     permission: 'important_announcements.read',
   },
+  { label: 'Contacto', href: '/contacto', icon: 'mail', permission: 'contact.read' },
   { label: 'Sitio', href: '/sitio', icon: 'building-2', permission: 'site_content.read' },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
