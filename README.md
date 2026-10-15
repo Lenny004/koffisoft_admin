@@ -40,6 +40,7 @@
   conversiones con auditoria y permisos.
 - **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
 - **SEO editorial:** edición protegida de metatítulos, descripciones, imagen OG, canonical y noindex por recurso publicado.
+- **Respaldos operativos:** `/respaldos` inicia, consulta, descarga y elimina artefactos protegidos según permisos específicos.
 
 ## 🌟 Aspectos destacados
 
@@ -61,7 +62,7 @@
 
 `koffisoft_admin` es el panel privado de Koffi-Soft. Su shell recupera los módulos operativos del legacy, pero usa SvelteKit 2, Svelte 5, TypeScript estricto, Tailwind CSS 4, shadcn-svelte sobre Bits UI y bloques BEM para la capa visual.
 
-La API (`koffisoft_api`) mantiene PostgreSQL, sesiones, TOTP, permisos y contratos HTTP. El admin no accede directamente a la base de datos. Dashboard, catálogo y directorios administrativos usan endpoints documentados; ventas y otros módulos sin contrato administrativo se identifican como fixtures o “en construcción”.
+La API (`koffisoft_api`) mantiene PostgreSQL, sesiones, TOTP, permisos y contratos HTTP. El admin no accede directamente a la base de datos. Dashboard, catálogo, directorios administrativos y respaldos usan endpoints documentados; ventas y otros módulos sin contrato administrativo se identifican como fixtures o “en construcción”.
 
 **Stack:** SvelteKit 2.70.3, Svelte 5.57.1, TypeScript 5.9.3, Vite 7.3.6, Tailwind CSS 4.3.3, shadcn-svelte 1.7.0, TanStack Svelte Table 9.2.4, Zod 4.6.5, Vitest 5.0.3 y Playwright 1.63.0.
 
@@ -133,7 +134,8 @@ acciones cuando el usuario no tiene `content.publish`.
 ├── src/lib/components/admin/     # Shell, login, tabla y placeholders
 ├── src/lib/config/               # Navegación y permisos
 ├── src/lib/fixtures/              # Datos de prueba claramente marcados
-├── src/lib/server/                # BFF de API, auth hook y clientes de menú, avisos y usuarios
+├── src/lib/server/                # BFF de API, auth hook y clientes de módulos
+├── src/routes/(app)/respaldos/    # Lista, acciones y stream BFF de respaldos
 ├── src/lib/announcements/         # Tipos del CRUD de avisos importantes
 ├── src/lib/menu/                  # Tipos y mapeos del contrato administrativo
 ├── src/lib/seo/                   # Tipos, límites y cliente BFF de SEO
@@ -162,7 +164,7 @@ pnpm build
 
 El BFF de inventario y proveedores está documentado en [`docs/inventario-admin.md`](docs/inventario-admin.md).
 
-La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md), [SEO editorial](docs/seo-admin.md) y el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md).
+La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md), [SEO editorial](docs/seo-admin.md), el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md) y [respaldos](docs/respaldos-admin.md).
 
 <!-- section:testing -->
 
@@ -195,6 +197,7 @@ Las pruebas de inventario cubren validación de recepciones y mermas, consultas 
 - [x] Bloque 2: pantalla SEO con permisos, límites y BFF server-side.
 - [x] Directorio administrativo de usuarios y empleados con roles, vínculos y controles de seguridad.
 - [x] Inventario, proveedores, recepciones, movimientos, alertas y recetas conectados al contrato administrativo.
+- [x] Bloque 6: pantalla de respaldos con estados, checksum, descarga autenticada y acciones por permiso.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->

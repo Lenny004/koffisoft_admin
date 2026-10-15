@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     BriefcaseBusiness,
+    Archive,
     Building2,
     Boxes,
     CalendarCheck,
@@ -52,6 +53,7 @@
     mail: Mail,
     'building-2': Building2,
     'globe-2': Globe2,
+    archive: Archive,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 
   const items = $derived(filterNavigation(permissions));
