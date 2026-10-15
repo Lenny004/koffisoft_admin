@@ -16,6 +16,7 @@ import {
   updateRequirementSchema,
 } from '$lib/validation/events';
 import { localElSalvadorDateTimeToIso } from '$lib/formatting/dates';
+import { parsePositivePage } from '$lib/utils';
 import { formValues, validationErrors } from '$lib/validation/errors';
 
 const PAGE_SIZE = 20;
@@ -86,7 +87,7 @@ function eventForm(formData: FormData) {
 }
 
 export const load: PageServerLoad = async (event) => {
-  const page = Math.max(1, Number(event.url.searchParams.get('page') || 1));
+  const page = parsePositivePage(event.url.searchParams.get('page'));
   const statusParam = event.url.searchParams.get('status') ?? '';
   const status = EVENT_STATUSES.includes(statusParam as (typeof EVENT_STATUSES)[number])
     ? statusParam

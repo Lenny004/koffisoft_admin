@@ -6,6 +6,7 @@ import {
   actionErrorStatus,
   apiErrorMessage,
   apiRequest,
+  connectionErrorMessage,
   forwardSessionCookies,
 } from '$lib/server/api';
 import { changePasswordSchema } from '$lib/validation/auth';
@@ -21,15 +22,23 @@ export const actions: Actions = {
     if (!result.success)
       return fail(400, { errors: validationErrors(result.error), values: formValues(formData) });
 
-    const response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: { currentPassword: result.data.currentPassword, newPassword: result.data.newPassword },
-    });
-    forwardSessionCookies(
-      event,
-      response,
-      event.url.protocol === 'https:' || env.COOKIE_SECURE === 'true',
-    );
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: {
+          currentPassword: result.data.currentPassword,
+          newPassword: result.data.newPassword,
+        },
+      });
+      forwardSessionCookies(
+        event,
+        response,
+        event.url.protocol === 'https:' || env.COOKIE_SECURE === 'true',
+      );
+    } catch (error) {
+      return fail(502, { errors: [connectionErrorMessage(error)] });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         errors: [await apiErrorMessage(response)],

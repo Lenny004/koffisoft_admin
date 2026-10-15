@@ -31,6 +31,10 @@
   } from '$lib/reservations/types';
   import type { DiningTable, Reservation, VenueSpace } from '$lib/reservations/types';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { PageProps } from '../../../routes/(app)/reservaciones/$types';
   import { resolve } from '$app/paths';
 
@@ -40,16 +44,11 @@
   let { data, form }: Props = $props();
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && typeof errors === 'object' && !Array.isArray(errors)
-      ? ((errors as Record<string, string>)[name] ?? '')
-      : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    const errors = form?.errors;
-    if (!errors) return [];
-    return Array.isArray(errors) ? errors : [];
+    return getGlobalErrors(form?.errors);
   }
   let section = $state<Section>('list');
   let view = $state<'table' | 'day'>('table');

@@ -21,6 +21,10 @@
   } from '$lib/events/types';
   import type { Event, EventPackage } from '$lib/events/types';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { PageProps } from '../../../routes/(app)/eventos/$types';
   import { resolve } from '$app/paths';
 
@@ -30,16 +34,11 @@
   let { data, form }: Props = $props();
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && typeof errors === 'object' && !Array.isArray(errors)
-      ? ((errors as Record<string, string>)[name] ?? '')
-      : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    const errors = form?.errors;
-    if (!errors) return [];
-    return Array.isArray(errors) ? errors : [];
+    return getGlobalErrors(form?.errors);
   }
   let section = $state<Section>('events');
   let eventOpen = $state(false);

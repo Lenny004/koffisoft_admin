@@ -122,21 +122,27 @@
       </div>
       <nav aria-label="Accesos rápidos">
         <ul class="dashboard__quick-list">
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/productos')}
-              >Revisar menú <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/reservaciones')}
-              >Gestionar reservas <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/reportes')}
-              >Ver reportes <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
+          {#if data.permissions?.includes('catalog.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/productos')}
+                >Revisar menú <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
+          {#if data.permissions?.includes('reservations.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/reservaciones')}
+                >Gestionar reservas <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
+          {#if data.permissions?.includes('reports.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/reportes')}
+                >Ver reportes <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
         </ul>
       </nav>
     </aside>

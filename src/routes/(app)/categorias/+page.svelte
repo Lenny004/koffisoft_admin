@@ -12,6 +12,10 @@
   import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { CategoryRow } from '$lib/menu/types';
   import type { PageProps } from './$types';
 
@@ -29,16 +33,11 @@
   let search = $state('');
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && typeof errors === 'object' && !Array.isArray(errors)
-      ? ((errors as Record<string, string>)[name] ?? '')
-      : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    const errors = form?.errors;
-    if (!errors) return [];
-    return Array.isArray(errors) ? errors : [];
+    return getGlobalErrors(form?.errors);
   }
 
   $effect(() => {

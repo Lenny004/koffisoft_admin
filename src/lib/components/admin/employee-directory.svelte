@@ -17,6 +17,10 @@
   import * as Table from '$lib/components/ui/table/index.js';
   import type { EmployeeRow, PageMeta, UserRow } from '$lib/users/types';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { EmployeeFilterValues } from '$lib/validation/users';
 
   interface Props {
@@ -65,13 +69,11 @@
   });
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && !Array.isArray(errors) ? (errors[name] ?? '') : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    if (!form?.errors) return [];
-    return Array.isArray(form.errors) ? form.errors : form.errors._form ? [form.errors._form] : [];
+    return getGlobalErrors(form?.errors);
   }
 
   function startCreate() {

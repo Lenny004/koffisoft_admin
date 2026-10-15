@@ -13,6 +13,7 @@ import {
   priceSchema,
 } from '$lib/validation/menu';
 import { MenuApiError, createMenuClient } from '$lib/server/menu';
+import { parsePositivePage } from '$lib/utils';
 import { formValues, validationErrors } from '$lib/validation/errors';
 
 const PAGE_SIZE = 20;
@@ -94,7 +95,7 @@ async function listFilteredItems(
 }
 
 export const load: PageServerLoad = async (event) => {
-  const page = Math.max(1, Number(event.url.searchParams.get('page') || 1));
+  const page = parsePositivePage(event.url.searchParams.get('page'));
   const search = event.url.searchParams.get('search')?.trim() ?? '';
   const categoryId = event.url.searchParams.get('categoryId') ?? '';
   const locationId = env.DEFAULT_LOCATION_ID ?? '';

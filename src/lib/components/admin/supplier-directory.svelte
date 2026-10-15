@@ -12,6 +12,10 @@
   import * as Table from '$lib/components/ui/table/index.js';
   import type { InventoryPageMeta, Supplier } from '$lib/inventory/types';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
 
   interface ActionForm {
     action?: string;
@@ -59,12 +63,10 @@
   });
 
   function fieldError(field: string): string {
-    const errors = form?.errors;
-    return errors && !Array.isArray(errors) ? (errors[field] ?? '') : '';
+    return getFieldError(form?.errors, field);
   }
   function globalErrors(): string[] {
-    if (!form?.errors) return [];
-    return Array.isArray(form.errors) ? form.errors : form.errors._form ? [form.errors._form] : [];
+    return getGlobalErrors(form?.errors);
   }
   function startCreate() {
     editingId = null;
