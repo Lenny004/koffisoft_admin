@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     BriefcaseBusiness,
+    Building2,
     Boxes,
     CalendarCheck,
     CalendarDays,
@@ -44,6 +45,7 @@
     'chart-no-axes-combined': ChartNoAxesCombined,
     'user-round-cog': UserRoundCog,
     megaphone: Megaphone,
+    'building-2': Building2,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 
   const items = $derived(filterNavigation(permissions));

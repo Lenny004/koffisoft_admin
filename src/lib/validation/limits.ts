@@ -68,6 +68,26 @@ export const FORM_LIMITS = {
     ctaUrlMaxLength: 500,
     displayOrderMax: 100_000,
   },
+  site: {
+    addressMaxLength: 1000,
+    municipalityMaxLength: 120,
+    departmentMaxLength: 120,
+    phoneMaxLength: 40,
+    emailMaxLength: 200,
+    coordinateMax: 90,
+    heroEyebrowMaxLength: 120,
+    heroTitleMaxLength: 160,
+    editorialMaxLength: 10_000,
+    imageUrlMaxLength: 500,
+    serviceTypeMaxLength: 30,
+    reasonMaxLength: 200,
+    teamNameMaxLength: 120,
+    teamRoleMaxLength: 120,
+    teamDescriptionMaxLength: 2000,
+    maxHours: 50,
+    maxOverrides: 100,
+    maxTeam: 12,
+  },
   user: {
     searchMaxLength: 200, // UserListQueryDto.search @MaxLength(200).
     usernameMinLength: 3, // CreateUserDto/UpdateUserDto @MinLength(3).

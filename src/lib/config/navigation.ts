@@ -10,7 +10,8 @@ export type NavigationIcon =
   | 'users'
   | 'chart-no-axes-combined'
   | 'user-round-cog'
-  | 'megaphone';
+  | 'megaphone'
+  | 'building-2';
 
 export interface NavigationItem {
   label: string;
@@ -37,6 +38,7 @@ export const navigationItems: NavigationItem[] = [
     icon: 'megaphone',
     permission: 'important_announcements.read',
   },
+  { label: 'Sitio', href: '/sitio', icon: 'building-2', permission: 'site_content.read' },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
     label: 'Proveedores',

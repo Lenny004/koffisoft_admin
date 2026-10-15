@@ -31,6 +31,8 @@
 
 <!-- section:highlights -->
 
+- **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
+
 ## 🌟 Aspectos destacados
 
 - **Shell responsive:** sidebar con permisos, offcanvas móvil, topbar, tema oscuro y enlace al sitio público.
