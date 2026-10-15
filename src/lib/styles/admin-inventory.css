@@ -242,6 +242,47 @@
   border-radius: var(--radius-md);
 }
 
+.inventory__supplier-links {
+  display: grid;
+  gap: var(--space-md);
+  padding-block-start: var(--space-md);
+  border-block-start: 1px solid var(--border);
+}
+
+.inventory__helper {
+  margin: var(--space-xs) 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.inventory__supplier-links-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.inventory__supplier-link {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: var(--space-sm);
+  min-inline-size: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.inventory__supplier-link legend {
+  padding-inline: var(--space-xs);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.inventory__supplier-link-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
 .inventory__line legend {
   padding-inline: var(--space-xs);
   color: var(--text-muted);

@@ -93,13 +93,14 @@ export const ingredientSchema = z.object({
     .array(
       z.object({
         supplierId: uuid,
-        supplierSku: optionalText(60),
+        supplierSku: optionalText(FORM_LIMITS.inventory.supplierSkuMaxLength),
         packQuantity: positiveDecimal,
         packUnitId: uuid,
         unitCost: decimal,
         isPreferred: z.boolean().default(false),
       }),
     )
+    .max(FORM_LIMITS.inventory.supplierLinksMaxSize)
     .default([]),
 });
 
@@ -128,7 +129,10 @@ export const receiptSchema = z.object({
   receivedAt: z.string().datetime({ offset: true }),
   storageLocationId: uuid,
   notes: optionalText(FORM_LIMITS.inventory.notesMaxLength),
-  lines: z.array(receiptLineSchema).min(1, 'Agrega al menos una línea de recepción.'),
+  lines: z
+    .array(receiptLineSchema)
+    .min(1, 'Agrega al menos una línea de recepción.')
+    .max(FORM_LIMITS.inventory.receiptLinesMaxSize),
 });
 
 export const adjustmentSchema = z.object({

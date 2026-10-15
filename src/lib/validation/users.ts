@@ -79,7 +79,10 @@ export const createUserSchema = z
     password,
     confirmPassword: password,
     employeeId: optionalUuid,
-    roleIds: z.array(z.string().uuid('Uno de los roles no es válido.')).default([]),
+    roleIds: z
+      .array(z.string().uuid('Uno de los roles no es válido.'))
+      .max(FORM_LIMITS.user.roleIdsMaxSize)
+      .default([]),
     mustChangePassword: z.boolean().default(false),
   })
   .refine((values) => values.password === values.confirmPassword, {
@@ -101,7 +104,10 @@ export const updateUserSchema = z.object({
 
 export const assignRolesSchema = z.object({
   id: z.string().uuid('El usuario no es válido.'),
-  roleIds: z.array(z.string().uuid('Uno de los roles no es válido.')).default([]),
+  roleIds: z
+    .array(z.string().uuid('Uno de los roles no es válido.'))
+    .max(FORM_LIMITS.user.roleIdsMaxSize)
+    .default([]),
 });
 
 export const userActionSchema = z.object({

@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -14,7 +16,51 @@ import {
 } from '$lib/validation/inventory';
 
 const PAGE_SIZE = 20;
+const OPTION_PAGE_SIZE = 100;
 const emptyMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
+
+type InventoryClient = ReturnType<typeof createInventoryClient>;
+type InventoryQuery = Record<string, string | number | boolean | undefined>;
+
+async function loadAllItems(client: InventoryClient, query: InventoryQuery) {
+  const firstPage = await client.listItems({
+    ...query,
+    page: 1,
+    pageSize: OPTION_PAGE_SIZE,
+  });
+  if (firstPage.meta.totalPages <= 1) return firstPage.data;
+
+  const remaining = await Promise.all(
+    Array.from({ length: firstPage.meta.totalPages - 1 }, (_, index) =>
+      client.listItems({
+        ...query,
+        page: index + 2,
+        pageSize: OPTION_PAGE_SIZE,
+      }),
+    ),
+  );
+  return [firstPage, ...remaining].flatMap((page) => page.data);
+}
+
+async function loadAllSuppliers(client: InventoryClient, query: InventoryQuery) {
+  const firstPage = await client.listSuppliers({
+    ...query,
+    page: 1,
+    pageSize: OPTION_PAGE_SIZE,
+  });
+  if (firstPage.meta.totalPages <= 1) return firstPage.data;
+
+  const remaining = await Promise.all(
+    Array.from({ length: firstPage.meta.totalPages - 1 }, (_, index) =>
+      client.listSuppliers({
+        ...query,
+        page: index + 2,
+        pageSize: OPTION_PAGE_SIZE,
+      }),
+    ),
+  );
+  return [firstPage, ...remaining].flatMap((page) => page.data);
+}
 
 function configurationError(): string {
   return 'No se pudo cargar el inventario: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
@@ -111,7 +157,7 @@ export const load = async (event: RequestEvent) => {
         storageLocationId: filters.storageLocationId || undefined,
         includeInactive: true,
       }),
-      client.listItems({ locationId, page: 1, pageSize: 100, includeInactive: true }),
+      loadAllItems(client, { locationId, includeInactive: false }),
       client.listMovements({
         locationId,
         page: filters.movementPage,
@@ -129,12 +175,12 @@ export const load = async (event: RequestEvent) => {
       client.listStorageLocations(locationId),
       client.listAlerts(locationId, filters.expiryDays),
       selectedId ? client.getItem(selectedId, locationId) : Promise.resolve(null),
-      client.listSuppliers({ locationId, page: 1, pageSize: 100, includeInactive: false }),
+      loadAllSuppliers(client, { locationId, includeInactive: false }),
     ]);
 
     return {
       items: itemPage.data,
-      filterItems: filterItemPage.data,
+      filterItems: filterItemPage,
       selectedItem,
       movements: movementPage.data,
       receipts: receiptPage.data,
@@ -142,7 +188,7 @@ export const load = async (event: RequestEvent) => {
       units,
       categories,
       storageLocations,
-      suppliers: supplierPage.data,
+      suppliers: supplierPage,
       alerts,
       itemMeta: itemPage.meta,
       movementMeta: movementPage.meta,
@@ -309,7 +355,7 @@ export const actions = {
     try {
       const { operationId, inventoryLotId, ...payload } = result.data;
       await createInventoryClient(event, env.API_BASE_URL ?? '').createAdjustment({
-        ...(operationId ? { operationId } : {}),
+        operationId: operationId || randomUUID(),
         ...payload,
         ...(inventoryLotId ? { inventoryLotId } : {}),
       });

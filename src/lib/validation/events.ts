@@ -157,7 +157,7 @@ export const packageSchema = z.object({
     .optional()
     .or(z.literal('')),
   active: z.boolean(),
-  lines: z.array(packageLineSchema).default([]),
+  lines: z.array(packageLineSchema).max(FORM_LIMITS.event.packageLinesMaxSize).default([]),
 });
 
 export const quoteLineSchema = z.object({
@@ -189,7 +189,10 @@ export const quoteSchema = z.object({
   validUntil: z.string().date('La fecha de vigencia no es válida.'),
   termsEs: z.string().trim().max(10_000).optional().or(z.literal('')),
   termsEn: z.string().trim().max(10_000).optional().or(z.literal('')),
-  lines: z.array(quoteLineSchema).min(1, 'La cotización requiere al menos una línea.'),
+  lines: z
+    .array(quoteLineSchema)
+    .min(1, 'La cotización requiere al menos una línea.')
+    .max(FORM_LIMITS.event.quoteLinesMaxSize),
 });
 
 export const quoteStatusSchema = z.object({

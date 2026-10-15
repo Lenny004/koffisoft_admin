@@ -25,6 +25,7 @@
     Recipe,
     StorageLocation,
     Supplier,
+    SupplierLink,
   } from '$lib/inventory/types';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
 
@@ -85,6 +86,8 @@
     unitCost: string;
   };
 
+  type SupplierLinkForm = Omit<SupplierLink, 'supplierName' | 'packUnitCode'>;
+
   let { data, form }: Props = $props();
   let activeTab = $state<'items' | 'movements' | 'receipts' | 'recipes'>('items');
   let itemDialogOpen = $state(false);
@@ -99,6 +102,7 @@
   let itemReorderLevel = $state('0');
   let itemTrackLots = $state(true);
   let itemActive = $state(true);
+  let itemSupplierLinks = $state<SupplierLinkForm[]>([]);
   let receiptSupplierId = $state('');
   let receiptNumber = $state('');
   let receiptReceivedAt = $state('');
@@ -112,6 +116,8 @@
   let adjustmentQuantity = $state('');
   let adjustmentUnitCost = $state('0');
   let adjustmentReason = $state('');
+  let adjustmentOperationId = $state('');
+  let pendingAction = $state<string | null>(null);
 
   const canManage = $derived(data.permissions.includes('inventory.manage'));
   const canReceive = $derived(data.permissions.includes('inventory.receive'));
@@ -171,6 +177,7 @@
     itemReorderLevel = '0';
     itemTrackLots = true;
     itemActive = true;
+    itemSupplierLinks = [];
     itemDialogOpen = true;
   }
 
@@ -184,6 +191,14 @@
     itemReorderLevel = item.reorderLevel;
     itemTrackLots = item.trackLots;
     itemActive = item.active;
+    itemSupplierLinks = item.supplierLinks.map((supplierLink) => ({
+      supplierId: supplierLink.supplierId,
+      supplierSku: supplierLink.supplierSku,
+      packQuantity: supplierLink.packQuantity,
+      packUnitId: supplierLink.packUnitId,
+      unitCost: supplierLink.unitCost,
+      isPreferred: supplierLink.isPreferred,
+    }));
     itemDialogOpen = true;
   }
 
@@ -222,7 +237,36 @@
     adjustmentQuantity = '';
     adjustmentUnitCost = '0';
     adjustmentReason = '';
+    adjustmentOperationId = globalThis.crypto.randomUUID();
+    pendingAction = null;
     adjustmentDialogOpen = true;
+  }
+
+  function addSupplierLink(): void {
+    if (itemSupplierLinks.length >= FORM_LIMITS.inventory.supplierLinksMaxSize) return;
+    itemSupplierLinks = [
+      ...itemSupplierLinks,
+      {
+        supplierId: data.suppliers[0]?.id ?? '',
+        supplierSku: null,
+        packQuantity: '1',
+        packUnitId: data.units[0]?.id ?? '',
+        unitCost: '0',
+        isPreferred: itemSupplierLinks.length === 0,
+      },
+    ];
+  }
+
+  function removeSupplierLink(index: number): void {
+    itemSupplierLinks = itemSupplierLinks.filter((_, currentIndex) => currentIndex !== index);
+  }
+
+  function guardSubmit(action: string, event: SubmitEvent): void {
+    if (pendingAction) {
+      event.preventDefault();
+      return;
+    }
+    pendingAction = action;
   }
 
   function movementLabel(value: string): string {
@@ -260,10 +304,12 @@
   }
 
   $effect(() => {
+    if (form?.action) pendingAction = null;
     if (form?.success) {
       itemDialogOpen = false;
       receiveDialogOpen = false;
       adjustmentDialogOpen = false;
+      pendingAction = null;
     }
   });
 </script>
@@ -691,12 +737,21 @@
         >El stock se modifica únicamente por recepciones, ajustes o mermas.</Dialog.Description
       ></Dialog.Header
     >
-    <form class="inventory__form" method="POST" action="?/saveItem">
+    <form
+      class="inventory__form"
+      method="POST"
+      action="?/saveItem"
+      onsubmit={(event: SubmitEvent) => guardSubmit('saveItem', event)}
+    >
       <input type="hidden" name="id" value={editingItemId ?? ''} /><input
         type="hidden"
         name="locationId"
         value={data.locationId}
-      /><input type="hidden" name="supplierLinks" value="[]" /><Dialog.Body
+      /><input
+        type="hidden"
+        name="supplierLinks"
+        value={JSON.stringify(itemSupplierLinks)}
+      /><Dialog.Body
         ><p class="form-legend">
           <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
         </p>
@@ -777,6 +832,94 @@
               rows="3"></textarea></FormField
           >
         </div>
+        <section class="inventory__supplier-links" aria-labelledby="supplier-links-title">
+          <div class="inventory__line-heading">
+            <div>
+              <h3 id="supplier-links-title">Proveedores asociados</h3>
+              <p class="inventory__helper">
+                Opcional. Define presentaciones y costos para este insumo.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onclick={addSupplierLink}
+              disabled={itemSupplierLinks.length >= FORM_LIMITS.inventory.supplierLinksMaxSize}
+              ><Plus class="size-4" aria-hidden="true" />Agregar proveedor</Button
+            >
+          </div>
+          <div class="inventory__supplier-links-list">
+            {#each itemSupplierLinks as link, index (index)}
+              <fieldset class="inventory__supplier-link">
+                <legend>Proveedor {index + 1}</legend>
+                <FormField id={`item-supplier-${index}`} label="Proveedor" required>
+                  <select id={`item-supplier-${index}`} bind:value={link.supplierId} required>
+                    <option value="" disabled>Selecciona un proveedor</option>
+                    {#each data.suppliers as supplier (supplier.id)}
+                      <option value={supplier.id}>{supplier.name}</option>
+                    {/each}
+                  </select>
+                </FormField>
+                <FormField id={`item-supplier-sku-${index}`} label="SKU del proveedor">
+                  <input
+                    id={`item-supplier-sku-${index}`}
+                    bind:value={link.supplierSku}
+                    maxlength={FORM_LIMITS.inventory.supplierSkuMaxLength}
+                    placeholder="Ej. PROV-001"
+                  />
+                </FormField>
+                <FormField id={`item-pack-quantity-${index}`} label="Cantidad por empaque" required>
+                  <input
+                    id={`item-pack-quantity-${index}`}
+                    type="number"
+                    bind:value={link.packQuantity}
+                    min="0.000001"
+                    max={FORM_LIMITS.inventory.decimalMax}
+                    step="0.000001"
+                    placeholder="Ej. 1"
+                    required
+                  />
+                </FormField>
+                <FormField id={`item-pack-unit-${index}`} label="Unidad de empaque" required>
+                  <select id={`item-pack-unit-${index}`} bind:value={link.packUnitId} required>
+                    <option value="" disabled>Selecciona una unidad</option>
+                    {#each data.units as unit (unit.id)}
+                      <option value={unit.id}>{unit.name} ({unit.code})</option>
+                    {/each}
+                  </select>
+                </FormField>
+                <FormField id={`item-unit-cost-${index}`} label="Costo unitario" required>
+                  <input
+                    id={`item-unit-cost-${index}`}
+                    type="number"
+                    bind:value={link.unitCost}
+                    min="0"
+                    max={FORM_LIMITS.inventory.decimalMax}
+                    step="0.000001"
+                    placeholder="Ej. 0.50"
+                    required
+                  />
+                </FormField>
+                <div class="inventory__supplier-link-actions">
+                  <label class="inventory__checkbox">
+                    <input type="checkbox" bind:checked={link.isPreferred} /> Preferido
+                  </label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Quitar proveedor ${index + 1}`}
+                    onclick={() => removeSupplierLink(index)}
+                    ><Trash2 class="size-4 text-destructive" aria-hidden="true" /></Button
+                  >
+                </div>
+              </fieldset>
+            {:else}
+              <p class="inventory__empty">No hay proveedores asociados.</p>
+            {/each}
+          </div>
+        </section>
         <input type="hidden" name="trackLots" value="false" /><label class="inventory__checkbox"
           ><input type="checkbox" name="trackLots" value="true" bind:checked={itemTrackLots} /> Controlar
           lotes y vencimientos</label
@@ -786,7 +929,8 @@
       ><Dialog.Footer
         ><Button type="button" variant="outline" onclick={() => (itemDialogOpen = false)}
           >Cancelar</Button
-        ><Button type="submit">Guardar insumo</Button></Dialog.Footer
+        ><Button type="submit" loading={pendingAction === 'saveItem'}>Guardar insumo</Button
+        ></Dialog.Footer
       >
     </form></Dialog.Content
   ></Dialog.Root
@@ -799,7 +943,12 @@
         >La recepción crea lotes y movimientos de entrada de forma idempotente.</Dialog.Description
       ></Dialog.Header
     >
-    <form class="inventory__form" method="POST" action="?/receive">
+    <form
+      class="inventory__form"
+      method="POST"
+      action="?/receive"
+      onsubmit={(event: SubmitEvent) => guardSubmit('receive', event)}
+    >
       <input type="hidden" name="locationId" value={data.locationId} /><input
         type="hidden"
         name="lines"
@@ -884,6 +1033,7 @@
             variant="outline"
             size="sm"
             onclick={() => (receiptLines = [...receiptLines, emptyReceiptLine()])}
+            disabled={receiptLines.length >= FORM_LIMITS.inventory.receiptLinesMaxSize}
             ><Plus class="size-4" aria-hidden="true" />Agregar línea</Button
           >
         </div>
@@ -986,7 +1136,8 @@
       ><Dialog.Footer
         ><Button type="button" variant="outline" onclick={() => (receiveDialogOpen = false)}
           >Cancelar</Button
-        ><Button type="submit">Registrar recepción</Button></Dialog.Footer
+        ><Button type="submit" loading={pendingAction === 'receive'}>Registrar recepción</Button
+        ></Dialog.Footer
       >
     </form></Dialog.Content
   ></Dialog.Root
@@ -999,8 +1150,17 @@
         >Los movimientos son append-only y toda salida requiere un motivo.</Dialog.Description
       ></Dialog.Header
     >
-    <form class="inventory__form" method="POST" action="?/adjust">
-      <input type="hidden" name="locationId" value={data.locationId} /><Dialog.Body
+    <form
+      class="inventory__form"
+      method="POST"
+      action="?/adjust"
+      onsubmit={(event: SubmitEvent) => guardSubmit('adjust', event)}
+    >
+      <input type="hidden" name="locationId" value={data.locationId} /><input
+        type="hidden"
+        name="operationId"
+        value={adjustmentOperationId}
+      /><Dialog.Body
         ><p class="form-legend">
           <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
         </p>
@@ -1103,7 +1263,9 @@
       ><Dialog.Footer
         ><Button type="button" variant="outline" onclick={() => (adjustmentDialogOpen = false)}
           >Cancelar</Button
-        ><Button type="submit" variant="destructive">Registrar movimiento</Button></Dialog.Footer
+        ><Button type="submit" variant="destructive" loading={pendingAction === 'adjust'}
+          >Registrar movimiento</Button
+        ></Dialog.Footer
       >
     </form></Dialog.Content
   ></Dialog.Root

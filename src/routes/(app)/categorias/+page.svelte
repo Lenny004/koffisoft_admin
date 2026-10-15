@@ -296,6 +296,9 @@
     </Dialog.Header>
     <form class="categories__form" method="POST" action="?/save">
       {#if editingId}<input type="hidden" name="id" value={editingId} />{/if}
+      <p class="form-legend">
+        <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+      </p>
       <FormField id="category-slug" label="Slug" required error={fieldError('slug')}>
         <input
           id="category-slug"

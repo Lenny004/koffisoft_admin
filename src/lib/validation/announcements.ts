@@ -43,7 +43,7 @@ export const announcementSchema = z
     ),
     startsAt: z.string().optional(),
     endsAt: z.string().optional(),
-    displayOrder: z.coerce.number().int().min(0).max(100_000),
+    displayOrder: z.coerce.number().int().min(0).max(FORM_LIMITS.announcement.displayOrderMax),
     active: z.boolean(),
   })
   .superRefine((value, context) => {

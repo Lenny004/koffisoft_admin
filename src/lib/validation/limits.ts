@@ -31,6 +31,7 @@ export const FORM_LIMITS = {
     partySizeMax: 100, // DTO de disponibilidad y creación pública @Max(100).
     durationMinutesMin: 30, // DTO @Min(30).
     durationMinutesMax: 360, // DTO @Max(360).
+    tableIdsMaxSize: 50,
   },
   event: {
     eventCodeMaxLength: 50, // Event.event_code @db.VarChar(50), DTO @MaxLength(50).
@@ -49,6 +50,8 @@ export const FORM_LIMITS = {
     packageDescriptionMaxLength: 10_000, // EventPackage.description_* @db.Text, DTO @MaxLength(10_000).
     packagePriceMax: 999_999_999_999.99, // EventPackage.base_price @db.Decimal(14,2), CHECK >= 0.
     packageGuestCountMin: 1, // event_packages.*_guest_count CHECK (> 0), DTO @Min(1).
+    packageLinesMaxSize: 100,
+    quoteLinesMaxSize: 100,
     lineLabelMaxLength: 200, // EventPackageLine/EventQuoteLine.label_* @db.VarChar(200), DTO @MaxLength(200).
     lineUnitMaxLength: 40, // EventPackageLine/EventQuoteLine.unit @db.VarChar(40), DTO @MaxLength(40).
     lineQuantityMax: 99_999_999.999999, // Event*Line.quantity @db.Decimal(14,6), CHECK > 0.
@@ -63,6 +66,7 @@ export const FORM_LIMITS = {
     messageMaxLength: 10_000,
     ctaLabelMaxLength: 80,
     ctaUrlMaxLength: 500,
+    displayOrderMax: 100_000,
   },
   user: {
     searchMaxLength: 200, // UserListQueryDto.search @MaxLength(200).
@@ -75,6 +79,7 @@ export const FORM_LIMITS = {
     phoneMaxLength: 40, // Employee.phone @db.VarChar(40).
     passwordMinLength: 12, // CreateUserDto.password @MinLength(12).
     passwordMaxLength: 128, // CreateUserDto.password @MaxLength(128).
+    roleIdsMaxSize: 20,
   },
   menu: {
     categorySlugMaxLength: 120, // MenuCategory.slug @db.VarChar(120), DTO @MaxLength(120).
@@ -90,6 +95,8 @@ export const FORM_LIMITS = {
     dayOfWeekMax: 7, // menu_availability.day_of_week CHECK BETWEEN 1 AND 7, DTO @Max(7).
     searchMaxLength: 120, // AdminListQueryDto.search @MaxLength(120).
     allergenMaxLength: 40, // PublicMenuQueryDto.allergen @MaxLength(40).
+    categoryReorderMaxSize: 100,
+    allergenMaxSize: 100,
   },
   venue: {
     smallIntMax: 32_767, // PostgreSQL SMALLINT usado por capacidades y asientos.
@@ -111,7 +118,10 @@ export const FORM_LIMITS = {
     ingredientSkuMaxLength: 50,
     ingredientNameMaxLength: 160,
     ingredientDescriptionMaxLength: 10_000,
+    supplierLinksMaxSize: 50,
+    supplierSkuMaxLength: 60,
     receiptNumberMaxLength: 50,
+    receiptLinesMaxSize: 100,
     lotCodeMaxLength: 80,
     notesMaxLength: 10_000,
     reasonMinLength: 3,
