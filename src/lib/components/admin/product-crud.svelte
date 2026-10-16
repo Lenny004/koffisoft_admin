@@ -12,6 +12,10 @@
   import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { CategoryRow, MenuAllergen, MenuPageMeta, MenuRow } from '$lib/menu/types';
 
   interface ProductPageData {
@@ -34,12 +38,11 @@
   let { data, form }: Props = $props();
 
   function fieldError(name: string): string {
-    return form?.errors && !Array.isArray(form.errors) ? (form.errors[name] ?? '') : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    if (!form?.errors) return [];
-    return Array.isArray(form.errors) ? form.errors : form.errors._form ? [form.errors._form] : [];
+    return getGlobalErrors(form?.errors);
   }
   let products = $derived(data.products);
   let open = $state(false);

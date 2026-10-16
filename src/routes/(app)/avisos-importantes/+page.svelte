@@ -8,6 +8,10 @@
   import FormField from '$lib/components/ui/form-field.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
   import type { PageProps } from './$types';
 
   let { data, form }: PageProps = $props();
@@ -21,19 +25,16 @@
   let endsAt = $state('');
   let displayOrder = $state(0);
   let active = $state(true);
+  let pendingAction = $state<string | null>(null);
 
   const canManage = $derived(data.permissions.includes('important_announcements.manage'));
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && typeof errors === 'object' && !Array.isArray(errors)
-      ? ((errors as Record<string, string>)[name] ?? '')
-      : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    const errors = form?.errors;
-    return Array.isArray(errors) ? errors : [];
+    return getGlobalErrors(form?.errors);
   }
 
   function startCreate() {
@@ -66,7 +67,16 @@
     return window.confirm(messageText);
   }
 
+  function guardSubmit(action: string, event: SubmitEvent, messageText?: string): void {
+    if (pendingAction || (messageText && !confirmAction(messageText))) {
+      event.preventDefault();
+      return;
+    }
+    pendingAction = action;
+  }
+
   $effect(() => {
+    if (form?.action) pendingAction = null;
     if (form?.success) open = false;
   });
 </script>
@@ -77,7 +87,7 @@
   <header class="page-header">
     <div>
       <p class="page-header__eyebrow">Contenido público</p>
-      <h2 class="page-header__title" id="announcements-title">Important Announcement</h2>
+      <h2 class="page-header__title" id="announcements-title">Avisos importantes</h2>
       <p class="page-header__description">
         Publica avisos destacados en la portada y programa cuándo deben aparecer.
       </p>
@@ -148,20 +158,19 @@
                   <form
                     method="POST"
                     action="?/toggle"
-                    onsubmit={(event: SubmitEvent) => {
-                      if (
-                        !confirmAction(
-                          `${announcement.active ? '¿Desactivar' : 'Activar'} el aviso?`,
-                        )
-                      )
-                        event.preventDefault();
-                    }}
+                    onsubmit={(event: SubmitEvent) =>
+                      guardSubmit(
+                        `toggle-${announcement.id}`,
+                        event,
+                        `${announcement.active ? '¿Desactivar' : 'Activar'} el aviso?`,
+                      )}
                   >
                     <input type="hidden" name="id" value={announcement.id} />
                     <input type="hidden" name="active" value={String(!announcement.active)} />
                     <Button
                       variant="ghost"
                       size="icon"
+                      loading={pendingAction === `toggle-${announcement.id}`}
                       aria-label={`${announcement.active ? 'Desactivar' : 'Activar'} aviso`}
                     >
                       <Power class="size-4" aria-hidden="true" />
@@ -170,13 +179,20 @@
                   <form
                     method="POST"
                     action="?/delete"
-                    onsubmit={(event: SubmitEvent) => {
-                      if (!confirmAction('El aviso se desactivará. ¿Continuar?'))
-                        event.preventDefault();
-                    }}
+                    onsubmit={(event: SubmitEvent) =>
+                      guardSubmit(
+                        `delete-${announcement.id}`,
+                        event,
+                        'El aviso se desactivará. ¿Continuar?',
+                      )}
                   >
                     <input type="hidden" name="id" value={announcement.id} />
-                    <Button variant="ghost" size="icon" aria-label="Desactivar aviso">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      loading={pendingAction === `delete-${announcement.id}`}
+                      aria-label="Desactivar aviso"
+                    >
                       <Trash2 class="size-4 text-destructive" aria-hidden="true" />
                     </Button>
                   </form>
@@ -204,8 +220,17 @@
         >El aviso aparecerá en la landing cuando esté activo y vigente.</Dialog.Description
       >
     </Dialog.Header>
-    <form class="announcements__form" method="POST" action="?/save">
+    <form
+      class="announcements__form"
+      method="POST"
+      action="?/save"
+      onsubmit={(event: SubmitEvent) => guardSubmit('save', event)}
+    >
       <input type="hidden" name="id" value={editingId ?? ''} />
+
+      <p class="form-legend">
+        <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+      </p>
 
       <div class="announcements__form-grid">
         <FormField
@@ -221,7 +246,7 @@
             name="title"
             bind:value={title}
             maxlength={FORM_LIMITS.announcement.titleMaxLength}
-            placeholder="Ej. Important Announcement"
+            placeholder="Ej. Horario especial este fin de semana"
             required
             aria-invalid={Boolean(fieldError('title'))}
           />
@@ -237,7 +262,7 @@
             name="displayOrder"
             type="number"
             min="0"
-            max="100000"
+            max={FORM_LIMITS.announcement.displayOrderMax}
             step="1"
             bind:value={displayOrder}
             placeholder="Ej. 0"
@@ -290,6 +315,7 @@
             id="announcement-cta-url"
             name="ctaUrl"
             bind:value={ctaUrl}
+            type={ctaUrl.trimStart().startsWith('/') ? 'text' : 'url'}
             maxlength={FORM_LIMITS.announcement.ctaUrlMaxLength}
             placeholder="Ej. /reservas"
             inputmode="url"
@@ -328,7 +354,7 @@
       </label>
       <Dialog.Footer>
         <Button type="button" variant="outline" onclick={() => (open = false)}>Cancelar</Button>
-        <Button type="submit">Guardar aviso</Button>
+        <Button type="submit" loading={pendingAction === 'save'}>Guardar aviso</Button>
       </Dialog.Footer>
     </form>
   </Dialog.Content>

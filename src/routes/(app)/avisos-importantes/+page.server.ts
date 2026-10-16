@@ -95,7 +95,7 @@ export const actions: Actions = {
     try {
       const client = createAnnouncementsClient(event, env.API_BASE_URL ?? '');
       const payload = apiPayload(result.data);
-      if (result.data.id) await client.update(result.data.id, payload);
+      if (result.data.id) await client.update(result.data.id, locationId, payload);
       else await client.create({ locationId, ...payload });
       return { success: true };
     } catch (error) {
@@ -113,7 +113,9 @@ export const actions: Actions = {
     const id = formText(formData.get('id'));
     if (!id) return fail(400, { action: 'toggle', errors: ['El aviso no es válido.'] });
     try {
-      await createAnnouncementsClient(event, env.API_BASE_URL ?? '').update(id, {
+      const locationId = env.DEFAULT_LOCATION_ID ?? '';
+      if (!locationId) return fail(503, { action: 'toggle', errors: [configurationError()] });
+      await createAnnouncementsClient(event, env.API_BASE_URL ?? '').update(id, locationId, {
         active: formBoolean(formData.get('active')),
       });
       return { success: true };
@@ -131,7 +133,9 @@ export const actions: Actions = {
     const id = formText((await event.request.formData()).get('id'));
     if (!id) return fail(400, { action: 'delete', errors: ['El aviso no es válido.'] });
     try {
-      await createAnnouncementsClient(event, env.API_BASE_URL ?? '').remove(id);
+      const locationId = env.DEFAULT_LOCATION_ID ?? '';
+      if (!locationId) return fail(503, { action: 'delete', errors: [configurationError()] });
+      await createAnnouncementsClient(event, env.API_BASE_URL ?? '').remove(id, locationId);
       return { success: true };
     } catch (error) {
       const response = actionError(error);

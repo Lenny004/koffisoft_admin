@@ -41,6 +41,34 @@
     control.addEventListener('input', updateLength);
     return () => control.removeEventListener('input', updateLength);
   });
+
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    const control = document.getElementById(id);
+    if (!(
+      control instanceof HTMLInputElement ||
+      control instanceof HTMLTextAreaElement ||
+      control instanceof HTMLSelectElement
+    ))
+      return;
+
+    const errorId = `${id}-error`;
+    const describedBy = (control.getAttribute('aria-describedby') ?? '')
+      .split(/\s+/u)
+      .filter((value) => value && value !== errorId);
+    if (error) {
+      control.setAttribute('aria-describedby', [...describedBy, errorId].join(' '));
+      control.setAttribute('aria-errormessage', errorId);
+      control.setAttribute('aria-invalid', 'true');
+      return;
+    }
+
+    if (describedBy.length) control.setAttribute('aria-describedby', describedBy.join(' '));
+    else control.removeAttribute('aria-describedby');
+    if (control.getAttribute('aria-errormessage') === errorId)
+      control.removeAttribute('aria-errormessage');
+    if (control.getAttribute('aria-invalid') === 'true') control.removeAttribute('aria-invalid');
+  });
 </script>
 
 <div

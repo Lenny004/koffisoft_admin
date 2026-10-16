@@ -10,6 +10,19 @@ const optionalText = (max: number) =>
     .transform((value) => value || undefined)
     .optional();
 
+function isSafeAnnouncementUrl(value: string): boolean {
+  if (/[\u0000-\u001f\u007f\\]/u.test(value)) {
+    return false;
+  }
+  if (value.startsWith('/')) return !value.startsWith('//');
+  try {
+    const parsed = new URL(value);
+    return ['http:', 'https:'].includes(parsed.protocol) && /^https?:\/\//iu.test(value);
+  } catch {
+    return false;
+  }
+}
+
 export const announcementSchema = z
   .object({
     id: z.string().optional(),
@@ -24,10 +37,13 @@ export const announcementSchema = z
       .min(1, 'El mensaje es obligatorio.')
       .max(FORM_LIMITS.announcement.messageMaxLength),
     ctaLabel: optionalText(FORM_LIMITS.announcement.ctaLabelMaxLength),
-    ctaUrl: optionalText(FORM_LIMITS.announcement.ctaUrlMaxLength),
+    ctaUrl: optionalText(FORM_LIMITS.announcement.ctaUrlMaxLength).refine(
+      (value) => value === undefined || isSafeAnnouncementUrl(value),
+      'Usa una URL HTTP(S) o una ruta relativa segura.',
+    ),
     startsAt: z.string().optional(),
     endsAt: z.string().optional(),
-    displayOrder: z.coerce.number().int().min(0).max(100_000),
+    displayOrder: z.coerce.number().int().min(0).max(FORM_LIMITS.announcement.displayOrderMax),
     active: z.boolean(),
   })
   .superRefine((value, context) => {

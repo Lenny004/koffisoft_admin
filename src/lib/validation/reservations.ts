@@ -82,7 +82,7 @@ export const diningTableSchema = z.object({
 
 export const assignTablesSchema = z.object({
   reservationId: uuid,
-  tableIds: z.array(uuid),
+  tableIds: z.array(uuid).max(FORM_LIMITS.reservation.tableIdsMaxSize),
 });
 
 export const createReservationSchema = z
@@ -127,7 +127,7 @@ export const createReservationSchema = z
       .optional()
       .or(z.literal('')),
     status: z.enum(['PendingConfirmation', 'Confirmed']),
-    tableIds: z.array(uuid),
+    tableIds: z.array(uuid).max(FORM_LIMITS.reservation.tableIdsMaxSize),
   })
   .superRefine((value, context) => {
     if (!value.customerId && !value.contactName) {

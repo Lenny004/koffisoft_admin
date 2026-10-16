@@ -4,6 +4,10 @@
   import FormField from '$lib/components/ui/form-field.svelte';
   import PasswordInput from '$lib/components/ui/password-input.svelte';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
 
   type LoginStep =
     'bootstrap' | 'login' | 'forgot' | 'totp' | 'setup' | 'confirm' | 'recovery' | 'password';
@@ -14,23 +18,27 @@
     uri?: string;
     label?: string;
     recoveryCodes?: string[];
+    returnTo?: string;
   }
 
   let {
     data,
     form,
-  }: { data: { setupRequired: boolean; showForgot: boolean }; form?: LoginForm | null } = $props();
+  }: {
+    data: { setupRequired: boolean; showForgot: boolean; returnTo: string };
+    form?: LoginForm | null;
+  } = $props();
   const step = $derived<LoginStep>(
     form?.step ?? (data.setupRequired ? 'bootstrap' : data.showForgot ? 'forgot' : 'login'),
   );
+  const destination = $derived(form?.returnTo ?? data.returnTo);
 
   function fieldError(name: string): string {
-    return form?.errors && !Array.isArray(form.errors) ? (form.errors[name] ?? '') : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    if (!form?.errors) return [];
-    return Array.isArray(form.errors) ? form.errors : form.errors._form ? [form.errors._form] : [];
+    return getGlobalErrors(form?.errors);
   }
 
   function formValue(name: string): string {
@@ -68,6 +76,7 @@
           Esta cuenta se crea una sola vez. Después el panel solo muestra el inicio de sesión.
         </p>
         <form class="login-card__form" method="POST" action="?/bootstrap" autocomplete="on">
+          <input type="hidden" name="returnTo" value={destination} />
           <div class="login-card__fields">
             <FormField
               id="setup-first-name"
@@ -187,7 +196,12 @@
           escribir la contraseña.
         </p>
         <div class="login-card__actions">
-          <a class="login-card__secondary" href={resolve('/')}>Volver al inicio de sesión</a>
+          <a
+            class="login-card__secondary"
+            href={resolve(
+              (destination ? `/?returnTo=${encodeURIComponent(destination)}` : '/') as '/',
+            )}>Volver al inicio de sesión</a
+          >
         </div>
       {:else if step === 'login'}
         <p class="login-card__eyebrow">Panel privado</p>
@@ -196,6 +210,7 @@
           Administra el catálogo y la operación diaria de Koffi-Soft.
         </p>
         <form class="login-card__form" method="POST" action="?/login" autocomplete="on">
+          <input type="hidden" name="returnTo" value={destination} />
           <div class="login-card__fields">
             <FormField
               id="login-email"
@@ -246,6 +261,7 @@
         </form>
         <form class="login-card__actions" method="GET" action={resolve('/')}>
           <input type="hidden" name="recuperar" value="1" />
+          <input type="hidden" name="returnTo" value={destination} />
           <Button class="login-card__link" variant="link" type="submit">Olvidé mi contraseña</Button
           >
         </form>
@@ -256,6 +272,7 @@
           Escribe el código de seis dígitos de tu aplicación autenticadora.
         </p>
         <form class="login-card__form" method="POST" action="?/verifyMfa">
+          <input type="hidden" name="returnTo" value={destination} />
           <FormField
             id="totp-code"
             label="Código TOTP"
@@ -285,6 +302,7 @@
           <Button class="login-card__submit" type="submit">Verificar código</Button>
         </form>
         <form class="login-card__actions" method="POST" action="?/recoverMfa">
+          <input type="hidden" name="returnTo" value={destination} />
           <FormField
             id="recovery-code"
             label="¿No tienes tu aplicación?"
@@ -318,6 +336,7 @@
           La API exige registrar un factor TOTP antes de entrar al panel.
         </p>
         <form class="login-card__form" method="POST" action="?/setupMfa">
+          <input type="hidden" name="returnTo" value={destination} />
           <p class="form-legend">
             <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio · Campo opcional
           </p>
@@ -353,6 +372,7 @@
         <div class="login-card__notice" role="status">{form?.uri}</div>
         <form class="login-card__form" method="POST" action="?/confirmMfa">
           <input type="hidden" name="uri" value={form?.uri ?? ''} />
+          <input type="hidden" name="returnTo" value={destination} />
           <FormField
             id="confirm-code"
             label="Código TOTP"
@@ -391,7 +411,10 @@
           {#each form?.recoveryCodes ?? [] as code (code)}<li>{code}</li>{/each}
         </ul>
         <div class="login-card__actions">
-          <a class="login-card__secondary" href={resolve('/dashboard')}>Entrar al panel</a>
+          <a
+            class="login-card__secondary"
+            href={resolve((destination || '/dashboard') as '/dashboard')}>Entrar al panel</a
+          >
         </div>
       {:else if step === 'password'}
         <p class="login-card__eyebrow">Acción requerida</p>
@@ -400,6 +423,7 @@
           La API indicó que necesitas cambiar tu contraseña antes de continuar.
         </p>
         <form class="login-card__form" method="POST" action="?/changePassword">
+          <input type="hidden" name="returnTo" value={destination} />
           <FormField
             id="current-password"
             label="Contraseña actual"

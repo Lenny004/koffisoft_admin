@@ -7,6 +7,10 @@ export interface ImportantAnnouncement {
   ctaUrl: string | null;
   startsAt: string | null;
   endsAt: string | null;
+  publicationStatus?: 'Draft' | 'Scheduled' | 'Published';
+  publishedAt?: string | null;
+  scheduledAt?: string | null;
+  expiresAt?: string | null;
   displayOrder: number;
   active: boolean;
   createdAt: string;

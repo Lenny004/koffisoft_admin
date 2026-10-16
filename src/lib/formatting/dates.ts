@@ -1,4 +1,5 @@
 const EL_SALVADOR_TIMEZONE = 'America/El_Salvador';
+const PLAIN_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
 
 const dateTimeFormatter = new Intl.DateTimeFormat('es-SV', {
   timeZone: EL_SALVADOR_TIMEZONE,
@@ -20,6 +21,7 @@ export function formatElSalvadorDateTime(value: string): string {
 }
 
 export function formatElSalvadorDate(value: string): string {
+  if (PLAIN_DATE_PATTERN.test(value)) return value;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? 'Fecha no disponible' : dateFormatter.format(date);
 }
@@ -31,6 +33,7 @@ export function todayInElSalvador(): string {
 /** `datetime-local` no incluye offset; la API exige una fecha ISO con offset explícito. */
 export function localElSalvadorDateTimeToIso(value: string): string {
   if (!value) return '';
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/u.test(value)) return '';
   return `${value}:00-06:00`;
 }
 

@@ -1,10 +1,9 @@
 <script lang="ts">
-  import UnderConstruction from '$lib/components/admin/under-construction.svelte';
+  import type { PageProps } from './$types';
+  import EmployeeDirectory from '$lib/components/admin/employee-directory.svelte';
+
+  let { data, form }: PageProps = $props();
 </script>
 
 <svelte:head><title>Empleados | Koffi-Soft Admin</title></svelte:head>
-<UnderConstruction
-  title="Empleados"
-  permission="users.read"
-  description="La pantalla conserva el módulo del legacy; la API aún no documenta un recurso administrativo de empleados para consumir aquí."
-/>
+<EmployeeDirectory {data} {form} />

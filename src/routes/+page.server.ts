@@ -23,6 +23,7 @@ import {
 } from '$lib/validation/auth';
 import { formValues } from '$lib/validation/errors';
 import { validationErrors } from '$lib/validation/errors';
+import { safeReturnTo } from '$lib/server/return-to';
 
 /** Form actions del acceso: validan en servidor, llaman a auth y trasladan solo cookies seguras. */
 interface LoginResponse {
@@ -46,19 +47,25 @@ function secureCookie(event: RequestEvent): boolean {
   return event.url.protocol === 'https:' || env.COOKIE_SECURE === 'true';
 }
 
-function returnTo(event: RequestEvent): string {
-  const requested = event.url.searchParams.get('returnTo');
-  return requested?.startsWith('/') && !requested.startsWith('//') ? requested : '/dashboard';
+function returnTo(event: RequestEvent, formData?: FormData): string {
+  const submitted = formData?.get('returnTo');
+  const requested =
+    typeof submitted === 'string' ? submitted : event.url.searchParams.get('returnTo');
+  return safeReturnTo(requested, event.url.origin);
 }
 
 async function authenticatedStep(event: RequestEvent): Promise<'password' | undefined> {
-  if (!env.API_BASE_URL) return undefined;
-  const response = await apiRequest(event, '/auth/me', env.API_BASE_URL);
-  if (!response.ok) return undefined;
-  const payload = (await readJson<{ user?: Record<string, unknown> }>(response)) ?? {};
-  return needsPasswordChange(payload.user as AuthenticatedUser | undefined)
-    ? 'password'
-    : undefined;
+  try {
+    if (!env.API_BASE_URL) return undefined;
+    const response = await apiRequest(event, '/auth/me', env.API_BASE_URL);
+    if (!response.ok) return undefined;
+    const payload = (await readJson<{ user?: Record<string, unknown> }>(response)) ?? {};
+    return needsPasswordChange(payload.user as AuthenticatedUser | undefined)
+      ? 'password'
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export const load: PageServerLoad = async (event) => {
@@ -78,6 +85,7 @@ export const load: PageServerLoad = async (event) => {
   return {
     setupRequired,
     showForgot: event.url.searchParams.get('recuperar') === '1',
+    returnTo: returnTo(event),
   };
 };
 
@@ -100,6 +108,7 @@ export const actions: Actions = {
         step: 'bootstrap' as const,
         errors: validationErrors(result.error),
         values: safeValues,
+        returnTo: returnTo(event, submitted),
       });
     }
 
@@ -121,6 +130,7 @@ export const actions: Actions = {
         step: 'bootstrap' as const,
         errors: [connectionErrorMessage(error)],
         values: safeValues,
+        returnTo: returnTo(event, submitted),
       });
     }
 
@@ -130,17 +140,22 @@ export const actions: Actions = {
         step: 'bootstrap' as const,
         errors: [await apiErrorMessage(response)],
         values: safeValues,
+        returnTo: returnTo(event, submitted),
       });
     }
 
     const payload = (await readJson<LoginResponse>(response)) ?? {};
-    if (payload.requiresMfa) return { action: 'bootstrap', step: 'totp' as const };
-    if (payload.requiresMfaSetup) return { action: 'bootstrap', step: 'setup' as const };
-    redirect(303, returnTo(event));
+    const destination = returnTo(event, submitted);
+    if (payload.requiresMfa)
+      return { action: 'bootstrap', step: 'totp' as const, returnTo: destination };
+    if (payload.requiresMfaSetup)
+      return { action: 'bootstrap', step: 'setup' as const, returnTo: destination };
+    redirect(303, destination);
   },
 
   login: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
     const result = loginSchema.safeParse({
       email: values.email,
       password: values.password,
@@ -151,6 +166,7 @@ export const actions: Actions = {
         action: 'login',
         errors: validationErrors(result.error),
         values: { email: String(values.email ?? '') },
+        returnTo: returnTo(event, submitted),
       });
     }
 
@@ -166,6 +182,7 @@ export const actions: Actions = {
         action: 'login',
         errors: [connectionErrorMessage(error)],
         email: result.data.email,
+        returnTo: returnTo(event, submitted),
       });
     }
 
@@ -174,71 +191,106 @@ export const actions: Actions = {
         action: 'login',
         errors: [await apiErrorMessage(response)],
         email: result.data.email,
+        returnTo: returnTo(event, submitted),
       });
     }
 
     const payload = (await readJson<LoginResponse>(response)) ?? {};
-    if (payload.requiresMfa) return { action: 'login', step: 'totp' as const };
-    if (payload.requiresMfaSetup) return { action: 'login', step: 'setup' as const };
+    const destination = returnTo(event, submitted);
+    if (payload.requiresMfa)
+      return { action: 'login', step: 'totp' as const, returnTo: destination };
+    if (payload.requiresMfaSetup)
+      return { action: 'login', step: 'setup' as const, returnTo: destination };
     if (payload.requiresPasswordChange || payload.mustChangePassword) {
-      return { action: 'login', step: 'password' as const };
+      return { action: 'login', step: 'password' as const, returnTo: destination };
     }
 
-    redirect(303, returnTo(event));
+    redirect(303, destination);
   },
 
   verifyMfa: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const destination = returnTo(event, submitted);
     const result = totpSchema.safeParse({ code: values.code });
     if (!result.success)
       return fail(400, {
         action: 'verifyMfa',
         step: 'totp' as const,
         errors: validationErrors(result.error),
+        returnTo: destination,
       });
 
-    const response = await apiRequest(event, '/auth/mfa/verify', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: result.data,
-    });
-    forwardSessionCookies(event, response, secureCookie(event));
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/mfa/verify', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: result.data,
+      });
+      forwardSessionCookies(event, response, secureCookie(event));
+    } catch (error) {
+      return fail(502, {
+        action: 'verifyMfa',
+        step: 'totp' as const,
+        errors: [connectionErrorMessage(error)],
+        returnTo: destination,
+      });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         action: 'verifyMfa',
         step: 'totp' as const,
         errors: [await apiErrorMessage(response)],
+        returnTo: destination,
       });
 
-    if (await authenticatedStep(event)) return { action: 'verifyMfa', step: 'password' as const };
-    redirect(303, '/dashboard');
+    if (await authenticatedStep(event))
+      return { action: 'verifyMfa', step: 'password' as const, returnTo: destination };
+    redirect(303, destination);
   },
 
   recoverMfa: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const destination = returnTo(event, submitted);
     const result = recoveryCodeSchema.safeParse({ code: values.code });
     if (!result.success)
       return fail(400, {
         action: 'recoverMfa',
         step: 'recovery' as const,
         errors: validationErrors(result.error),
+        returnTo: destination,
       });
 
-    const response = await apiRequest(event, '/auth/mfa/recovery', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: result.data,
-    });
-    forwardSessionCookies(event, response, secureCookie(event));
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/mfa/recovery', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: result.data,
+      });
+      forwardSessionCookies(event, response, secureCookie(event));
+    } catch (error) {
+      return fail(502, {
+        action: 'recoverMfa',
+        step: 'recovery' as const,
+        errors: [connectionErrorMessage(error)],
+        returnTo: destination,
+      });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         action: 'recoverMfa',
         step: 'recovery' as const,
         errors: [await apiErrorMessage(response)],
+        returnTo: destination,
       });
-    redirect(303, '/dashboard');
+    redirect(303, destination);
   },
 
   setupMfa: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const destination = returnTo(event, submitted);
     const result = mfaSetupSchema.safeParse({ label: values.label || undefined });
     if (!result.success)
       return fail(400, {
@@ -246,17 +298,30 @@ export const actions: Actions = {
         step: 'setup' as const,
         errors: validationErrors(result.error),
         values: { label: String(values.label ?? '') },
+        returnTo: destination,
       });
     const label = result.data.label;
-    const response = await apiRequest(event, '/auth/mfa/totp/setup', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: label ? { label } : {},
-    });
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/mfa/totp/setup', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: label ? { label } : {},
+      });
+    } catch (error) {
+      return fail(502, {
+        action: 'setupMfa',
+        step: 'setup' as const,
+        errors: [connectionErrorMessage(error)],
+        values: { label },
+        returnTo: destination,
+      });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         action: 'setupMfa',
         step: 'setup' as const,
         errors: [await apiErrorMessage(response)],
+        returnTo: destination,
       });
     const payload = await readJson<MfaSetupResponse>(response);
     return {
@@ -264,11 +329,14 @@ export const actions: Actions = {
       step: 'confirm' as const,
       uri: payload?.uri,
       label: payload?.label,
+      returnTo: destination,
     };
   },
 
   confirmMfa: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const destination = returnTo(event, submitted);
     const result = totpSchema.safeParse({ code: values.code });
     if (!result.success)
       return fail(400, {
@@ -277,50 +345,83 @@ export const actions: Actions = {
         errors: validationErrors(result.error),
         values: { uri: String(values.uri ?? '') },
         uri: values.uri,
+        returnTo: destination,
       });
 
-    const response = await apiRequest(event, '/auth/mfa/totp/confirm', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: result.data,
-    });
-    forwardSessionCookies(event, response, secureCookie(event));
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/mfa/totp/confirm', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: result.data,
+      });
+      forwardSessionCookies(event, response, secureCookie(event));
+    } catch (error) {
+      return fail(502, {
+        action: 'confirmMfa',
+        step: 'confirm' as const,
+        errors: [connectionErrorMessage(error)],
+        values: { uri: String(values.uri ?? '') },
+        uri: values.uri,
+        returnTo: destination,
+      });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         action: 'confirmMfa',
         step: 'confirm' as const,
         errors: [await apiErrorMessage(response)],
+        values: { uri: String(values.uri ?? '') },
         uri: values.uri,
+        returnTo: destination,
       });
     const payload = await readJson<RecoveryCodesResponse>(response);
     return {
       action: 'confirmMfa',
       step: 'recovery' as const,
       recoveryCodes: payload?.recoveryCodes ?? [],
+      returnTo: destination,
     };
   },
 
   changePassword: async (event) => {
-    const values = Object.fromEntries(await event.request.formData());
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const destination = returnTo(event, submitted);
     const result = changePasswordSchema.safeParse(values);
     if (!result.success)
       return fail(400, {
         action: 'changePassword',
         step: 'password' as const,
         errors: validationErrors(result.error),
+        returnTo: destination,
       });
 
-    const response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {
-      method: 'POST',
-      json: { currentPassword: result.data.currentPassword, newPassword: result.data.newPassword },
-    });
-    forwardSessionCookies(event, response, secureCookie(event));
+    let response: Response;
+    try {
+      response = await apiRequest(event, '/auth/password', env.API_BASE_URL ?? '', {
+        method: 'POST',
+        json: {
+          currentPassword: result.data.currentPassword,
+          newPassword: result.data.newPassword,
+        },
+      });
+      forwardSessionCookies(event, response, secureCookie(event));
+    } catch (error) {
+      return fail(502, {
+        action: 'changePassword',
+        step: 'password' as const,
+        errors: [connectionErrorMessage(error)],
+        returnTo: destination,
+      });
+    }
     if (!response.ok)
       return fail(actionErrorStatus(response.status), {
         action: 'changePassword',
         step: 'password' as const,
         errors: [await apiErrorMessage(response)],
+        returnTo: destination,
       });
-    redirect(303, '/dashboard');
+    redirect(303, destination);
   },
 
   logout: async (event) => {

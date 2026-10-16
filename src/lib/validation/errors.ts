@@ -2,6 +2,20 @@ import type { ZodError } from 'zod';
 
 /** Convierte las rutas de Zod en mensajes serializables que cada campo puede mostrar. */
 export type FieldErrors = Record<string, string>;
+export type FormErrors = FieldErrors | string[];
+
+/** Obtiene el mensaje de un campo sin repetir el estrechamiento del resultado de una action. */
+export function fieldError(errors: FormErrors | undefined, field: string): string {
+  if (!errors || Array.isArray(errors)) return '';
+  return errors[field] ?? '';
+}
+
+/** Conserva los errores generales y los errores serializados como lista. */
+export function globalErrors(errors: FormErrors | undefined): string[] {
+  if (!errors) return [];
+  if (Array.isArray(errors)) return errors;
+  return errors._form ? [errors._form] : [];
+}
 
 export function validationErrors(error: ZodError): FieldErrors {
   return error.issues.reduce<FieldErrors>((errors, issue) => {

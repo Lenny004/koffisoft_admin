@@ -80,6 +80,41 @@
       </ul>
     </section>
 
+    {#if data.inventoryAlertSource === 'api' && data.inventoryAlerts}
+      <section class="dashboard__panel" aria-labelledby="inventory-alerts-title">
+        <div class="dashboard__panel-heading">
+          <h3 class="dashboard__panel-title" id="inventory-alerts-title">Alertas de inventario</h3>
+          <a class="dashboard__quick-link" href={resolve('/inventario')}
+            >Abrir inventario <ArrowUpRight aria-hidden="true" /></a
+          >
+        </div>
+        <p class="dashboard__reservation-meta">
+          {data.inventoryAlerts.lowStock.length} con stock bajo · {data.inventoryAlerts.expiringLots
+            .length} próximos a vencer
+        </p>
+        {#if data.inventoryAlerts.lowStock.length || data.inventoryAlerts.expiringLots.length}
+          <ul class="dashboard__reservation-list">
+            {#each data.inventoryAlerts.lowStock.slice(0, 3) as alert (alert.name)}
+              <li class="dashboard__reservation">
+                <span>{alert.name}</span><span class="admin-status admin-status--warning"
+                  >Stock bajo</span
+                >
+              </li>
+            {/each}
+            {#each data.inventoryAlerts.expiringLots.slice(0, 3) as alert (alert.lotCode)}
+              <li class="dashboard__reservation">
+                <span>{alert.ingredientName} · lote {alert.lotCode}</span><span
+                  class="admin-status admin-status--danger">Vence {alert.expiresOn}</span
+                >
+              </li>
+            {/each}
+          </ul>
+        {:else}
+          <p class="dashboard__reservation-meta">No hay alertas activas.</p>
+        {/if}
+      </section>
+    {/if}
+
     <aside class="dashboard__panel" aria-labelledby="quick-access-title">
       <div class="dashboard__panel-heading">
         <h3 class="dashboard__panel-title" id="quick-access-title">Accesos rápidos</h3>
@@ -87,21 +122,27 @@
       </div>
       <nav aria-label="Accesos rápidos">
         <ul class="dashboard__quick-list">
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/productos')}
-              >Revisar menú <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/reservaciones')}
-              >Gestionar reservas <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
-          <li>
-            <a class="dashboard__quick-link" href={resolve('/reportes')}
-              >Ver reportes <ArrowUpRight aria-hidden="true" /></a
-            >
-          </li>
+          {#if data.permissions?.includes('catalog.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/productos')}
+                >Revisar menú <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
+          {#if data.permissions?.includes('reservations.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/reservaciones')}
+                >Gestionar reservas <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
+          {#if data.permissions?.includes('reports.read')}
+            <li>
+              <a class="dashboard__quick-link" href={resolve('/reportes')}
+                >Ver reportes <ArrowUpRight aria-hidden="true" /></a
+              >
+            </li>
+          {/if}
         </ul>
       </nav>
     </aside>

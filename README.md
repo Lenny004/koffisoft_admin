@@ -31,6 +31,17 @@
 
 <!-- section:highlights -->
 
+- **Estadísticas sin cookies:** `/estadisticas` muestra visitas agregadas por sede, páginas, platos, eventos y dominios con `analytics.read`.
+
+- **Publicacion editorial:** `/publicacion` programa avisos, eventos y platos
+  con zona horaria de El Salvador y preview temporal; ve [docs/publicacion-admin.md](docs/publicacion-admin.md).
+
+- **Bandeja de contacto:** filtra mensajes por sede, gestiona estados y
+  conversiones con auditoria y permisos.
+- **Sitio editable:** permisos, alcance por sede y formularios para dirección, horarios, hero, Nosotros y redes sociales.
+- **SEO editorial:** edición protegida de metatítulos, descripciones, imagen OG, canonical y noindex por recurso publicado.
+- **Respaldos operativos:** `/respaldos` inicia, consulta, descarga y elimina artefactos protegidos según permisos específicos.
+
 ## 🌟 Aspectos destacados
 
 - **Shell responsive:** sidebar con permisos, offcanvas móvil, topbar, tema oscuro y enlace al sitio público.
@@ -39,7 +50,11 @@
 - **Diseño compartido:** Helvetica Neue Light, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
 - **Reservaciones y eventos conectados:** agenda, creación interna, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
-- **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlace opcional para la landing pública.
+- **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlaces CTA validados por la API para la landing pública.
+- **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
+
+- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos, alcance por sede y validación Zod.
+- **Descubrimiento público:** la ruta `/seo` administra defaults y overrides de páginas, platos, eventos y avisos mediante BFF.
 
 <!-- section:overview -->
 
@@ -47,7 +62,7 @@
 
 `koffisoft_admin` es el panel privado de Koffi-Soft. Su shell recupera los módulos operativos del legacy, pero usa SvelteKit 2, Svelte 5, TypeScript estricto, Tailwind CSS 4, shadcn-svelte sobre Bits UI y bloques BEM para la capa visual.
 
-La API (`koffisoft_api`) mantiene PostgreSQL, sesiones, TOTP, permisos y contratos HTTP. El admin no accede directamente a la base de datos. Dashboard y productos usan endpoints documentados cuando hay `DEFAULT_LOCATION_ID`; ventas y otros módulos sin contrato administrativo se identifican como fixtures o “en construcción”.
+La API (`koffisoft_api`) mantiene PostgreSQL, sesiones, TOTP, permisos y contratos HTTP. El admin no accede directamente a la base de datos. Dashboard, catálogo, directorios administrativos y respaldos usan endpoints documentados; ventas y otros módulos sin contrato administrativo se identifican como fixtures o “en construcción”.
 
 **Stack:** SvelteKit 2.70.3, Svelte 5.57.1, TypeScript 5.9.3, Vite 7.3.6, Tailwind CSS 4.3.3, shadcn-svelte 1.7.0, TanStack Svelte Table 9.2.4, Zod 4.6.5, Vitest 5.0.3 y Playwright 1.63.0.
 
@@ -87,7 +102,7 @@ Configura `.env` con los valores locales de la API y del origen del panel. No gu
 pnpm dev
 ```
 
-Abre la URL mostrada por Vite. `/` presenta el login; después de autenticarte, `/dashboard` muestra el shell y los módulos permitidos por la API.
+Abre la URL mostrada por Vite. `/` presenta el login; después de autenticarte, `/dashboard` muestra el shell y los módulos permitidos por la API. Con `seo.read` aparece `/seo`; las acciones se muestran solo con `seo.manage`.
 
 <!-- section:configuration -->
 
@@ -108,17 +123,22 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 
 <!-- section:structure -->
 
+La ruta `src/routes/(app)/publicacion/` consume el BFF de publicacion y oculta
+acciones cuando el usuario no tiene `content.publish`.
+
 ## 🗂️ Estructura del proyecto
 
 ```text
 .
-├── docs/                         # Diseño, autenticación y catálogo del panel
+├── docs/                         # Diseño, autenticación, catálogo, SEO y usuarios
 ├── src/lib/components/admin/     # Shell, login, tabla y placeholders
 ├── src/lib/config/               # Navegación y permisos
 ├── src/lib/fixtures/              # Datos de prueba claramente marcados
-├── src/lib/server/                # BFF de API, auth hook y clientes de menú y avisos
+├── src/lib/server/                # BFF de API, auth hook y clientes de módulos
+├── src/routes/(app)/respaldos/    # Lista, acciones y stream BFF de respaldos
 ├── src/lib/announcements/         # Tipos del CRUD de avisos importantes
 ├── src/lib/menu/                  # Tipos y mapeos del contrato administrativo
+├── src/lib/seo/                   # Tipos, límites y cliente BFF de SEO
 ├── src/lib/styles/                # Bloques BEM del shell y pantallas
 ├── src/routes/(app)/              # Layout y rutas protegidas
 ├── src/routes/+page.server.ts    # Form actions de login y MFA
@@ -126,6 +146,7 @@ La sesión nunca se guarda en `localStorage`; la única preferencia local es el 
 ├── static/                        # Assets de marca, fixtures visuales y Helvetica Neue Light
 ├── tests/                         # Pruebas E2E de la pantalla pública
 ├── .env.example                   # Variables de entorno sin secretos
+├── src/lib/inventory/             # Tipos y datos de pantalla de inventario y proveedores
 └── package.json                   # Scripts y dependencias
 ```
 
@@ -141,7 +162,9 @@ pnpm typecheck
 pnpm build
 ```
 
-La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md) y el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md).
+El BFF de inventario y proveedores está documentado en [`docs/inventario-admin.md`](docs/inventario-admin.md).
+
+La guía visual está en [`docs/sistema-diseno.md`](docs/sistema-diseno.md), el flujo de autenticación en [`docs/auth-admin.md`](docs/auth-admin.md), la integración del catálogo en [`docs/catalogo-admin.md`](docs/catalogo-admin.md), el módulo operativo en [`docs/reservas-eventos-admin.md`](docs/reservas-eventos-admin.md), [SEO editorial](docs/seo-admin.md), el directorio administrativo en [`docs/usuarios-admin.md`](docs/usuarios-admin.md) y [respaldos](docs/respaldos-admin.md).
 
 <!-- section:testing -->
 
@@ -153,9 +176,13 @@ pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Vitest cubre validación del login y menú, mapeos del catálogo, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
+Vitest cubre validación del login, menú y usuarios, mapeos del catálogo, SEO, cliente server-side, navegación por permisos y hook server-side. Playwright comprueba que la pantalla de login sea pública.
+
+Las pruebas de inventario cubren validación de recepciones y mermas, consultas paginadas del BFF, cookies HttpOnly, origen CSRF y errores de permisos.
 
 <!-- section:roadmap -->
+
+- [x] Bloque 4: programacion, expiracion y vista previa segura de contenido.
 
 ## 🗺️ Hoja de ruta y estado
 
@@ -167,6 +194,10 @@ Vitest cubre validación del login y menú, mapeos del catálogo, cliente server
 - [x] Integración administrativa de reservaciones, espacios, mesas y agenda.
 - [x] Integración de eventos, bloqueos de espacios, paquetes, cotizaciones y requisitos.
 - [x] CRUD de avisos importantes conectado a la landing pública.
+- [x] Bloque 2: pantalla SEO con permisos, límites y BFF server-side.
+- [x] Directorio administrativo de usuarios y empleados con roles, vínculos y controles de seguridad.
+- [x] Inventario, proveedores, recepciones, movimientos, alertas y recetas conectados al contrato administrativo.
+- [x] Bloque 6: pantalla de respaldos con estados, checksum, descarga autenticada y acciones por permiso.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
 <!-- section:contributing -->

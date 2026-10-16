@@ -16,6 +16,7 @@ export const FORM_LIMITS = {
     personNameMaxLength: 80, // InitialSetupDto firstName/lastName @MaxLength(80), Employee @db.VarChar(80).
   },
   contact: {
+    searchMaxLength: 120,
     nameMaxLength: 200, // ContactMessage.name_snapshot @db.VarChar(200).
     emailMaxLength: 200, // ContactMessage.email @db.VarChar(200).
     phoneMaxLength: 40, // ContactMessage.phone @db.VarChar(40).
@@ -31,6 +32,7 @@ export const FORM_LIMITS = {
     partySizeMax: 100, // DTO de disponibilidad y creación pública @Max(100).
     durationMinutesMin: 30, // DTO @Min(30).
     durationMinutesMax: 360, // DTO @Max(360).
+    tableIdsMaxSize: 50,
   },
   event: {
     eventCodeMaxLength: 50, // Event.event_code @db.VarChar(50), DTO @MaxLength(50).
@@ -49,6 +51,8 @@ export const FORM_LIMITS = {
     packageDescriptionMaxLength: 10_000, // EventPackage.description_* @db.Text, DTO @MaxLength(10_000).
     packagePriceMax: 999_999_999_999.99, // EventPackage.base_price @db.Decimal(14,2), CHECK >= 0.
     packageGuestCountMin: 1, // event_packages.*_guest_count CHECK (> 0), DTO @Min(1).
+    packageLinesMaxSize: 100,
+    quoteLinesMaxSize: 100,
     lineLabelMaxLength: 200, // EventPackageLine/EventQuoteLine.label_* @db.VarChar(200), DTO @MaxLength(200).
     lineUnitMaxLength: 40, // EventPackageLine/EventQuoteLine.unit @db.VarChar(40), DTO @MaxLength(40).
     lineQuantityMax: 99_999_999.999999, // Event*Line.quantity @db.Decimal(14,6), CHECK > 0.
@@ -63,6 +67,46 @@ export const FORM_LIMITS = {
     messageMaxLength: 10_000,
     ctaLabelMaxLength: 80,
     ctaUrlMaxLength: 500,
+    displayOrderMax: 100_000,
+  },
+  seo: {
+    resourceKeyMaxLength: 160,
+    metaTitleMaxLength: 70,
+    metaDescriptionMaxLength: 160,
+    urlMaxLength: 500,
+  },
+  site: {
+    addressMaxLength: 1000,
+    municipalityMaxLength: 120,
+    departmentMaxLength: 120,
+    phoneMaxLength: 40,
+    emailMaxLength: 200,
+    coordinateMax: 90,
+    heroEyebrowMaxLength: 120,
+    heroTitleMaxLength: 160,
+    editorialMaxLength: 10_000,
+    imageUrlMaxLength: 500,
+    serviceTypeMaxLength: 30,
+    reasonMaxLength: 200,
+    teamNameMaxLength: 120,
+    teamRoleMaxLength: 120,
+    teamDescriptionMaxLength: 2000,
+    maxHours: 50,
+    maxOverrides: 100,
+    maxTeam: 12,
+  },
+  user: {
+    searchMaxLength: 200, // UserListQueryDto.search @MaxLength(200).
+    usernameMinLength: 3, // CreateUserDto/UpdateUserDto @MinLength(3).
+    usernameMaxLength: 100, // User.username @db.VarChar(100), DTO @MaxLength(100).
+    emailMaxLength: 200, // User.email @db.VarChar(200), DTO @MaxLength(200).
+    roleCodeMaxLength: 40, // UserListQueryDto.role @Matches(...{0,39}).
+    employeeCodeMaxLength: 30, // Employee.employee_code @db.VarChar(30), DTO @MaxLength(30).
+    employeeNameMaxLength: 80, // Employee.first_name/last_name @db.VarChar(80).
+    phoneMaxLength: 40, // Employee.phone @db.VarChar(40).
+    passwordMinLength: 12, // CreateUserDto.password @MinLength(12).
+    passwordMaxLength: 128, // CreateUserDto.password @MaxLength(128).
+    roleIdsMaxSize: 20,
   },
   menu: {
     categorySlugMaxLength: 120, // MenuCategory.slug @db.VarChar(120), DTO @MaxLength(120).
@@ -78,6 +122,8 @@ export const FORM_LIMITS = {
     dayOfWeekMax: 7, // menu_availability.day_of_week CHECK BETWEEN 1 AND 7, DTO @Max(7).
     searchMaxLength: 120, // AdminListQueryDto.search @MaxLength(120).
     allergenMaxLength: 40, // PublicMenuQueryDto.allergen @MaxLength(40).
+    categoryReorderMaxSize: 100,
+    allergenMaxSize: 100,
   },
   venue: {
     smallIntMax: 32_767, // PostgreSQL SMALLINT usado por capacidades y asientos.
@@ -89,6 +135,33 @@ export const FORM_LIMITS = {
     tableNameMaxLength: 80, // DiningTable.name @db.VarChar(80), DTO @MaxLength(80).
     shapeMaxLength: 20, // DiningTable.shape @db.VarChar(20), DTO @MaxLength(20).
   },
+  inventory: {
+    supplierCodeMaxLength: 40,
+    supplierNameMaxLength: 200,
+    supplierTaxIdMaxLength: 40,
+    supplierPhoneMaxLength: 40,
+    supplierEmailMaxLength: 200,
+    supplierAddressMaxLength: 10_000,
+    ingredientSkuMaxLength: 50,
+    ingredientNameMaxLength: 160,
+    ingredientDescriptionMaxLength: 10_000,
+    supplierLinksMaxSize: 50,
+    supplierSkuMaxLength: 60,
+    receiptNumberMaxLength: 50,
+    receiptLinesMaxSize: 100,
+    lotCodeMaxLength: 80,
+    notesMaxLength: 10_000,
+    reasonMinLength: 3,
+    reasonMaxLength: 200,
+    decimalMax: 99_999_999.999999,
+    expiryDaysMin: 0,
+    expiryDaysMax: 365,
+    searchMaxLength: 160,
+    pageSizeMax: 100,
+  },
+  analytics: {
+    reportRangeMaxDays: 366,
+  },
   pagination: {
     pageMin: 1, // DTOs administrativos @Min(1).
     pageSizeMax: 100, // DTOs administrativos @Max(100).
@@ -98,8 +171,12 @@ export const FORM_LIMITS = {
 export const FORM_PATTERNS = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/u,
   slug: /^[a-z0-9-]+$/u,
+  username: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u,
+  roleCode: /^[a-z][a-z0-9_.-]{0,39}$/u,
   decimal2: /^\d+(\.\d{1,2})?$/u,
   decimal6: /^\d+(\.\d{1,6})?$/u,
   time: /^([01]\d|2[0-3]):[0-5]\d$/u,
   uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu,
+  httpUrl: /^https?:\/\/[^\s]+$/iu,
+  seoKey: /^[A-Za-z0-9][A-Za-z0-9/_-]*$/u,
 } as const;

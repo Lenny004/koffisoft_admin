@@ -30,7 +30,8 @@ export const categorySchema = z.object({
 export const categoryReorderSchema = z.object({
   categories: z
     .array(z.object({ id: z.string().uuid(), displayOrder: z.coerce.number().int().min(0) }))
-    .min(1, 'Debes enviar al menos una categoría.'),
+    .min(1, 'Debes enviar al menos una categoría.')
+    .max(FORM_LIMITS.menu.categoryReorderMaxSize),
 });
 
 const itemTypes = ['Food', 'Beverage', 'Dessert', 'Service'] as const;
@@ -77,13 +78,15 @@ export const priceSchema = z.object({
 
 export const allergenSchema = z.object({
   variantId: z.string().uuid('Selecciona una variante.'),
-  allergens: z.array(
-    z.object({
-      allergenId: z.string().uuid('El alérgeno no es válido.'),
-      presenceType: z.enum(['contains', 'may_contain']),
-      isReviewed: z.boolean(),
-    }),
-  ),
+  allergens: z
+    .array(
+      z.object({
+        allergenId: z.string().uuid('El alérgeno no es válido.'),
+        presenceType: z.enum(['contains', 'may_contain']),
+        isReviewed: z.boolean(),
+      }),
+    )
+    .max(FORM_LIMITS.menu.allergenMaxSize),
 });
 
 export const availabilitySchema = z.object({

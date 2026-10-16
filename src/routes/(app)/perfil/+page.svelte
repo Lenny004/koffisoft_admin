@@ -1,9 +1,14 @@
 <script lang="ts">
   import type { PageProps } from './$types';
-  import { displayUserName } from '$lib/types/auth';
+  import { Alert } from '$lib/components/ui/alert/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import { displayUserName, needsPasswordChange } from '$lib/types/auth';
   import { FORM_LIMITS } from '$lib/validation/limits';
+  import {
+    fieldError as getFieldError,
+    globalErrors as getGlobalErrors,
+  } from '$lib/validation/errors';
 
   interface ProfileForm {
     errors?: Record<string, string> | string[];
@@ -13,16 +18,11 @@
   let { data, form }: { data: PageProps['data']; form?: ProfileForm | null } = $props();
 
   function fieldError(name: string): string {
-    const errors = form?.errors;
-    return errors && typeof errors === 'object' && !Array.isArray(errors)
-      ? (errors[name] ?? '')
-      : '';
+    return getFieldError(form?.errors, name);
   }
 
   function globalErrors(): string[] {
-    const errors = form?.errors;
-    if (!errors) return [];
-    return Array.isArray(errors) ? errors : [];
+    return getGlobalErrors(form?.errors);
   }
 </script>
 
@@ -40,6 +40,14 @@
       </p>
     </div>
   </header>
+
+  {#if needsPasswordChange(data.user)}
+    <Alert variant="warning">
+      <p>
+        Tu cuenta requiere cambiar la contraseña antes de continuar con el resto de operaciones.
+      </p>
+    </Alert>
+  {/if}
 
   <article class="profile-page__card">
     <h3>Cambiar contraseña</h3>

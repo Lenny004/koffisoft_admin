@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 
 import {
   formatElSalvadorDateTime,
+  formatElSalvadorDate,
   isoToElSalvadorDateTimeLocal,
   localElSalvadorDateTimeToIso,
 } from './dates';
 
 describe('fechas del panel', () => {
+  it('no desplaza las fechas DATE de Prisma al día anterior', () => {
+    expect(formatElSalvadorDate('2026-10-25')).toBe('2026-10-25');
+  });
+
   it('conserva el offset local requerido por la API', () => {
     expect(localElSalvadorDateTimeToIso('2026-10-24T18:30')).toBe('2026-10-24T18:30:00-06:00');
   });

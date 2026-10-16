@@ -1,10 +1,8 @@
 <script lang="ts">
-  import UnderConstruction from '$lib/components/admin/under-construction.svelte';
+  import SupplierDirectory from '$lib/components/admin/supplier-directory.svelte';
+  import type { InventoryActionForm, SupplierPageData } from '$lib/inventory/page-types';
+
+  let { data, form }: { data: SupplierPageData; form: InventoryActionForm | null } = $props();
 </script>
 
-<svelte:head><title>Proveedores | Koffi-Soft Admin</title></svelte:head>
-<UnderConstruction
-  title="Proveedores"
-  permission="inventory.read"
-  description="La ruta conserva el módulo del legacy y queda lista para el contrato administrativo de proveedores."
-/>
+<SupplierDirectory {data} {form} />

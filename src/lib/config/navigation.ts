@@ -4,13 +4,18 @@ export type NavigationIcon =
   | 'tags'
   | 'calendar-check'
   | 'calendar-days'
+  | 'calendar-clock'
   | 'boxes'
   | 'truck'
   | 'briefcase-business'
   | 'users'
   | 'chart-no-axes-combined'
   | 'user-round-cog'
-  | 'megaphone';
+  | 'megaphone'
+  | 'mail'
+  | 'building-2'
+  | 'globe-2'
+  | 'archive';
 
 export interface NavigationItem {
   label: string;
@@ -32,11 +37,21 @@ export const navigationItems: NavigationItem[] = [
   },
   { label: 'Eventos', href: '/eventos', icon: 'calendar-days', permission: 'events.read' },
   {
+    label: 'Publicación',
+    href: '/publicacion',
+    icon: 'calendar-clock',
+    permission: 'content.publish',
+  },
+  {
     label: 'Avisos importantes',
     href: '/avisos-importantes',
     icon: 'megaphone',
     permission: 'important_announcements.read',
   },
+  { label: 'Contacto', href: '/contacto', icon: 'mail', permission: 'contact.read' },
+  { label: 'Sitio', href: '/sitio', icon: 'building-2', permission: 'site_content.read' },
+  { label: 'SEO', href: '/seo', icon: 'globe-2', permission: 'seo.read' },
+  { label: 'Respaldos', href: '/respaldos', icon: 'archive', permission: 'backups.read' },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
     label: 'Proveedores',
@@ -46,6 +61,12 @@ export const navigationItems: NavigationItem[] = [
   },
   { label: 'Empleados', href: '/empleados', icon: 'briefcase-business', permission: 'users.read' },
   { label: 'Usuarios', href: '/usuarios', icon: 'users', permission: 'users.read' },
+  {
+    label: 'Estadísticas',
+    href: '/estadisticas',
+    icon: 'chart-no-axes-combined',
+    permission: 'analytics.read',
+  },
   {
     label: 'Reportes',
     href: '/reportes',

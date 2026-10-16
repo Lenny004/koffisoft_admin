@@ -3,6 +3,7 @@
 @import url('./lib/styles/admin-shell.css');
 @import url('./lib/styles/admin-login.css');
 @import url('./lib/styles/admin-pages.css');
+@import url('./lib/styles/admin-inventory.css');
 
 @font-face {
   font-family: 'Helvetica Neue Light';
@@ -102,8 +103,8 @@
   --status-danger: var(--state-danger);
 
   /* Escala base de 16px: todos los tamaños se expresan en rem. */
-  --font-family-base: 'Helvetica Neue Light', ui-sans-serif, system-ui, sans-serif;
-  --font-family-display: var(--font-family-base);
+  --font-family-base: 'Manrope', 'Helvetica Neue Light', ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: 'Fraunces', georgia, serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;

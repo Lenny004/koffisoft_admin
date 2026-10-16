@@ -18,6 +18,16 @@ interface ReservationPage {
   data: ReservationResponse[];
 }
 
+interface InventoryAlertsResponse {
+  lowStock: Array<{
+    name: string;
+    currentStock: string;
+    reorderLevel: string;
+    baseUnitCode: string;
+  }>;
+  expiringLots: Array<{ ingredientName: string; lotCode: string; expiresOn: string }>;
+}
+
 function todayRange(): { from: string; to: string } {
   const date = new Date();
   const value = date.toISOString().slice(0, 10);
@@ -27,6 +37,8 @@ function todayRange(): { from: string; to: string } {
 export const load: PageServerLoad = async (event) => {
   let reservations: DashboardReservation[] = dashboardFixture.reservations;
   let reservationSource: 'api' | 'fixture' = 'fixture';
+  let inventoryAlerts: InventoryAlertsResponse | null = null;
+  let inventoryAlertSource: 'api' | 'unavailable' = 'unavailable';
 
   if (
     env.API_BASE_URL &&
@@ -61,6 +73,27 @@ export const load: PageServerLoad = async (event) => {
     }
   }
 
+  if (
+    env.API_BASE_URL &&
+    env.DEFAULT_LOCATION_ID &&
+    event.locals.permissions.includes('inventory.read')
+  ) {
+    try {
+      const query = new URLSearchParams({ locationId: env.DEFAULT_LOCATION_ID, expiryDays: '30' });
+      const response = await apiRequest(
+        event,
+        `/inventory/admin/alerts?${query}`,
+        env.API_BASE_URL,
+      );
+      if (response.ok) {
+        inventoryAlerts = await readJson<InventoryAlertsResponse>(response);
+        inventoryAlertSource = inventoryAlerts ? 'api' : 'unavailable';
+      }
+    } catch {
+      // El dashboard no debe fallar completo si el módulo de inventario no responde.
+    }
+  }
+
   return {
     kpis: dashboardFixture.kpis.map((kpi) =>
       kpi.label === 'Reservas de hoy' && reservationSource === 'api'
@@ -69,5 +102,7 @@ export const load: PageServerLoad = async (event) => {
     ),
     reservations,
     reservationSource,
+    inventoryAlerts,
+    inventoryAlertSource,
   };
 };
