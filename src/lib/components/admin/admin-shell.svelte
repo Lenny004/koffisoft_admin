@@ -6,13 +6,17 @@
   import AdminTopbar from './admin-topbar.svelte';
   import type { AuthenticatedUser } from '$lib/types/auth';
 
+  import type { NotificationItem } from '$lib/notifications/types';
+
   interface Props {
     user: AuthenticatedUser;
     permissions: string[];
+    unreadCount?: number;
+    latestNotifications?: NotificationItem[];
     children: Snippet;
   }
 
-  let { user, permissions, children }: Props = $props();
+  let { user, permissions, unreadCount = 0, latestNotifications = [], children }: Props = $props();
   let menuOpen = $state(false);
 </script>
 
@@ -22,7 +26,13 @@
   <AdminSidebar {user} {permissions} mobile closeMenu={() => (menuOpen = false)} />
 
   <div class="admin-shell__main">
-    <AdminTopbar {user} openMenu={() => (menuOpen = true)} />
+    <AdminTopbar
+      {user}
+      {permissions}
+      {unreadCount}
+      {latestNotifications}
+      openMenu={() => (menuOpen = true)}
+    />
     <main class="admin-shell__content">{@render children()}</main>
     <AdminFooter />
   </div>

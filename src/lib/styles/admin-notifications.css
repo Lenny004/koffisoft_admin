@@ -71,11 +71,16 @@
 .notification-bell__item,
 .notifications__item {
   display: grid;
+  inline-size: 100%;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  border-block-end: 1px solid var(--border);
-  text-decoration: none;
   color: inherit;
+  border: 0;
+  border-block-end: 1px solid var(--border);
+  background: transparent;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .notification-bell__item:last-child {

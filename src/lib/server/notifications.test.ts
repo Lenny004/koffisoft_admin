@@ -56,8 +56,8 @@ describe('cliente server-side de notificaciones', () => {
     const { event } = eventFor(
       new Response(JSON.stringify({ message: 'Sin permiso.' }), { status: 403 }),
     );
-    await expect(createNotificationsClient(event, 'http://api.test').unreadCount()).rejects.toBeInstanceOf(
-      NotificationsApiError,
-    );
+    await expect(
+      createNotificationsClient(event, 'http://api.test').unreadCount(),
+    ).rejects.toBeInstanceOf(NotificationsApiError);
   });
 });

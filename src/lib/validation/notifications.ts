@@ -5,12 +5,7 @@ import { FORM_LIMITS } from './limits';
 
 export const notificationFilterSchema = z.object({
   page: z.coerce.number().int().min(FORM_LIMITS.pagination.pageMin).default(1),
-  pageSize: z.coerce
-    .number()
-    .int()
-    .min(1)
-    .max(FORM_LIMITS.pagination.pageSizeMax)
-    .default(20),
+  pageSize: z.coerce.number().int().min(1).max(FORM_LIMITS.pagination.pageSizeMax).default(20),
   notificationType: z.enum(NOTIFICATION_TYPES).or(z.literal('')).default(''),
   severity: z.enum(NOTIFICATION_SEVERITIES).or(z.literal('')).default(''),
   unreadOnly: z.boolean().default(false),
