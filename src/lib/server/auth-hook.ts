@@ -15,6 +15,7 @@ export function isPublicPath(pathname: string): boolean {
   return (
     pathname === '/' ||
     pathname === '/login' ||
+    pathname === '/restablecer' ||
     pathname.startsWith('/_app/') ||
     pathname.startsWith('/brand/') ||
     pathname.startsWith('/fixtures/') ||

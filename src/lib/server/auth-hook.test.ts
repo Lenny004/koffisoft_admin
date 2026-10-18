@@ -27,6 +27,20 @@ function eventFor(pathname: string, cookie: string | undefined, snapshot?: unkno
 }
 
 describe('hook de autenticación', () => {
+  it('deja pública la recuperación de contraseña', async () => {
+    const event = eventFor('/restablecer', undefined);
+    const resolve = vi.fn(async () => new Response('reset'));
+    const handle = createAuthHandle({
+      apiBaseUrl: 'http://api.test',
+      sessionCookieName: 'session',
+    });
+
+    await handle({ event, resolve });
+
+    expect(resolve).toHaveBeenCalledOnce();
+    expect(event.locals.user).toBeUndefined();
+  });
+
   it('deja pública la pantalla de login sin sesión', async () => {
     const event = eventFor('/', undefined);
     const resolve = vi.fn(async () => new Response('login'));

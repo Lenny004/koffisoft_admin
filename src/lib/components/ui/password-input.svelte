@@ -5,7 +5,7 @@
   let {
     id,
     name,
-    value = '',
+    value = $bindable(''),
     placeholder = '',
     autocomplete = 'current-password',
     minlength,
@@ -27,7 +27,6 @@
   } = $props();
 
   let visible = $state(false);
-  let current = $derived(value);
 </script>
 
 <div class="login-card__password">
@@ -36,7 +35,7 @@
     {id}
     {name}
     type={visible ? 'text' : 'password'}
-    bind:value={current}
+    bind:value
     {placeholder}
     {autocomplete}
     {minlength}

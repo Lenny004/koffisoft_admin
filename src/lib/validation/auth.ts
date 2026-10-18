@@ -96,6 +96,9 @@ export const mfaSetupSchema = z.object({
     .optional(),
 });
 
+export const FORGOT_PASSWORD_MESSAGE =
+  'Si el correo existe, recibirás instrucciones de recuperación.';
+
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
