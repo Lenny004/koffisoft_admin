@@ -1,6 +1,11 @@
 import type { RequestEvent } from '@sveltejs/kit';
 
-import type { MaintenanceSchedule, ResourceItem, ResourcePage } from '$lib/resources/types';
+import type {
+  MaintenancePage,
+  MaintenanceSchedule,
+  ResourceItem,
+  ResourcePage,
+} from '$lib/resources/types';
 import { apiErrorMessage, apiRequest, readJson } from './api';
 import { withQuery, type QueryValue } from './query';
 
@@ -40,6 +45,14 @@ export function createResourcesClient(event: RequestEvent, apiBaseUrl: string) {
       return request<ResourceItem>(
         withQuery(`/resources/admin/${encodeURIComponent(id)}`, { locationId }),
         { method: 'PATCH', json: payload },
+      );
+    },
+    listMaintenances(query: Record<string, QueryValue>) {
+      return request<MaintenancePage>(withQuery('/resources/admin/maintenance', query));
+    },
+    listResourceMaintenances(id: string, query: Record<string, QueryValue>) {
+      return request<MaintenancePage>(
+        withQuery(`/resources/admin/${encodeURIComponent(id)}/maintenance`, query),
       );
     },
     scheduleMaintenance(payload: unknown) {

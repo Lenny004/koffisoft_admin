@@ -13,6 +13,14 @@ export const resourceFilterSchema = z.object({
   status: z.enum(RESOURCE_STATUSES).or(z.literal('')).default(''),
 });
 
+export const maintenanceFilterSchema = z.object({
+  page: z.coerce.number().int().min(FORM_LIMITS.pagination.pageMin).default(1),
+  resourceId: z.union([uuid, z.literal('')]).default(''),
+  completed: z.enum(['true', 'false']).or(z.literal('')).default(''),
+  dateFrom: z.union([z.string().date('La fecha inicial no es válida.'), z.literal('')]).default(''),
+  dateTo: z.union([z.string().date('La fecha final no es válida.'), z.literal('')]).default(''),
+});
+
 export const resourceSchema = z.object({
   id: uuid.optional().or(z.literal('')),
   locationId: uuid,

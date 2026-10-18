@@ -54,7 +54,7 @@
 - **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
 
 - **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores (entrega, recordatorio, notas e historial de compras) con form actions, permisos y validación Zod.
-- **Órdenes, recursos y bitácora:** `/ordenes-compra`, `/recursos` y `/bitacora` cubren el flujo de compra, el equipo/mobiliario con mantenimientos y la consulta de AuditLog.
+- **Órdenes, recursos y bitácora:** `/ordenes-compra` edita líneas en Draft; `/recursos` lista el historial de mantenimientos (global o por recurso) con filtros; `/bitacora` consulta AuditLog.
 - **Notificaciones en vivo:** campana del topbar con SSE autenticado, bandeja `/notificaciones` y recuperación de contraseña contra `/auth/forgot-password` y `/auth/reset-password`.
 - **Descubrimiento público:** la ruta `/seo` administra defaults y overrides de páginas, platos, eventos y avisos mediante BFF.
 

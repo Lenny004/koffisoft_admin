@@ -22,6 +22,7 @@
   import { globalErrors as getGlobalErrors } from '$lib/validation/errors';
 
   interface DraftLine {
+    id?: string;
     ingredientId: string;
     unitId: string;
     quantityOrdered: string;
@@ -68,6 +69,8 @@
   let lines = $state<DraftLine[]>([
     { ingredientId: '', unitId: '', quantityOrdered: '', unitCost: '' },
   ]);
+  let draftLines = $state<DraftLine[]>([]);
+  let draftLinesOrderId = $state('');
   let receiveStorageId = $state('');
   let receiveNotes = $state('');
   let receiveLines = $state<ReceiveLine[]>([]);
@@ -105,13 +108,37 @@
     Cancelled: 'danger',
   };
 
+  function emptyLine(): DraftLine {
+    return { ingredientId: '', unitId: '', quantityOrdered: '', unitCost: '' };
+  }
+
   function addLine() {
     if (lines.length >= FORM_LIMITS.inventory.purchaseOrderLinesMaxSize) return;
-    lines = [...lines, { ingredientId: '', unitId: '', quantityOrdered: '', unitCost: '' }];
+    lines = [...lines, emptyLine()];
   }
 
   function removeLine(index: number) {
     lines = lines.filter((_, current) => current !== index);
+  }
+
+  function addDraftLine() {
+    if (draftLines.length >= FORM_LIMITS.inventory.purchaseOrderLinesMaxSize) return;
+    draftLines = [...draftLines, emptyLine()];
+  }
+
+  function removeDraftLine(index: number) {
+    draftLines = draftLines.filter((_, current) => current !== index);
+  }
+
+  function syncDraftLines(order: PurchaseOrder) {
+    draftLines = order.lines.map((line) => ({
+      id: line.id,
+      ingredientId: line.ingredientId,
+      unitId: line.unitId,
+      quantityOrdered: line.quantityOrdered,
+      unitCost: line.unitCost,
+    }));
+    draftLinesOrderId = order.id;
   }
 
   function startReceive(order: PurchaseOrder) {
@@ -144,7 +171,18 @@
     if (form?.success) {
       createOpen = false;
       receiveOpen = false;
+      if (form.action === 'replaceLines' || form.action === 'update') draftLinesOrderId = '';
     }
+  });
+
+  $effect(() => {
+    const order = data.selected;
+    if (!order || order.status !== 'Draft') {
+      draftLinesOrderId = '';
+      return;
+    }
+    if (draftLinesOrderId === order.id) return;
+    syncDraftLines(order);
   });
 </script>
 
@@ -156,8 +194,8 @@
       <p class="page-header__eyebrow">Compras</p>
       <h2 class="page-header__title" id="orders-title">Órdenes de compra</h2>
       <p class="page-header__description">
-        Crea borradores con líneas, envíalos a aprobación, cancélalos o recíbelos en almacén con
-        lote y vencimiento.
+        Crea borradores, edita sus líneas, envíalos a aprobación, cancélalos o recíbelos en almacén
+        con lote y vencimiento.
       </p>
     </div>
     {#if canManage}
@@ -307,28 +345,104 @@
           </form>
         {/if}
 
-        <div class="suppliers__table-wrap">
-          <Table.Root>
-            <Table.Header>
-              <Table.Row>
-                <Table.Head class="suppliers__table-head">Insumo</Table.Head>
-                <Table.Head class="suppliers__table-head">Cantidad</Table.Head>
-                <Table.Head class="suppliers__table-head">Costo</Table.Head>
-                <Table.Head class="suppliers__table-head">Recibido</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {#each order.lines as line (line.id)}
+        {#if canManage && order.status === 'Draft'}
+          <form class="suppliers__form" method="POST" action="?/replaceLines">
+            <input type="hidden" name="id" value={order.id} />
+            <input type="hidden" name="lines" value={JSON.stringify(draftLines)} />
+            <p class="form-legend">
+              <span class="form-field__required" aria-hidden="true">*</span> Campo obligatorio
+            </p>
+            <div class="inventory__line-heading">
+              <h3>Líneas del borrador</h3>
+              <Button type="button" variant="outline" size="sm" onclick={addDraftLine}>
+                <Plus class="size-4" aria-hidden="true" />Agregar línea
+              </Button>
+            </div>
+            {#each draftLines as line, index (line.id ?? `new-${index}`)}
+              <fieldset class="inventory__supplier-link">
+                <legend>Línea {index + 1}</legend>
+                <FormField id={`draft-ingredient-${index}`} label="Insumo" required>
+                  <SearchSelect
+                    id={`draft-ingredient-${index}`}
+                    bind:value={line.ingredientId}
+                    options={ingredientOptions}
+                    placeholder="Busca un insumo"
+                    required
+                    allowEmpty={false}
+                  />
+                </FormField>
+                <FormField id={`draft-unit-${index}`} label="Unidad" required>
+                  <SearchSelect
+                    id={`draft-unit-${index}`}
+                    bind:value={line.unitId}
+                    options={unitOptions}
+                    placeholder="Busca una unidad"
+                    required
+                    allowEmpty={false}
+                  />
+                </FormField>
+                <FormField id={`draft-qty-${index}`} label="Cantidad" required>
+                  <input
+                    id={`draft-qty-${index}`}
+                    type="number"
+                    min="0.000001"
+                    max={FORM_LIMITS.inventory.decimalMax}
+                    step="0.000001"
+                    bind:value={line.quantityOrdered}
+                    placeholder="Ej. 12"
+                    required
+                  />
+                </FormField>
+                <FormField id={`draft-cost-${index}`} label="Costo unitario" required>
+                  <input
+                    id={`draft-cost-${index}`}
+                    type="number"
+                    min="0.000001"
+                    max={FORM_LIMITS.inventory.decimalMax}
+                    step="0.000001"
+                    bind:value={line.unitCost}
+                    placeholder="Ej. 3.50"
+                    required
+                  />
+                </FormField>
+                {#if draftLines.length > 1}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onclick={() => removeDraftLine(index)}
+                  >
+                    <Trash2 class="size-4 text-destructive" aria-hidden="true" />
+                  </Button>
+                {/if}
+              </fieldset>
+            {/each}
+            <Button type="submit" variant="secondary">Guardar líneas</Button>
+          </form>
+        {:else}
+          <div class="suppliers__table-wrap">
+            <Table.Root>
+              <Table.Header>
                 <Table.Row>
-                  <Table.Cell>{line.ingredientName}</Table.Cell>
-                  <Table.Cell>{line.quantityOrdered} {line.unitCode}</Table.Cell>
-                  <Table.Cell>{line.totalCost}</Table.Cell>
-                  <Table.Cell>{line.quantityReceived ?? 'Pendiente'}</Table.Cell>
+                  <Table.Head class="suppliers__table-head">Insumo</Table.Head>
+                  <Table.Head class="suppliers__table-head">Cantidad</Table.Head>
+                  <Table.Head class="suppliers__table-head">Costo</Table.Head>
+                  <Table.Head class="suppliers__table-head">Recibido</Table.Head>
                 </Table.Row>
-              {/each}
-            </Table.Body>
-          </Table.Root>
-        </div>
+              </Table.Header>
+              <Table.Body>
+                {#each order.lines as line (line.id)}
+                  <Table.Row>
+                    <Table.Cell>{line.ingredientName}</Table.Cell>
+                    <Table.Cell>{line.quantityOrdered} {line.unitCode}</Table.Cell>
+                    <Table.Cell>{line.totalCost}</Table.Cell>
+                    <Table.Cell>{line.quantityReceived ?? 'Pendiente'}</Table.Cell>
+                  </Table.Row>
+                {/each}
+              </Table.Body>
+            </Table.Root>
+          </div>
+        {/if}
 
         {#if canManage}
           <div class="suppliers__actions">
@@ -372,7 +486,7 @@
     <Dialog.Header>
       <Dialog.Title>Nueva orden de compra</Dialog.Title>
       <Dialog.Description
-        >Se crea en estado borrador. Las líneas no se editan después.</Dialog.Description
+        >Se crea en estado borrador. Las líneas se pueden ajustar mientras no se envíe.</Dialog.Description
       >
     </Dialog.Header>
     <form class="suppliers__form" method="POST" action="?/create">

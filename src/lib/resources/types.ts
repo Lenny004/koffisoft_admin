@@ -61,6 +61,9 @@ export interface ResourcePage {
 export interface MaintenanceSchedule {
   id: string;
   resourceId: string;
+  locationId?: string;
+  resourceCode?: string;
+  resourceName?: string;
   scheduledDate: string;
   description: string;
   completed: boolean;
@@ -68,4 +71,14 @@ export interface MaintenanceSchedule {
   completedByUserId: string | null;
   notes: string | null;
   createdAt: string;
+}
+
+export interface MaintenancePage {
+  data: MaintenanceSchedule[];
+  meta: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
 }

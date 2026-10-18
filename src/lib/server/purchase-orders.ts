@@ -47,6 +47,12 @@ export function createPurchaseOrdersClient(event: RequestEvent, apiBaseUrl: stri
         json: payload,
       });
     },
+    replaceDraftLines(id: string, payload: unknown) {
+      return request<PurchaseOrder>(`/purchase-orders/${encodeURIComponent(id)}/lines`, {
+        method: 'PUT',
+        json: payload,
+      });
+    },
     submitOrder(id: string) {
       return request<PurchaseOrder>(`/purchase-orders/${encodeURIComponent(id)}/submit`, {
         method: 'POST',

@@ -10,9 +10,28 @@ import {
   purchaseOrderCreateSchema,
   purchaseOrderFilterSchema,
   purchaseOrderIdSchema,
+  purchaseOrderReplaceLinesSchema,
   purchaseOrderUpdateSchema,
   receivePurchaseOrderSchema,
 } from '$lib/validation/purchase-orders';
+
+function toApiDraftLines(
+  lines: {
+    id?: string;
+    ingredientId: string;
+    unitId: string;
+    quantityOrdered: string;
+    unitCost: string;
+  }[],
+) {
+  return lines.map((line) => ({
+    ...(line.id ? { id: line.id } : {}),
+    ingredientId: line.ingredientId,
+    unitId: line.unitId,
+    quantityOrdered: Number(line.quantityOrdered),
+    unitCost: Number(line.unitCost),
+  }));
+}
 
 const PAGE_SIZE = 20;
 
@@ -148,10 +167,17 @@ export const actions = {
       return fail(403, { action: 'update', errors: ['No tienes permiso para editar órdenes.'] });
     }
     const formData = await event.request.formData();
+    const rawLines = formData.get('lines');
+    const hasLines = typeof rawLines === 'string' && rawLines.trim() !== '';
+    const lines = hasLines
+      ? jsonFormValue(formData, 'lines', 'Las líneas no tienen un formato válido.')
+      : { value: undefined as undefined };
+    if (hasLines && lines.error) return fail(400, { action: 'update', errors: [lines.error] });
     const result = purchaseOrderUpdateSchema.safeParse({
       id: formText(formData.get('id')),
       expectedDelivery: formText(formData.get('expectedDelivery')),
       notes: formText(formData.get('notes')),
+      lines: hasLines ? lines.value : undefined,
     });
     if (!result.success) {
       return fail(400, {
@@ -164,11 +190,44 @@ export const actions = {
       await createPurchaseOrdersClient(event, env.API_BASE_URL ?? '').updateOrder(result.data.id, {
         expectedDelivery: result.data.expectedDelivery || undefined,
         notes: result.data.notes || undefined,
+        ...(result.data.lines ? { lines: toApiDraftLines(result.data.lines) } : {}),
       });
       return { success: true, action: 'update' };
     } catch (error) {
       const response = actionError(error);
       return fail(response.status, { action: 'update', errors: response.errors });
+    }
+  },
+  replaceLines: async (event: RequestEvent) => {
+    if (!event.locals.permissions.includes('purchase_orders.manage')) {
+      return fail(403, {
+        action: 'replaceLines',
+        errors: ['No tienes permiso para editar las líneas de la orden.'],
+      });
+    }
+    const formData = await event.request.formData();
+    const lines = jsonFormValue(formData, 'lines', 'Las líneas no tienen un formato válido.');
+    if (lines.error) return fail(400, { action: 'replaceLines', errors: [lines.error] });
+    const result = purchaseOrderReplaceLinesSchema.safeParse({
+      id: formText(formData.get('id')),
+      lines: lines.value,
+    });
+    if (!result.success) {
+      return fail(400, {
+        action: 'replaceLines',
+        errors: validationErrors(result.error),
+        values: formValues(formData),
+      });
+    }
+    try {
+      await createPurchaseOrdersClient(event, env.API_BASE_URL ?? '').replaceDraftLines(
+        result.data.id,
+        { lines: toApiDraftLines(result.data.lines) },
+      );
+      return { success: true, action: 'replaceLines' };
+    } catch (error) {
+      const response = actionError(error);
+      return fail(response.status, { action: 'replaceLines', errors: response.errors });
     }
   },
   submit: async (event: RequestEvent) => mutateStatus(event, 'submit'),

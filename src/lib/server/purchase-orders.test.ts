@@ -44,6 +44,29 @@ describe('cliente server-side de órdenes de compra', () => {
     expect(url).toContain('page=2');
   });
 
+  it('reemplaza las líneas de un borrador', async () => {
+    const { event, fetch } = eventFor(new Response('{}', { status: 200 }));
+    const payload = {
+      lines: [
+        {
+          id: 'line-1',
+          ingredientId: 'ingredient-1',
+          unitId: 'unit-1',
+          quantityOrdered: 4,
+          unitCost: 2.5,
+        },
+      ],
+    };
+    await createPurchaseOrdersClient(event, 'http://api.test').replaceDraftLines(
+      'order-1',
+      payload,
+    );
+    const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://api.test/purchase-orders/order-1/lines');
+    expect(init.method).toBe('PUT');
+    expect(init.body).toBe(JSON.stringify(payload));
+  });
+
   it('envía la recepción con lote y ubicación', async () => {
     const { event, fetch } = eventFor(new Response('{}', { status: 200 }));
     const payload = {

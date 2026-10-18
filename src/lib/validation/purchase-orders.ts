@@ -28,6 +28,10 @@ export const purchaseOrderLineSchema = z.object({
   unitCost: positiveAmount,
 });
 
+export const purchaseOrderLineUpdateSchema = purchaseOrderLineSchema.extend({
+  id: uuid.optional().or(z.literal('')),
+});
+
 export const purchaseOrderCreateSchema = z.object({
   locationId: uuid,
   supplierId: uuid,
@@ -52,6 +56,19 @@ export const purchaseOrderUpdateSchema = z.object({
     .optional()
     .or(z.literal('')),
   notes: optionalText(FORM_LIMITS.inventory.notesMaxLength),
+  lines: z
+    .array(purchaseOrderLineUpdateSchema)
+    .min(1, 'Agrega al menos una línea.')
+    .max(FORM_LIMITS.inventory.purchaseOrderLinesMaxSize)
+    .optional(),
+});
+
+export const purchaseOrderReplaceLinesSchema = z.object({
+  id: uuid,
+  lines: z
+    .array(purchaseOrderLineUpdateSchema)
+    .min(1, 'Agrega al menos una línea.')
+    .max(FORM_LIMITS.inventory.purchaseOrderLinesMaxSize),
 });
 
 export const purchaseOrderIdSchema = z.object({

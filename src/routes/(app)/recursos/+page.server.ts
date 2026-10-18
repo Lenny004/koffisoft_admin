@@ -6,17 +6,18 @@ import { createInventoryClient } from '$lib/server/inventory';
 import { createResourcesClient, ResourcesApiError } from '$lib/server/resources';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { formText } from '$lib/validation/menu';
+import {
+  completeMaintenanceSchema,
+  maintenanceFilterSchema,
+  maintenanceSchema,
+  resourceFilterSchema,
+  resourceSchema,
+} from '$lib/validation/resources';
 
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const value = formData.getAll(name).at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
 }
-import {
-  completeMaintenanceSchema,
-  maintenanceSchema,
-  resourceFilterSchema,
-  resourceSchema,
-} from '$lib/validation/resources';
 
 const PAGE_SIZE = 20;
 const emptyMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
@@ -38,13 +39,27 @@ export const load = async (event: RequestEvent) => {
     status: event.url.searchParams.get('status') ?? '',
   });
   const filters = parsed.success ? parsed.data : resourceFilterSchema.parse({});
+  const maintenanceParsed = maintenanceFilterSchema.safeParse({
+    page: event.url.searchParams.get('mPage') ?? '1',
+    resourceId: event.url.searchParams.get('resourceId') ?? '',
+    completed: event.url.searchParams.get('completed') ?? '',
+    dateFrom: event.url.searchParams.get('dateFrom') ?? '',
+    dateTo: event.url.searchParams.get('dateTo') ?? '',
+  });
+  const maintenanceFilters = maintenanceParsed.success
+    ? maintenanceParsed.data
+    : maintenanceFilterSchema.parse({});
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
   const empty = {
     resources: [],
     suppliers: [],
+    resourceOptions: [],
+    maintenances: [],
     meta: { ...emptyMeta, page: filters.page },
+    maintenanceMeta: { ...emptyMeta, page: maintenanceFilters.page },
     filters,
+    maintenanceFilters,
     locationId,
     permissions,
     lastSchedule: null,
@@ -58,8 +73,18 @@ export const load = async (event: RequestEvent) => {
   }
 
   try {
-    const [resources, suppliers] = await Promise.all([
-      createResourcesClient(event, env.API_BASE_URL).list({
+    const client = createResourcesClient(event, env.API_BASE_URL);
+    const maintenanceQuery = {
+      locationId,
+      page: maintenanceFilters.page,
+      pageSize: PAGE_SIZE,
+      completed:
+        maintenanceFilters.completed === '' ? undefined : maintenanceFilters.completed === 'true',
+      dateFrom: maintenanceFilters.dateFrom || undefined,
+      dateTo: maintenanceFilters.dateTo || undefined,
+    };
+    const [resources, suppliers, catalog, maintenances] = await Promise.all([
+      client.list({
         locationId,
         page: filters.page,
         pageSize: PAGE_SIZE,
@@ -71,12 +96,23 @@ export const load = async (event: RequestEvent) => {
       createInventoryClient(event, env.API_BASE_URL)
         .listSuppliers({ locationId, page: 1, pageSize: 100, includeInactive: false })
         .catch(() => ({ data: [] })),
+      client
+        .list({ locationId, page: 1, pageSize: 100, includeInactive: true })
+        .catch(() => ({ data: [] })),
+      // El listado por recurso usa GET /resources/admin/:id/maintenance; el global, /maintenance.
+      maintenanceFilters.resourceId
+        ? client.listResourceMaintenances(maintenanceFilters.resourceId, maintenanceQuery)
+        : client.listMaintenances(maintenanceQuery),
     ]);
     return {
       resources: resources.data,
       suppliers: suppliers.data,
+      resourceOptions: catalog.data,
+      maintenances: maintenances.data,
       meta: resources.meta,
+      maintenanceMeta: maintenances.meta,
       filters,
+      maintenanceFilters,
       locationId,
       permissions,
       lastSchedule: null,
