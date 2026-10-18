@@ -31,6 +31,20 @@ export function validationMessages(errors: FieldErrors): string[] {
     .map(([, message]) => message);
 }
 
+export function jsonFormValue<T>(
+  formData: FormData,
+  name: string,
+  message: string,
+): { value?: T; error?: string } {
+  const raw = formData.get(name);
+  if (typeof raw !== 'string' || raw.trim() === '') return { value: [] as T };
+  try {
+    return { value: JSON.parse(raw) as T };
+  } catch {
+    return { error: message };
+  }
+}
+
 export function formValues(formData: FormData): Record<string, string> {
   return Object.fromEntries(
     Array.from(formData.entries())
