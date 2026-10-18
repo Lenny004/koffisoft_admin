@@ -142,6 +142,10 @@ export const FORM_LIMITS = {
     supplierPhoneMaxLength: 40,
     supplierEmailMaxLength: 200,
     supplierAddressMaxLength: 10_000,
+    deliveryDaysMin: 0, // Supplier.delivery_days SMALLINT CHECK >= 0.
+    deliveryDaysMax: 365, // Límite razonable para días de entrega.
+    orderReminderDaysMin: 0, // Supplier.order_reminder_days SMALLINT CHECK >= 0.
+    orderReminderDaysMax: 365, // Límite razonable para recordatorio.
     ingredientSkuMaxLength: 50,
     ingredientNameMaxLength: 160,
     ingredientDescriptionMaxLength: 10_000,
@@ -158,6 +162,26 @@ export const FORM_LIMITS = {
     expiryDaysMax: 365,
     searchMaxLength: 160,
     pageSizeMax: 100,
+    orderNumberMaxLength: 80, // PurchaseOrder.order_number @db.VarChar(80).
+    purchaseOrderLinesMaxSize: 100, // Límite razonable para líneas de orden.
+    resourceCodeMaxLength: 40, // Resource.resource_code @db.VarChar(40).
+    resourceNameMaxLength: 200, // Resource.name @db.VarChar(200).
+    resourceLocationMaxLength: 200, // Resource.location @db.VarChar(200).
+    maintenanceDescriptionMaxLength: 10_000, // ResourceMaintenanceSchedule.description @db.Text.
+  },
+  notification: {
+    titleMaxLength: 200, // Notification.title @db.VarChar(200).
+    bodyMaxLength: 10_000, // Notification.body @db.Text.
+    internalLinkMaxLength: 500, // Notification.internal_link @db.VarChar(500).
+  },
+  auditLog: {
+    searchMaxLength: 200, // Límite de búsqueda para usuario, acción, entidad.
+  },
+  passwordReset: {
+    emailMaxLength: 200, // ForgotPasswordDto.email @MaxLength(200).
+    tokenLength: 64, // PasswordResetToken.token_hash @db.Char(64) (SHA-256).
+    newPasswordMinLength: 12, // ResetPasswordDto.password @MinLength(12).
+    newPasswordMaxLength: 128, // ResetPasswordDto.password @MaxLength(128).
   },
   analytics: {
     reportRangeMaxDays: 366,
