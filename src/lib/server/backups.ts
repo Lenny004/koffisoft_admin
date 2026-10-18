@@ -3,6 +3,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { BackupJob, BackupType } from '$lib/backups/types';
 import { apiErrorMessage, apiRequest, readJson } from './api';
 
+/** Error al gestionar trabajos de respaldo en la API. */
 export class BackupApiError extends Error {
   constructor(
     public readonly status: number,
@@ -13,6 +14,7 @@ export class BackupApiError extends Error {
   }
 }
 
+/** Serializa parámetros de consulta omitiendo valores vacíos. */
 function withQuery(path: string, values: Record<string, string | number | undefined>): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(values)) {
@@ -24,6 +26,7 @@ function withQuery(path: string, values: Record<string, string | number | undefi
 
 /** Cliente BFF de respaldos: conserva la sesión HttpOnly y nunca entrega rutas del VPS al navegador. */
 export function createBackupClient(event: RequestEvent, apiBaseUrl: string) {
+  /** Ejecuta mutaciones y lecturas de respaldo con manejo uniforme de errores. */
   async function request<T>(
     path: string,
     options: { method?: string; json?: unknown } = {},
@@ -34,12 +37,15 @@ export function createBackupClient(event: RequestEvent, apiBaseUrl: string) {
   }
 
   return {
+    /** Historial reciente de trabajos de respaldo. */
     list(limit = 100) {
       return request<BackupJob[]>(withQuery('/backups/admin', { limit }));
     },
+    /** Encola un nuevo respaldo del tipo indicado. */
     create(type: BackupType) {
       return request<BackupJob>('/backups/admin', { method: 'POST', json: { type } });
     },
+    /** Elimina un trabajo de respaldo por identificador. */
     delete(id: string) {
       return request<BackupJob>(`/backups/admin/${encodeURIComponent(id)}`, { method: 'DELETE' });
     },

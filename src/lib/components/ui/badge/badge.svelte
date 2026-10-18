@@ -1,4 +1,5 @@
 <script lang="ts">
+  /** Badge compacto con variantes de estado operativo (`success`, `warning`, `danger`, `info`). */
   import { cn } from '$lib/utils.js';
 
   type BadgeVariant =

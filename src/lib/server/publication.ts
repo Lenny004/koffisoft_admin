@@ -9,6 +9,7 @@ import type {
   PublicationStatus,
 } from '$lib/publication/types';
 
+/** Estado de publicación devuelto tras programar o publicar un recurso. */
 export interface PublicationResponse {
   resourceType: PublicationResourceType;
   resourceId: string;
@@ -20,6 +21,7 @@ export interface PublicationResponse {
   expiresAt: string | null;
 }
 
+/** Error al cambiar visibilidad o vista previa de contenido publicable. */
 export class PublicationApiError extends Error {
   constructor(
     public readonly status: number,
@@ -30,11 +32,14 @@ export class PublicationApiError extends Error {
   }
 }
 
+/** Añade `locationId` como único parámetro de consulta. */
 function withLocation(path: string, locationId: string): string {
   return `${path}?${new URLSearchParams({ locationId }).toString()}`;
 }
 
+/** Cliente BFF de publicación; coordina estados sin exponer tokens al cliente. */
 export function createPublicationClient(event: RequestEvent, apiBaseUrl: string) {
+  /** Solicitudes autenticadas bajo `/publication/admin`. */
   async function request<T>(
     path: string,
     options: { method?: string; json?: unknown } = {},
@@ -46,9 +51,11 @@ export function createPublicationClient(event: RequestEvent, apiBaseUrl: string)
   }
 
   return {
+    /** Metadatos de zona horaria y reglas de publicación de la sede. */
     context(locationId: string) {
       return request<PublicationContext>(withLocation('/publication/admin/context', locationId));
     },
+    /** Aplica una acción de publicación (publicar, programar, retirar) sobre un recurso. */
     update(
       resourceType: PublicationResourceType,
       resourceId: string,
@@ -68,6 +75,7 @@ export function createPublicationClient(event: RequestEvent, apiBaseUrl: string)
         { method: 'POST', json: payload },
       );
     },
+    /** Genera token de vista previa temporal para un recurso. */
     preview(resourceType: PublicationResourceType, resourceId: string, locationId: string) {
       return request<PreviewTokenResponse>(
         withLocation(

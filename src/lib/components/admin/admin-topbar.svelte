@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Barra superior del layout admin: título según ruta, fecha local, campana de
+   * notificaciones, conmutador de tema y acceso al perfil del usuario autenticado.
+   */
   import { ChevronDown, Menu, Moon, Sun } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
@@ -53,6 +57,7 @@
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   });
 
+  /** Persiste y aplica el tema claro u oscuro en el documento y en localStorage. */
   function toggleTheme() {
     dark = !dark;
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';

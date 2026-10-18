@@ -20,12 +20,14 @@ export function formatElSalvadorDateTime(value: string): string {
   return Number.isNaN(date.getTime()) ? 'Fecha no disponible' : dateTimeFormatter.format(date);
 }
 
+/** Fecha calendario en zona de la sede; las cadenas `YYYY-MM-DD` se muestran sin reinterpretar. */
 export function formatElSalvadorDate(value: string): string {
   if (PLAIN_DATE_PATTERN.test(value)) return value;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? 'Fecha no disponible' : dateFormatter.format(date);
 }
 
+/** Fecha de hoy en formato calendario según la zona horaria de la sede. */
 export function todayInElSalvador(): string {
   return dateFormatter.format(new Date());
 }
@@ -37,6 +39,7 @@ export function localElSalvadorDateTimeToIso(value: string): string {
   return `${value}:00-06:00`;
 }
 
+/** Adapta un instante ISO al valor que espera un control `datetime-local` en la sede. */
 export function isoToElSalvadorDateTimeLocal(value: string | null): string {
   if (!value) return '';
   const date = new Date(value);

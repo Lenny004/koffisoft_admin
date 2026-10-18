@@ -17,6 +17,7 @@ export function globalErrors(errors: FormErrors | undefined): string[] {
   return errors._form ? [errors._form] : [];
 }
 
+/** Agrupa los issues de Zod por ruta de campo, conservando un mensaje por clave. */
 export function validationErrors(error: ZodError): FieldErrors {
   return error.issues.reduce<FieldErrors>((errors, issue) => {
     const field = issue.path.length > 0 ? issue.path.join('.') : '_form';
@@ -25,12 +26,14 @@ export function validationErrors(error: ZodError): FieldErrors {
   }, {});
 }
 
+/** Extrae solo los errores de formulario general serializados bajo `_form`. */
 export function validationMessages(errors: FieldErrors): string[] {
   return Object.entries(errors)
     .filter(([field]) => field === '_form')
     .map(([, message]) => message);
 }
 
+/** Parsea un campo JSON oculto del formulario y devuelve error de validación si el JSON es inválido. */
 export function jsonFormValue<T>(
   formData: FormData,
   name: string,
@@ -45,6 +48,7 @@ export function jsonFormValue<T>(
   }
 }
 
+/** Snapshot de valores reenviables excluyendo credenciales y tokens sensibles. */
 export function formValues(formData: FormData): Record<string, string> {
   return Object.fromEntries(
     Array.from(formData.entries())

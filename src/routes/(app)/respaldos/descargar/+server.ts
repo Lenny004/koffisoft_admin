@@ -5,6 +5,7 @@ import { apiErrorMessage, apiRequest } from '$lib/server/api';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
+/** Descarga el archivo del respaldo reenviando cabeceras de la API tras validar permiso y UUID. */
 export const GET: RequestHandler = async (event) => {
   if (!event.locals.permissions.includes('backups.download')) {
     return new Response('No tienes permiso para descargar respaldos.', { status: 403 });

@@ -179,14 +179,17 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   Cancelled: 'Cancelada',
 };
 
+/** Etiqueta en español del ciclo del evento; conserva el valor crudo si no está mapeado. */
 export function eventStatusLabel(status: EventStatus): string {
   return EVENT_STATUS_LABELS[status] ?? status;
 }
 
+/** Etiqueta en español del tipo de evento; conserva el valor crudo si no está mapeado. */
 export function eventTypeLabel(type: EventType): string {
   return EVENT_TYPE_LABELS[type] ?? type;
 }
 
+/** Etiqueta en español del estado de cotización; conserva el valor crudo si no está mapeado. */
 export function quoteStatusLabel(status: QuoteStatus): string {
   return QUOTE_STATUS_LABELS[status] ?? status;
 }

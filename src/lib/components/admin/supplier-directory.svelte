@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Directorio de proveedores: tabla TanStack, búsqueda GET, CRUD en diálogo
+   * e historial resumido de órdenes de compra cuando el permiso lo permite.
+   */
   import { History, Pencil, Plus, Trash2 } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { createColumnHelper, createTable, tableFeatures } from '@tanstack/svelte-table';
@@ -79,12 +83,17 @@
     },
   });
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(field: string): string {
     return getFieldError(form?.errors, field);
   }
+
+  /** Agrupa los errores globales devueltos por las actions de proveedores. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
+
+  /** Abre el diálogo de alta con el proveedor activo por defecto. */
   function startCreate() {
     editingId = null;
     supplierCode = '';
@@ -99,6 +108,8 @@
     active = true;
     dialogOpen = true;
   }
+
+  /** Precarga el formulario de edición con los datos del proveedor seleccionado. */
   function startEdit(supplier: Supplier) {
     editingId = supplier.id;
     supplierCode = supplier.supplierCode;
@@ -114,9 +125,13 @@
     active = supplier.active;
     dialogOpen = true;
   }
+
+  /** Solicita confirmación nativa antes de acciones destructivas o irreversibles. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }
+
+  /** Conserva el término de búsqueda al navegar entre páginas del listado. */
   function pageQuery(page: number): string {
     const params = new URLSearchParams();
     if (data.search) params.set('search', data.search);

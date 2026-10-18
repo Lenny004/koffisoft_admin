@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Módulo de órdenes de compra: listado filtrado, detalle con flujo de estados,
+   * edición de líneas en borrador y recepción en almacén con lote y vencimiento.
+   */
   import { Plus, Trash2 } from '@lucide/svelte';
   import { resolve } from '$app/paths';
 
@@ -108,28 +112,34 @@
     Cancelled: 'danger',
   };
 
+  /** Plantilla vacía para una línea de insumo en formularios de creación o borrador. */
   function emptyLine(): DraftLine {
     return { ingredientId: '', unitId: '', quantityOrdered: '', unitCost: '' };
   }
 
+  /** Añade una línea al borrador de creación respetando el límite del contrato de inventario. */
   function addLine() {
     if (lines.length >= FORM_LIMITS.inventory.purchaseOrderLinesMaxSize) return;
     lines = [...lines, emptyLine()];
   }
 
+  /** Elimina una línea del formulario de nueva orden por índice. */
   function removeLine(index: number) {
     lines = lines.filter((_, current) => current !== index);
   }
 
+  /** Añade una línea editable al borrador de la orden seleccionada. */
   function addDraftLine() {
     if (draftLines.length >= FORM_LIMITS.inventory.purchaseOrderLinesMaxSize) return;
     draftLines = [...draftLines, emptyLine()];
   }
 
+  /** Quita una línea del borrador en edición antes de serializarla en `replaceLines`. */
   function removeDraftLine(index: number) {
     draftLines = draftLines.filter((_, current) => current !== index);
   }
 
+  /** Copia las líneas del servidor al estado editable local al abrir un borrador. */
   function syncDraftLines(order: PurchaseOrder) {
     draftLines = order.lines.map((line) => ({
       id: line.id,
@@ -141,6 +151,7 @@
     draftLinesOrderId = order.id;
   }
 
+  /** Inicializa el diálogo de recepción con cantidades pedidas y ubicación por defecto. */
   function startReceive(order: PurchaseOrder) {
     receiveStorageId = data.storageLocations[0]?.id ?? '';
     receiveNotes = '';
@@ -153,6 +164,7 @@
     receiveOpen = true;
   }
 
+  /** Arma la query del listado conservando filtros y la orden abierta en detalle. */
   function pageQuery(page: number, orderId?: string): string {
     const params = new URLSearchParams();
     if (data.filters.status) params.set('status', data.filters.status);
@@ -163,6 +175,7 @@
     return query ? `?${query}` : '';
   }
 
+  /** Delega confirmaciones destructivas al diálogo nativo del navegador. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }

@@ -8,16 +8,19 @@ import { formBoolean, formText } from '$lib/validation/menu';
 import { announcementSchema } from '$lib/validation/announcements';
 import { formValues, validationErrors } from '$lib/validation/errors';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los avisos: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof AnnouncementsApiError)
     return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de avisos no está disponible en este momento.'] };
 }
 
+/** Mapea FormData a campos del aviso, convirtiendo fechas locales de El Salvador a ISO. */
 function announcementForm(formData: FormData) {
   const startsAt = formText(formData.get('startsAt'));
   const endsAt = formText(formData.get('endsAt'));
@@ -34,6 +37,7 @@ function announcementForm(formData: FormData) {
   };
 }
 
+/** Adapta el DTO validado al contrato REST (nulls en campos opcionales vacíos). */
 function apiPayload(data: {
   title: string;
   message: string;
@@ -56,6 +60,7 @@ function apiPayload(data: {
   };
 }
 
+/** Lista avisos de la sede por defecto o devuelve error de configuración sin romper la UI. */
 export const load: PageServerLoad = async (event) => {
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
@@ -76,7 +81,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** CRUD de avisos importantes; exige permiso important_announcements.manage en mutaciones. */
 export const actions: Actions = {
+  /** Crea o actualiza un aviso en la API tras validar announcementSchema. */
   save: async (event) => {
     if (!event.locals.permissions.includes('important_announcements.manage'))
       return fail(403, { action: 'save', errors: ['No tienes permiso para administrar avisos.'] });
@@ -103,6 +110,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Activa o desactiva un aviso por id sin editar el resto de campos. */
   toggle: async (event) => {
     if (!event.locals.permissions.includes('important_announcements.manage'))
       return fail(403, {
@@ -124,6 +132,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'toggle', errors: response.errors });
     }
   },
+  /** Elimina un aviso de la sede configurada. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('important_announcements.manage'))
       return fail(403, {

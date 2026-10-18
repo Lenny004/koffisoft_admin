@@ -4,6 +4,7 @@ import type { AuditLogPage } from '$lib/audit/types';
 import { apiErrorMessage, apiRequest, readJson } from './api';
 import { withQuery, type QueryValue } from './query';
 
+/** Error al leer el historial de auditoría desde la API. */
 export class AuditLogsApiError extends Error {
   constructor(
     public readonly status: number,
@@ -14,7 +15,9 @@ export class AuditLogsApiError extends Error {
   }
 }
 
+/** Cliente BFF del módulo de auditoría; filtra en servidor sin exponer credenciales al navegador. */
 export function createAuditLogsClient(event: RequestEvent, apiBaseUrl: string) {
+  /** Ejecuta solicitudes autenticadas hacia `/audit-logs`. */
   async function request<T>(
     path: string,
     options: { method?: string; json?: unknown } = {},
@@ -25,6 +28,7 @@ export function createAuditLogsClient(event: RequestEvent, apiBaseUrl: string) {
   }
 
   return {
+    /** Página de registros de auditoría según filtros de consulta. */
     list(query: Record<string, QueryValue>) {
       return request<AuditLogPage>(withQuery('/audit-logs', query));
     },

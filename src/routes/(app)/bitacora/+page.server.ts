@@ -7,6 +7,7 @@ import { auditLogFilterSchema } from '$lib/validation/audit-logs';
 
 const emptyMeta = { page: 1, pageSize: 20, total: 0, totalPages: 1 };
 
+/** Pagina entradas de auditoría y actores; requiere audit_logs.read y API_BASE_URL. */
 export const load = async (event: RequestEvent) => {
   const parsed = auditLogFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',

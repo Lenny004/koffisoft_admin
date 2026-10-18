@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Módulo de eventos privados: listado y cotizaciones, paquetes configurables,
+   * diálogos de alta/edición y filtros enlazados a la ruta de eventos.
+   */
   import {
     createColumnHelper,
     createTable,
@@ -33,10 +37,12 @@
   type Props = Pick<PageProps, 'data' | 'form'>;
   let { data, form }: Props = $props();
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions del módulo. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
@@ -94,6 +100,7 @@
     },
   });
 
+  /** Fusiona el filtro de estado de la ruta con parámetros adicionales de navegación. */
   function queryUrl(values: Record<string, string | number | undefined>): string {
     const query = new URLSearchParams();
     if (data.filters.status) query.set('status', data.filters.status);
@@ -103,6 +110,7 @@
     return `?${query.toString()}`;
   }
 
+  /** Abre el diálogo de evento en alta o precarga los campos al editar. */
   function startEvent(event?: Event) {
     editingEvent = event ?? null;
     eventId = event?.id ?? '';
@@ -123,6 +131,7 @@
     eventOpen = true;
   }
 
+  /** Abre el diálogo de paquete en alta o precarga líneas y precios al editar. */
   function startPackage(packageItem?: EventPackage) {
     editingPackage = packageItem ?? null;
     packageId = packageItem?.id ?? '';
@@ -147,6 +156,7 @@
     packageOpen = true;
   }
 
+  /** Mapea estados de evento o cotización a clases semánticas del panel administrativo. */
   function statusClass(status: string): string {
     if (['Confirmed', 'InProgress', 'Completed', 'Accepted'].includes(status))
       return 'admin-status admin-status--success';
@@ -155,10 +165,12 @@
     return 'admin-status admin-status--warning';
   }
 
+  /** Resuelve el nombre del espacio asignado o un texto de respaldo si falta. */
   function spaceName(id: string): string {
     return data.spaces.find((space) => space.id === id)?.nameEs ?? 'Espacio no disponible';
   }
 
+  /** Plantilla JSON de ejemplo para líneas de cotización en el formulario. */
   function quoteLineExample(): string {
     return JSON.stringify(
       [
@@ -179,6 +191,7 @@
     );
   }
 
+  /** Plantilla JSON mínima de ejemplo para líneas de un paquete de evento. */
   function packageLineExample(): string {
     return JSON.stringify([
       {

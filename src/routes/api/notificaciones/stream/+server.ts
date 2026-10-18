@@ -16,7 +16,16 @@ export const GET: RequestHandler = async (event) => {
 
   const origin = env.ORIGIN || event.request.headers.get('origin') || event.url.origin;
   headers.set('origin', origin);
-  headers.set('referer', event.request.headers.get('referer') || `${origin}${event.url.pathname}`);
+  const requestReferer = event.request.headers.get('referer');
+  let referer = `${origin}${event.url.pathname}`;
+  if (requestReferer) {
+    try {
+      if (new URL(requestReferer).origin === origin) referer = requestReferer;
+    } catch {
+      // Un Referer mal formado no puede demostrar el origen configurado.
+    }
+  }
+  headers.set('referer', referer);
 
   const response = await event.fetch(`${apiBaseUrl}/notifications/stream`, { headers });
   if (!response.ok || !response.body) {

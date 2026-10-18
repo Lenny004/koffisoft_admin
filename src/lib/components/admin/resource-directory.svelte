@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Directorio de recursos físicos: inventario de equipos, mantenimientos programados
+   * y completados, con filtros GET independientes para cada listado.
+   */
   import { CalendarClock, Pencil, Plus } from '@lucide/svelte';
   import { resolve } from '$app/paths';
 
@@ -96,10 +100,12 @@
     Retired: 'secondary',
   };
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(field: string): string {
     return getFieldError(form?.errors, field);
   }
 
+  /** Abre el diálogo de alta de recurso con estado operativo por defecto. */
   function startCreate() {
     editingId = null;
     resourceCode = '';
@@ -115,6 +121,7 @@
     dialogOpen = true;
   }
 
+  /** Precarga el formulario de edición con los datos del recurso seleccionado. */
   function startEdit(resource: ResourceItem) {
     editingId = resource.id;
     resourceCode = resource.resourceCode;
@@ -130,6 +137,7 @@
     dialogOpen = true;
   }
 
+  /** Abre el diálogo para programar mantenimiento sobre el recurso indicado. */
   function startMaintenance(resource: ResourceItem) {
     maintenanceResourceId = resource.id;
     scheduledDate = '';
@@ -138,12 +146,14 @@
     maintenanceOpen = true;
   }
 
+  /** Abre el diálogo para registrar la finalización de un mantenimiento pendiente. */
   function startComplete(schedule: MaintenanceSchedule) {
     completeId = schedule.id;
     completeNotes = '';
     completeOpen = true;
   }
 
+  /** Etiqueta legible del recurso asociado a una fila de mantenimiento. */
   function resourceLabel(schedule: MaintenanceSchedule): string {
     if (schedule.resourceCode && schedule.resourceName) {
       return `${schedule.resourceCode} · ${schedule.resourceName}`;
@@ -154,6 +164,7 @@
     );
   }
 
+  /** Arma la consulta GET conservando filtros de recursos y de mantenimientos. */
   function buildQuery(
     overrides: {
       page?: number;

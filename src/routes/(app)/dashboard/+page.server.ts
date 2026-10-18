@@ -28,12 +28,14 @@ interface InventoryAlertsResponse {
   expiringLots: Array<{ ingredientName: string; lotCode: string; expiresOn: string }>;
 }
 
+/** Devuelve from/to en ISO (mismo día UTC) para filtrar reservas del día en curso. */
 function todayRange(): { from: string; to: string } {
   const date = new Date();
   const value = date.toISOString().slice(0, 10);
   return { from: value, to: value };
 }
 
+/** Compone KPIs con reservas reales del día y alertas de inventario cuando hay permisos; conserva fixtures en el resto. */
 export const load: PageServerLoad = async (event) => {
   let reservations: DashboardReservation[] = dashboardFixture.reservations;
   let reservationSource: 'api' | 'fixture' = 'fixture';

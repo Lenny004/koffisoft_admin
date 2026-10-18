@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Consola de inventario: insumos, movimientos, recepciones y recetas con pestañas,
+   * diálogos de CRUD, recepción en almacén y ajustes con control de envíos duplicados.
+   */
   import { Eye, PackagePlus, Pencil, Plus, SlidersHorizontal, Trash2, X } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { createColumnHelper, createTable, tableFeatures } from '@tanstack/svelte-table';
@@ -183,14 +187,17 @@
     },
   });
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions del módulo. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Abre el diálogo de alta de insumo con categoría y unidad por defecto de la sede. */
   function startCreateItem() {
     editingItemId = null;
     itemCategoryId = data.categories[0]?.id ?? '';
@@ -205,6 +212,7 @@
     itemDialogOpen = true;
   }
 
+  /** Precarga el formulario de insumo incluyendo vínculos con proveedores. */
   function startEditItem(item: Ingredient) {
     editingItemId = item.id;
     itemCategoryId = item.categoryId;
@@ -226,6 +234,7 @@
     itemDialogOpen = true;
   }
 
+  /** Inicializa el diálogo de recepción con una línea vacía y fecha operativa local. */
   function startReceive() {
     receiptSupplierId = data.suppliers[0]?.id ?? '';
     receiptNumber = '';
@@ -236,6 +245,7 @@
     receiveDialogOpen = true;
   }
 
+  /** Construye una línea de recepción con insumo y unidad base predeterminados. */
   function emptyReceiptLine(): ReceiptLineForm {
     return {
       ingredientId: data.filterItems[0]?.id ?? '',
@@ -248,11 +258,13 @@
     };
   }
 
+  /** Sincroniza la unidad de medida de la línea al cambiar el insumo seleccionado. */
   function setReceiptIngredient(line: ReceiptLineForm, ingredientId: string): void {
     line.ingredientId = ingredientId;
     line.unitId = data.filterItems.find((item) => item.id === ingredientId)?.baseUnitId ?? '';
   }
 
+  /** Abre el diálogo de ajuste con identificador de operación único para idempotencia. */
   function startAdjustment() {
     adjustmentStorageLocationId = data.storageLocations[0]?.id ?? '';
     adjustmentIngredientId = data.filterItems[0]?.id ?? '';
@@ -266,6 +278,7 @@
     adjustmentDialogOpen = true;
   }
 
+  /** Añade un vínculo proveedor-insumo respetando el límite configurado del formulario. */
   function addSupplierLink(): void {
     if (itemSupplierLinks.length >= FORM_LIMITS.inventory.supplierLinksMaxSize) return;
     itemSupplierLinks = [
@@ -281,10 +294,12 @@
     ];
   }
 
+  /** Elimina un vínculo proveedor-insumo del borrador en edición. */
   function removeSupplierLink(index: number): void {
     itemSupplierLinks = itemSupplierLinks.filter((_, currentIndex) => currentIndex !== index);
   }
 
+  /** Evita envíos duplicados mientras una action POST sigue en curso. */
   function guardSubmit(action: string, event: SubmitEvent): void {
     if (pendingAction) {
       event.preventDefault();
@@ -293,6 +308,7 @@
     pendingAction = action;
   }
 
+  /** Traduce tipos de movimiento de inventario a etiquetas en español. */
   function movementLabel(value: string): string {
     return (
       {
@@ -305,6 +321,7 @@
     );
   }
 
+  /** Conserva filtros activos al paginar insumos o movimientos según la pestaña. */
   function pageQuery(page: number, movement = false): string {
     const params = new URLSearchParams();
     if (data.filters.search) params.set('search', data.filters.search);
@@ -319,10 +336,12 @@
     return `?${params.toString()}`;
   }
 
+  /** Formatea cantidad y unidad para celdas y resúmenes del módulo. */
   function formatQuantity(value: string, unit = ''): string {
     return `${value} ${unit}`.trim();
   }
 
+  /** Solicita confirmación nativa antes de acciones destructivas o irreversibles. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }

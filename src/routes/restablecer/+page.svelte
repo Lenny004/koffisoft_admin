@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Restablecimiento de contraseña vía token en query: validación en cliente con indicador
+   * de fortaleza y envío a la action por defecto de `/restablecer`.
+   */
   import { resolve } from '$app/paths';
 
   import { Button } from '$lib/components/ui/button/index.js';
@@ -14,11 +18,13 @@
 
   let { data, form }: PageProps = $props();
   let newPassword = $state('');
+  /** Puntuación heurística solo informativa; la API valida la política real al guardar. */
   const strength = $derived(passwordStrengthScore(newPassword));
   const strengthLabel = $derived(
     ['Muy débil', 'Básica', 'Aceptable', 'Fuerte'][strength] ?? 'Muy débil',
   );
 
+  /** Obtiene el error de un campo tras enviar el formulario de restablecimiento. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }

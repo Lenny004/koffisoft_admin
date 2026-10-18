@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Directorio de usuarios: tabla TanStack, filtros GET, alta/edición de cuentas,
+   * asignación de roles y acciones de estado protegidas por permisos granulares.
+   */
   import {
     KeyRound,
     LockKeyhole,
@@ -78,14 +82,17 @@
     },
   });
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions de usuarios. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Abre el diálogo de alta obligando cambio de contraseña en el primer acceso. */
   function startCreate() {
     editingUserId = null;
     username = '';
@@ -98,6 +105,7 @@
     userDialogOpen = true;
   }
 
+  /** Precarga el formulario de edición sin exponer la contraseña almacenada. */
   function startEdit(user: UserRow) {
     editingUserId = user.id;
     username = user.username;
@@ -109,26 +117,31 @@
     userDialogOpen = true;
   }
 
+  /** Abre el diálogo de roles con la selección actual del usuario. */
   function startRoles(user: UserRow) {
     rolesUser = user;
     roleIds = user.roles.map((role) => role.id);
     rolesDialogOpen = true;
   }
 
+  /** Solicita confirmación nativa antes de acciones destructivas o irreversibles. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }
 
+  /** Traduce el estado de la cuenta a texto en español. */
   function statusLabel(status: string): string {
     return { active: 'Activo', inactive: 'Inactivo', locked: 'Bloqueado' }[status] ?? status;
   }
 
+  /** Asigna la variante del badge según el estado de la cuenta. */
   function statusVariant(status: string): 'success' | 'danger' | 'warning' {
     if (status === 'active') return 'success';
     if (status === 'locked') return 'warning';
     return 'danger';
   }
 
+  /** Traduce el cargo del empleado vinculado para mostrarlo en la tabla. */
   function jobLabel(jobCode: string): string {
     return (
       {
@@ -142,12 +155,14 @@
     );
   }
 
+  /** Formatea fechas de auditoría en locale de El Salvador o un guion si faltan. */
   function formatDate(value: string | null): string {
     return value
       ? new Intl.DateTimeFormat('es-SV', { dateStyle: 'medium' }).format(new Date(value))
       : '—';
   }
 
+  /** Conserva filtros de búsqueda, estado y rol al cambiar de página. */
   function pageQuery(page: number): string {
     const params = new URLSearchParams();
     if (data.filters.search) params.set('search', data.filters.search);

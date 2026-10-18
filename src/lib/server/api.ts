@@ -6,6 +6,7 @@ export interface ApiRequestOptions extends RequestInit {
   json?: unknown;
 }
 
+/** Indica que falta `API_BASE_URL` y no puede proxyarse la autenticación. */
 export class ApiNotConfiguredError extends Error {
   constructor() {
     super('El panel no tiene configurada la API. Sin API_BASE_URL no es posible iniciar sesión.');
@@ -18,11 +19,13 @@ export function actionErrorStatus(status: number): number {
   return status >= 400 && status <= 599 ? status : 502;
 }
 
+/** Mensaje amigable cuando el panel no alcanza la API de autenticación. */
 export function connectionErrorMessage(error: unknown): string {
   if (error instanceof ApiNotConfiguredError) return error.message;
   return 'No fue posible conectar con la API de autenticación.';
 }
 
+/** Proxy server-side hacia la API reenviando cookies, origen y cuerpo JSON opcional. */
 export async function apiRequest(
   event: RequestEvent,
   path: string,
@@ -43,7 +46,10 @@ export async function apiRequest(
 
   const origin = env.ORIGIN || event.request.headers.get('origin') || event.url.origin;
   headers.set('origin', origin);
-  headers.set('referer', event.request.headers.get('referer') || `${origin}${event.url.pathname}`);
+  headers.set(
+    'referer',
+    trustedReferer(event.request.headers.get('referer'), origin, event.url.pathname),
+  );
 
   let body = options.body;
   if (options.json !== undefined) {
@@ -60,6 +66,7 @@ export async function apiRequest(
   });
 }
 
+/** Extrae o infiere un mensaje legible a partir del cuerpo o código HTTP. */
 export async function apiErrorMessage(response: Response): Promise<string> {
   try {
     const payload = (await response.json()) as { message?: string | string[] };
@@ -81,6 +88,7 @@ export async function apiErrorMessage(response: Response): Promise<string> {
   return 'No se pudo completar la solicitud. Inténtalo de nuevo.';
 }
 
+/** Parsea JSON de la respuesta; devuelve null si el cuerpo no es JSON válido. */
 export async function readJson<T>(response: Response): Promise<T | null> {
   try {
     return (await response.json()) as T;
@@ -89,6 +97,20 @@ export async function readJson<T>(response: Response): Promise<T | null> {
   }
 }
 
+/** El CSRF de la API exige que Origin y Referer sean el mismo origen permitido. */
+function trustedReferer(requestReferer: string | null, origin: string, pathname: string): string {
+  if (requestReferer) {
+    try {
+      if (new URL(requestReferer).origin === origin) return requestReferer;
+    } catch {
+      // Un Referer mal formado no puede demostrar el origen configurado.
+    }
+  }
+
+  return `${origin}${pathname}`;
+}
+
+/** Normaliza cabeceras Set-Cookie tanto en runtimes con `getSetCookie` como legacy. */
 function setCookieHeaders(response: Response): string[] {
   const headers = response.headers as Headers & { getSetCookie?: () => string[] };
   const cookies = headers.getSetCookie?.();
@@ -97,6 +119,7 @@ function setCookieHeaders(response: Response): string[] {
     : (response.headers.get('set-cookie')?.split(/,(?=[^;]+=[^;]+)/u) ?? []);
 }
 
+/** Replica en `event.cookies` las cookies de sesión que devuelve la API tras login o refresh. */
 export function forwardSessionCookies(
   event: RequestEvent,
   response: Response,
@@ -128,6 +151,7 @@ export function forwardSessionCookies(
   }
 }
 
+/** Borra la cookie de sesión estándar y su variante `__Host-` si aplica. */
 export function clearSessionCookie(event: RequestEvent, cookieName: string): void {
   event.cookies.delete(cookieName, { path: '/' });
   if (!cookieName.startsWith('__Host-'))

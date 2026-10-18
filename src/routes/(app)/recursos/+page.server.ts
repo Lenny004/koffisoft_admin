@@ -14,6 +14,7 @@ import {
   resourceSchema,
 } from '$lib/validation/resources';
 
+/** Interpreta checkboxes del formulario de recursos. */
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const value = formData.getAll(name).at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
@@ -22,15 +23,18 @@ function booleanValue(formData: FormData, name: string, defaultValue = false): b
 const PAGE_SIZE = 20;
 const emptyMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los recursos: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof ResourcesApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de recursos no está disponible en este momento.'] };
 }
 
+/** Lista recursos y mantenimientos paginados con filtros independientes y proveedores para formularios. */
 export const load = async (event: RequestEvent) => {
   const parsed = resourceFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -126,7 +130,9 @@ export const load = async (event: RequestEvent) => {
   }
 };
 
+/** CRUD de activos y ciclo de mantenimientos bajo permiso resources.manage. */
 export const actions = {
+  /** Crea o actualiza un recurso físico de la sede. */
   save: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('resources.manage')) {
       return fail(403, {
@@ -175,6 +181,7 @@ export const actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Programa un mantenimiento y devuelve el registro creado. */
   schedule: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('resources.manage')) {
       return fail(403, {
@@ -210,6 +217,7 @@ export const actions = {
       return fail(response.status, { action: 'schedule', errors: response.errors });
     }
   },
+  /** Marca un mantenimiento como completado con notas opcionales. */
   complete: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('resources.manage')) {
       return fail(403, {

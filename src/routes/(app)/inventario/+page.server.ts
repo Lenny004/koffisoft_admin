@@ -22,6 +22,7 @@ const emptyMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 type InventoryClient = ReturnType<typeof createInventoryClient>;
 type InventoryQuery = Record<string, string | number | boolean | undefined>;
 
+/** Agrega todas las páginas de insumos cuando la UI necesita el catálogo completo para selects. */
 async function loadAllItems(client: InventoryClient, query: InventoryQuery) {
   const firstPage = await client.listItems({
     ...query,
@@ -42,6 +43,7 @@ async function loadAllItems(client: InventoryClient, query: InventoryQuery) {
   return [firstPage, ...remaining].flatMap((page) => page.data);
 }
 
+/** Agrega proveedores paginados hasta cubrir meta.totalPages para listas auxiliares. */
 async function loadAllSuppliers(client: InventoryClient, query: InventoryQuery) {
   const firstPage = await client.listSuppliers({
     ...query,
@@ -62,15 +64,18 @@ async function loadAllSuppliers(client: InventoryClient, query: InventoryQuery) 
   return [firstPage, ...remaining].flatMap((page) => page.data);
 }
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudo cargar el inventario: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown, fallback: string): { status: number; errors: string[] } {
   if (error instanceof InventoryApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: [fallback] };
 }
 
+/** Parsea JSON embebido en FormData con mensaje de error para validación. */
 function jsonValue(
   formData: FormData,
   name: string,
@@ -83,12 +88,14 @@ function jsonValue(
   }
 }
 
+/** Interpreta el último valor de un campo booleano del formulario. */
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const values = formData.getAll(name);
   const value = values.at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
 }
 
+/** Lee y valida filtros de inventario desde searchParams con schema Zod. */
 function parseFilters(event: RequestEvent) {
   const result = inventoryFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -104,6 +111,7 @@ function parseFilters(event: RequestEvent) {
   return result.success ? result.data : inventoryFilterSchema.parse({});
 }
 
+/** Carga insumos, lotes, movimientos, ubicaciones y catálogos auxiliares según permisos inventory.*. */
 export const load = async (event: RequestEvent) => {
   const filters = parseFilters(event);
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
@@ -224,7 +232,9 @@ export const load = async (event: RequestEvent) => {
   }
 };
 
+/** Mutaciones de insumos, recepciones y ajustes bajo permisos inventory.manage/receive/adjust. */
 export const actions = {
+  /** Crea o actualiza insumo con vínculos a proveedores en JSON. */
   saveItem: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('inventory.manage'))
       return fail(403, {
@@ -268,6 +278,7 @@ export const actions = {
       return fail(response.status, { action: 'saveItem', errors: response.errors });
     }
   },
+  /** Desactiva un insumo de la sede. */
   deleteItem: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('inventory.manage'))
       return fail(403, {
@@ -287,6 +298,7 @@ export const actions = {
       return fail(response.status, { action: 'deleteItem', errors: response.errors });
     }
   },
+  /** Registra recepción de mercancía con líneas y lotes opcionales. */
   receive: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('inventory.receive'))
       return fail(403, {
@@ -331,6 +343,7 @@ export const actions = {
       return fail(response.status, { action: 'receive', errors: response.errors });
     }
   },
+  /** Aplica ajuste de stock con operationId idempotente generado si falta. */
   adjust: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('inventory.adjust'))
       return fail(403, { action: 'adjust', errors: ['No tienes permiso para registrar ajustes.'] });

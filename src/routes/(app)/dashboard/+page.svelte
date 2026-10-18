@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Resumen operativo del área autenticada: KPIs, reservas del día, alertas de inventario
+   * y accesos rápidos filtrados por permisos del usuario.
+   */
   import { ArrowUpRight, CalendarCheck, CircleDollarSign, ShoppingBag } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import type { PageProps } from './$types';
@@ -15,6 +19,7 @@
     no_show: 'No llegó',
   };
 
+  /** Asocia cada estado de reserva con la variante visual del badge administrativo. */
   function statusClass(status: string): string {
     if (['confirmed', 'seated', 'completed'].includes(status))
       return 'admin-status admin-status--success';

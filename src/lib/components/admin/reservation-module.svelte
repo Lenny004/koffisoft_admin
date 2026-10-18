@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Consola de reservaciones: creación interna, listado con TanStack Table o agenda,
+   * mantenimiento de espacios y mesas, y detalle con transiciones y asignación de mesas.
+   */
   import {
     createColumnHelper,
     createTable,
@@ -43,10 +47,12 @@
   type Props = Pick<PageProps, 'data' | 'form'>;
   let { data, form }: Props = $props();
 
+  /** Resuelve el mensaje de error de un campo tras una action del módulo. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Lista errores globales devueltos por validación server-side. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
@@ -115,6 +121,7 @@
     selectedTableIds = data.selectedReservation?.tables.map((table) => table.id) ?? [];
   });
 
+  /** Fusiona filtros activos de la ruta con parámetros adicionales de navegación. */
   function queryUrl(values: Record<string, string | number | undefined>): string {
     const query = new URLSearchParams();
     if (data.filters.dateFrom) query.set('dateFrom', data.filters.dateFrom);
@@ -129,10 +136,12 @@
     return `?${query.toString()}`;
   }
 
+  /** Etiqueta legible del espacio preferido o de la mesa en pickers y tablas. */
   function spaceName(id: string | null): string {
     return data.spaces.find((space) => space.id === id)?.nameEs ?? 'Sin espacio';
   }
 
+  /** Abre el diálogo de espacio en alta o precarga los campos al editar. */
   function startSpace(space?: VenueSpace) {
     editingSpace = space ?? null;
     spaceId = space?.id ?? '';
@@ -148,6 +157,7 @@
     spaceOpen = true;
   }
 
+  /** Abre el diálogo de mesa en alta o precarga los campos al editar. */
   function startTable(table?: DiningTable) {
     editingTable = table ?? null;
     tableId = table?.id ?? '';
@@ -160,6 +170,7 @@
     tableOpen = true;
   }
 
+  /** Actualiza la selección de mesas del detalle de reserva antes de `assignTables`. */
   function toggleTable(event: Event, id: string) {
     const checked = (event.currentTarget as HTMLInputElement).checked;
     selectedTableIds = checked
@@ -167,6 +178,7 @@
       : selectedTableIds.filter((tableId) => tableId !== id);
   }
 
+  /** Actualiza las mesas opcionales enviadas al crear una reservación interna. */
   function toggleCreateTable(event: Event, id: string) {
     const checked = (event.currentTarget as HTMLInputElement).checked;
     createTableIds = checked
@@ -174,6 +186,7 @@
       : createTableIds.filter((tableId) => tableId !== id);
   }
 
+  /** Mapea estados de reserva a clases semánticas compartidas del panel administrativo. */
   function statusClass(status: string): string {
     if (['Confirmed', 'Seated', 'Completed'].includes(status))
       return 'admin-status admin-status--success';

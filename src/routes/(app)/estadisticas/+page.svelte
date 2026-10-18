@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Lectura de analytics anónimos: filtros GET por sede y rango, barras relativas al máximo
+   * del reporte y rankings de páginas, recursos y referrers (solo lectura).
+   */
   import { BarChart3, ExternalLink, Globe2, MapPin, Package, Route } from '@lucide/svelte';
 
   import { resolve } from '$app/paths';
@@ -11,6 +15,7 @@
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
+  /** Evita división por cero al normalizar barras `progress` respecto al pico del rango. */
   const maxDailyVisits = $derived(Math.max(...data.summary.daily.map((point) => point.visits), 1));
   const maxPageVisits = $derived(Math.max(...data.pages.map((row) => row.visits), 1));
   const maxProductVisits = $derived(Math.max(...data.products.map((row) => row.visits), 1));
@@ -21,6 +26,7 @@
     event: 'Evento',
   };
 
+  /** Texto auxiliar para lectores de pantalla junto a cada barra de ranking. */
   function barLabel(value: number, max: number): string {
     return `${Math.round((value / max) * 100)}% del máximo del rango`;
   }

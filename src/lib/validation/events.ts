@@ -228,6 +228,7 @@ export const updateRequirementSchema = z.object({
   resolvedAt: dateTime.optional().or(z.literal('')),
 });
 
+/** Lista plana de mensajes de Zod para resúmenes de error en formularios de eventos. */
 export function validationMessages(error: z.ZodError): string[] {
   return error.issues.map((issue) => issue.message);
 }

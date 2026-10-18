@@ -15,15 +15,18 @@ import type { PageMeta } from '$lib/users/types';
 const PAGE_SIZE = 20;
 const emptyMeta: PageMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los empleados: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof UsersApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de empleados no está disponible en este momento.'] };
 }
 
+/** Normaliza todos los campos del formulario de alta/edición de empleado. */
 function employeeFields(formData: FormData) {
   return {
     id: formText(formData.get('id')),
@@ -41,6 +44,7 @@ function employeeFields(formData: FormData) {
   };
 }
 
+/** Lista empleados paginados de la sede y usuarios activos para vincular cuenta. */
 export const load: PageServerLoad = async (event) => {
   const parsedFilters = employeeFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -94,7 +98,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Alta, edición y baja lógica de empleados bajo permiso users.manage. */
 export const actions: Actions = {
+  /** Crea o actualiza empleado según presencia de id en el formulario. */
   save: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, {
@@ -146,6 +152,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Desactiva el empleado mediante removeEmployee. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, {

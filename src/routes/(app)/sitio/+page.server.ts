@@ -7,10 +7,12 @@ import { formText } from '$lib/validation/menu';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { siteContentSchema } from '$lib/validation/site';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'Configura API_BASE_URL y DEFAULT_LOCATION_ID para editar el sitio.';
 }
 
+/** Parsea arrays JSON del formulario del sitio; devuelve [] si el JSON es inválido. */
 function parseJson(formData: FormData, name: string): unknown {
   try {
     return JSON.parse(formText(formData.get(name)) || '[]');
@@ -19,6 +21,7 @@ function parseJson(formData: FormData, name: string): unknown {
   }
 }
 
+/** Arma el objeto anidado location/profile/hours/overrides desde FormData. */
 function formPayload(formData: FormData) {
   return {
     location: {
@@ -49,6 +52,7 @@ function formPayload(formData: FormData) {
   };
 }
 
+/** Obtiene contenido editorial del sitio público para la sede configurada. */
 export const load: PageServerLoad = async (event) => {
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
@@ -68,7 +72,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Actualiza contenido del sitio bajo permiso site_content.manage. */
 export const actions: Actions = {
+  /** Valida siteContentSchema y persiste el perfil completo del sitio. */
   save: async (event) => {
     if (!event.locals.permissions.includes('site_content.manage'))
       return fail(403, {

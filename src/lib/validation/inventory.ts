@@ -11,6 +11,7 @@ const decimal = z
     'El valor es demasiado grande.',
   );
 const positiveDecimal = decimal.refine((value) => Number(value) > 0, 'Debe ser mayor que cero.');
+/** Texto opcional recortado; las cadenas vacías se normalizan a literal vacío. */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
 
 export const inventoryFilterSchema = z.object({

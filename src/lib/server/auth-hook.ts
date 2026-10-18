@@ -4,13 +4,14 @@ import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { requiredPermissionForPath } from '$lib/config/navigation';
 import type { AuthSnapshot, AuthenticatedUser } from '$lib/types/auth';
 
-/** Consulta la sesión server-side y aplica el permiso asociado a cada módulo protegido. */
+/** Parámetros para resolver sesión contra la API y poblar `event.locals`. */
 interface AuthHookOptions {
   apiBaseUrl: string;
   sessionCookieName: string;
   origin?: string;
 }
 
+/** Rutas accesibles sin sesión válida (login, assets estáticos del panel). */
 export function isPublicPath(pathname: string): boolean {
   return (
     pathname === '/' ||
@@ -23,6 +24,7 @@ export function isPublicPath(pathname: string): boolean {
   );
 }
 
+/** Valida y completa campos mínimos del snapshot devuelto por `/auth/me`. */
 function normalizeSnapshot(payload: unknown): AuthSnapshot | undefined {
   if (!payload || typeof payload !== 'object') return undefined;
   const value = payload as Partial<AuthSnapshot>;
@@ -51,6 +53,7 @@ function normalizeSnapshot(payload: unknown): AuthSnapshot | undefined {
   };
 }
 
+/** Obtiene el snapshot de autenticación usando la cookie de la solicitud entrante. */
 async function loadSnapshot(
   event: RequestEvent,
   options: AuthHookOptions,
@@ -72,6 +75,7 @@ async function loadSnapshot(
   }
 }
 
+/** Consulta la sesión server-side y aplica el permiso asociado a cada módulo protegido. */
 export function createAuthHandle(options: AuthHookOptions): Handle {
   return async ({ event, resolve }) => {
     const cookieName = options.sessionCookieName || 'koffisoft_session';

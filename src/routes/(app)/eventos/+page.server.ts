@@ -32,26 +32,31 @@ const EVENT_STATUSES = [
   'Lost',
 ] as const;
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los eventos: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown, fallback: string): { status: number; errors: string[] } {
   if (error instanceof EventsApiError || error instanceof ReservationsApiError)
     return { status: error.status, errors: [error.message] };
   return { status: 502, errors: [fallback] };
 }
 
+/** Lee el último valor enviado para un checkbox/booleano del formulario. */
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const values = formData.getAll(name);
   const value = values.at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
 }
 
+/** Convierte cadenas vacías en undefined para campos opcionales de la API. */
 function optional(value: string | undefined): string | undefined {
   return value || undefined;
 }
 
+/** Parsea un campo JSON del formulario o devuelve error legible para fail(). */
 function jsonValue(
   formData: FormData,
   name: string,
@@ -64,6 +69,7 @@ function jsonValue(
   }
 }
 
+/** Mapea FormData del evento convirtiendo fechas locales de El Salvador a ISO UTC. */
 function eventForm(formData: FormData) {
   return {
     id: formText(formData.get('id')),
@@ -86,6 +92,7 @@ function eventForm(formData: FormData) {
   };
 }
 
+/** Lista eventos paginados, paquetes, espacios (si hay permiso) y detalle/cotizaciones del seleccionado. */
 export const load: PageServerLoad = async (event) => {
   const page = parsePositivePage(event.url.searchParams.get('page'));
   const statusParam = event.url.searchParams.get('status') ?? '';
@@ -159,7 +166,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Operaciones de eventos, espacios, paquetes, cotizaciones y requisitos bajo permisos events.* y event_quotes.manage. */
 export const actions: Actions = {
+  /** Crea o actualiza el evento; en edición omite preferredLanguage del payload. */
   saveEvent: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -200,6 +209,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'saveEvent', errors: response.errors });
     }
   },
+  /** Cancela/elimina el evento por id. */
   deleteEvent: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -216,6 +226,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'deleteEvent', errors: response.errors });
     }
   },
+  /** Reserva un espacio del venue para el evento validando solapamientos en API. */
   bookSpace: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -257,6 +268,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'bookSpace', errors: response.errors });
     }
   },
+  /** Libera una reserva de espacio previamente retenida. */
   releaseSpace: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -274,6 +286,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'releaseSpace', errors: response.errors });
     }
   },
+  /** Crea o actualiza paquete con líneas JSON normalizadas. */
   savePackage: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -332,6 +345,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'savePackage', errors: response.errors });
     }
   },
+  /** Desactiva un paquete de eventos. */
   deletePackage: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -348,6 +362,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'deletePackage', errors: response.errors });
     }
   },
+  /** Genera cotización con líneas opcionales ligadas a paquete o variantes. */
   createQuote: async (event) => {
     if (!event.locals.permissions.includes('event_quotes.manage'))
       return fail(403, {
@@ -397,6 +412,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'createQuote', errors: response.errors });
     }
   },
+  /** Transiciona el estado de una cotización existente. */
   updateQuoteStatus: async (event) => {
     if (!event.locals.permissions.includes('event_quotes.manage'))
       return fail(403, {
@@ -425,6 +441,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'updateQuoteStatus', errors: response.errors });
     }
   },
+  /** Registra un nuevo requisito operativo del evento. */
   saveRequirement: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -458,6 +475,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'saveRequirement', errors: response.errors });
     }
   },
+  /** Actualiza o resuelve un requisito incluyendo resolvedAt opcional. */
   updateRequirement: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {
@@ -492,6 +510,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'updateRequirement', errors: response.errors });
     }
   },
+  /** Desactiva un requisito del evento. */
   deleteRequirement: async (event) => {
     if (!event.locals.permissions.includes('events.manage'))
       return fail(403, {

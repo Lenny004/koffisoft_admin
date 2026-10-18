@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Flujo de acceso al panel: bootstrap inicial, login, recuperación, MFA y cambio
+   * obligatorio de contraseña; el paso activo lo define la action o el `load`.
+   */
   import { resolve } from '$app/paths';
   import { Button } from '$lib/components/ui/button/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
@@ -30,19 +34,24 @@
     data: { setupRequired: boolean; showForgot: boolean; returnTo: string };
     form?: LoginForm | null;
   } = $props();
+  /** Prioriza el paso devuelto por la última action sobre el estado inicial del `load`. */
   const step = $derived<LoginStep>(
     form?.step ?? (data.setupRequired ? 'bootstrap' : data.showForgot ? 'forgot' : 'login'),
   );
+  /** Destino post-login acotado por el servidor (`safeReturnTo`). */
   const destination = $derived(form?.returnTo ?? data.returnTo);
 
+  /** Obtiene el error de un campo del paso de autenticación actual. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Devuelve errores globales de la action del paso visible. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Repuebla inputs tras un `fail()` sin perder lo que el usuario ya escribió. */
   function formValue(name: string): string {
     return form?.values?.[name] ?? '';
   }

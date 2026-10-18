@@ -14,15 +14,18 @@ import {
   contactUpdateSchema,
 } from '$lib/validation/contact';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudo cargar la bandeja: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof ContactApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de contacto no está disponible en este momento.'] };
 }
 
+/** Bandeja paginada de mensajes de contacto con filtros URL y detalle opcional por selected. */
 export const load: PageServerLoad = async (event) => {
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
@@ -103,7 +106,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Gestión de contactos: actualización, conversión a cliente, reserva o evento bajo contact.manage. */
 export const actions: Actions = {
+  /** Actualiza estado, asignación y archivo del mensaje. */
   update: async (event) => {
     if (!event.locals.permissions.includes('contact.manage'))
       return fail(403, {
@@ -138,6 +143,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'update', errors: response.errors });
     }
   },
+  /** Convierte el hilo en cliente registrado en la sede. */
   convertCustomer: async (event) => {
     if (!event.locals.permissions.includes('contact.manage'))
       return fail(403, {
@@ -159,6 +165,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'convertCustomer', errors: response.errors });
     }
   },
+  /** Abre una reserva interna a partir del mensaje de contacto. */
   convertReservation: async (event) => {
     if (!event.locals.permissions.includes('contact.manage'))
       return fail(403, {
@@ -203,6 +210,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'convertReservation', errors: response.errors });
     }
   },
+  /** Crea un evento comercial con fechas convertidas desde hora local SV. */
   convertEvent: async (event) => {
     if (!event.locals.permissions.includes('contact.manage'))
       return fail(403, {

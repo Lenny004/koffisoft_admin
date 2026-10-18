@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Botón del panel sobre bits-ui: alias `primary`/`default`, tamaños del admin
+   * y estado `loading` que deshabilita el control y expone `aria-busy`.
+   */
   import { Button as ButtonPrimitive } from 'bits-ui';
 
   import { cn } from '$lib/utils.js';

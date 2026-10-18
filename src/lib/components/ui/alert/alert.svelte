@@ -1,4 +1,5 @@
 <script lang="ts">
+  /** Alerta accesible con variantes semánticas del panel (`success`, `warning`, `info`) además de shadcn. */
   import { cn } from '$lib/utils.js';
 
   type AlertVariant = 'default' | 'destructive' | 'success' | 'warning' | 'info';

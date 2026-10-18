@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * CRUD de categorías del menú: tabla TanStack, búsqueda GET, reorden local con flechas
+   * y diálogo de alta/edición bajo permiso `catalog.manage`.
+   */
   import {
     createColumnHelper,
     createTable,
@@ -32,20 +36,24 @@
   let active = $state(true);
   let search = $state('');
 
+  /** Obtiene el error de un campo tras enviar el formulario del diálogo. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Devuelve errores globales de las actions del módulo (save, reorder, toggle, delete). */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Sincroniza la tabla con el resultado del `load` tras navegar o filtrar por búsqueda. */
   $effect(() => {
     categories = [...data.categories];
     search = data.search;
   });
 
   const canManage = $derived(data.permissions.includes('catalog.manage'));
+  /** TanStack solo renderiza columnas; reorden y CRUD usan estado local y form actions. */
   const features = tableFeatures({});
   const columnHelper = createColumnHelper<typeof features, CategoryRow>();
   const columns = columnHelper.columns([
@@ -66,6 +74,7 @@
     },
   });
 
+  /** Abre el diálogo en modo creación con orden sugerido al final de la lista. */
   function startCreate() {
     editingId = null;
     slug = '';
@@ -78,6 +87,7 @@
     open = true;
   }
 
+  /** Carga una categoría existente en el diálogo para edición. */
   function startEdit(category: CategoryRow) {
     editingId = category.id;
     slug = category.slug;
@@ -90,6 +100,7 @@
     open = true;
   }
 
+  /** Intercambia dos filas y recalcula `displayOrder` antes de persistir con `?/reorder`. */
   function moveCategory(index: number, offset: number) {
     const target = index + offset;
     if (target < 0 || target >= categories.length) return;
@@ -101,6 +112,7 @@
     }));
   }
 
+  /** Pide confirmación antes de activar, desactivar o dar de baja una categoría. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }

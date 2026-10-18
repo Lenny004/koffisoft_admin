@@ -7,15 +7,18 @@ import { formText } from '$lib/validation/menu';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { backupCreateSchema, backupDeleteSchema } from '$lib/validation/backups';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los respaldos: configura API_BASE_URL.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof BackupApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de respaldos no está disponible en este momento.'] };
 }
 
+/** Lista respaldos disponibles si el usuario tiene backups.read y la API está configurada. */
 export const load: PageServerLoad = async (event) => {
   const permissions = event.locals.permissions;
   const baseData = {
@@ -43,7 +46,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Generación y eliminación de respaldos con permisos backups.create y backups.delete. */
 export const actions: Actions = {
+  /** Encola o genera un respaldo del tipo solicitado. */
   create: async (event) => {
     if (!event.locals.permissions.includes('backups.create')) {
       return fail(403, { action: 'create', errors: ['No tienes permiso para generar respaldos.'] });
@@ -67,6 +72,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'create', errors: response.errors });
     }
   },
+  /** Elimina un respaldo por id. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('backups.delete')) {
       return fail(403, {

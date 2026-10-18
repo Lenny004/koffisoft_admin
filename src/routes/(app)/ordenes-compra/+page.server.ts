@@ -15,6 +15,7 @@ import {
   receivePurchaseOrderSchema,
 } from '$lib/validation/purchase-orders';
 
+/** Convierte líneas del formulario a números y conserva id en borradores existentes. */
 function toApiDraftLines(
   lines: {
     id?: string;
@@ -35,10 +36,12 @@ function toApiDraftLines(
 
 const PAGE_SIZE = 20;
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar las órdenes: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof PurchaseOrdersApiError) {
     return { status: error.status, errors: [error.message] };
@@ -46,6 +49,7 @@ function actionError(error: unknown): { status: number; errors: string[] } {
   return { status: 502, errors: ['La API de órdenes de compra no está disponible.'] };
 }
 
+/** Lista órdenes de compra, catálogos de inventario y detalle seleccionado por query orden. */
 export const load = async (event: RequestEvent) => {
   const parsed = purchaseOrderFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -119,7 +123,9 @@ export const load = async (event: RequestEvent) => {
   }
 };
 
+/** Ciclo de vida de órdenes de compra bajo purchase_orders.manage y permiso de lectura en load. */
 export const actions = {
+  /** Crea orden en borrador con líneas numéricas validadas. */
   create: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('purchase_orders.manage')) {
       return fail(403, { action: 'create', errors: ['No tienes permiso para crear órdenes.'] });
@@ -162,6 +168,7 @@ export const actions = {
       return fail(response.status, { action: 'create', errors: response.errors });
     }
   },
+  /** Actualiza cabecera y opcionalmente reemplaza líneas del borrador. */
   update: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('purchase_orders.manage')) {
       return fail(403, { action: 'update', errors: ['No tienes permiso para editar órdenes.'] });
@@ -198,6 +205,7 @@ export const actions = {
       return fail(response.status, { action: 'update', errors: response.errors });
     }
   },
+  /** Sustituye por completo las líneas de una orden en estado editable. */
   replaceLines: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('purchase_orders.manage')) {
       return fail(403, {
@@ -230,9 +238,13 @@ export const actions = {
       return fail(response.status, { action: 'replaceLines', errors: response.errors });
     }
   },
+  /** Envía la orden a aprobación (delegado en mutateStatus). */
   submit: async (event: RequestEvent) => mutateStatus(event, 'submit'),
+  /** Aprueba la orden pendiente. */
   approve: async (event: RequestEvent) => mutateStatus(event, 'approve'),
+  /** Cancela la orden. */
   cancel: async (event: RequestEvent) => mutateStatus(event, 'cancel'),
+  /** Registra recepción física con ubicación de almacén y lotes. */
   receive: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('purchase_orders.manage')) {
       return fail(403, { action: 'receive', errors: ['No tienes permiso para recibir órdenes.'] });
@@ -272,6 +284,7 @@ export const actions = {
   },
 };
 
+/** Centraliza submit/approve/cancel validando id y permiso antes de llamar al cliente de órdenes. */
 async function mutateStatus(event: RequestEvent, action: 'submit' | 'approve' | 'cancel') {
   if (!event.locals.permissions.includes('purchase_orders.manage')) {
     return fail(403, { action, errors: ['No tienes permiso para cambiar el estado de la orden.'] });

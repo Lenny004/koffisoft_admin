@@ -25,26 +25,31 @@ import type {
 const PAGE_SIZE = 20;
 const RESERVATION_ACTIONS = ['confirm', 'seat', 'complete', 'cancel', 'no-show'] as const;
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar las reservaciones: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown, fallback: string): { status: number; errors: string[] } {
   if (error instanceof ReservationsApiError)
     return { status: error.status, errors: [error.message] };
   return { status: 502, errors: [fallback] };
 }
 
+/** Lee booleanos del formulario de reservaciones (último valor enviado). */
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const values = formData.getAll(name);
   const value = values.at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
 }
 
+/** Transforma cadenas vacías en undefined para payloads opcionales. */
 function optional(value: string | undefined): string | undefined {
   return value || undefined;
 }
 
+/** Parsea JSON de mesas u otros arrays con mensaje de error controlado. */
 function parseJson(value: string, message: string): { value?: unknown; error?: string } {
   try {
     return { value: JSON.parse(value) };
@@ -53,6 +58,7 @@ function parseJson(value: string, message: string): { value?: unknown; error?: s
   }
 }
 
+/** Pagina reservas o filtra en memoria por texto cuando el API no expone búsqueda full-text. */
 async function listFilteredReservations(
   client: ReturnType<typeof createReservationsClient>,
   locationId: string,
@@ -94,6 +100,7 @@ async function listFilteredReservations(
   };
 }
 
+/** Reservas filtradas, espacios, mesas y metadatos de sede para operación diaria. */
 export const load: PageServerLoad = async (event) => {
   const rawFilters = {
     page: event.url.searchParams.get('page') ?? '1',
@@ -166,7 +173,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Reservas internas, transiciones de estado y catálogo de espacios/mesas bajo reservations.manage. */
 export const actions: Actions = {
+  /** Alta de reserva administrativa con mesas opcionales en JSON. */
   createReservation: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -217,6 +226,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'createReservation', errors: response.errors });
     }
   },
+  /** Aplica confirm/seat/complete/cancel/no-show según el campo transition. */
   transition: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -242,6 +252,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'transition', errors: response.errors });
     }
   },
+  /** Asigna mesas a una reserva existente. */
   assignTables: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -276,6 +287,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'assignTables', errors: response.errors });
     }
   },
+  /** Crea o actualiza un espacio del venue. */
   saveSpace: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -317,6 +329,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'saveSpace', errors: response.errors });
     }
   },
+  /** Desactiva un espacio. */
   deleteSpace: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -333,6 +346,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'deleteSpace', errors: response.errors });
     }
   },
+  /** Crea o actualiza mesa; en edición no cambia spaceId. */
   saveTable: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {
@@ -369,6 +383,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'saveTable', errors: response.errors });
     }
   },
+  /** Desactiva una mesa. */
   deleteTable: async (event) => {
     if (!event.locals.permissions.includes('reservations.manage'))
       return fail(403, {

@@ -17,6 +17,7 @@ const url = z
   .transform((value) => value || null);
 
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/u, 'Usa el formato HH:mm.');
+/** Coordenada numérica acotada o null cuando el campo se envía vacío. */
 const optionalCoordinate = (minimum: number, maximum: number) =>
   z.union([z.literal('').transform(() => null), z.coerce.number().min(minimum).max(maximum)]);
 const serviceType = z

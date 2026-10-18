@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Perfil del usuario autenticado: aviso de cambio obligatorio de contraseña y formulario
+   * `?/changePassword` validado contra los límites de auth del panel.
+   */
   import type { PageProps } from './$types';
   import { Alert } from '$lib/components/ui/alert/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
@@ -17,10 +21,12 @@
 
   let { data, form }: { data: PageProps['data']; form?: ProfileForm | null } = $props();
 
+  /** Obtiene el error de un campo tras enviar el formulario de contraseña. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Devuelve errores globales de la action `changePassword`. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }

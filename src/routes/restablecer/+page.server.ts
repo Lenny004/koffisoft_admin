@@ -11,11 +11,14 @@ import {
 import { resetPasswordSchema } from '$lib/validation/auth';
 import { validationErrors } from '$lib/validation/errors';
 
+/** Expone el token del enlace de recuperación recibido por query string. */
 export const load: PageServerLoad = ({ url }) => ({
   token: url.searchParams.get('token') ?? '',
 });
 
+/** Valida la nueva contraseña con Zod y la envía a `/auth/reset-password` sin crear sesión. */
 export const actions: Actions = {
+  /** Aplica el restablecimiento cuando el token del correo sigue siendo válido. */
   default: async (event) => {
     const submitted = await event.request.formData();
     const result = resetPasswordSchema.safeParse({

@@ -14,6 +14,7 @@ const imageByCategory: Record<string, string> = {
   bebidas: '/fixtures/products/coffee-special.png',
 };
 
+/** Normaliza texto para comparar slugs sin acentos ni espacios irregulares. */
 function normalize(value: string): string {
   return value
     .normalize('NFD')
@@ -33,10 +34,12 @@ export function legacyImageFor(slug: string, categorySlug: string, categoryName:
   );
 }
 
+/** Proyecta una categoría del contrato de menú al modelo de filas de la tabla. */
 export function mapCategory(category: MenuCategory): CategoryRow {
   return { ...category };
 }
 
+/** Enriquece el ítem con imagen local y nombres en español para la grilla administrativa. */
 export function mapMenuItem(item: MenuItem): MenuRow {
   return {
     id: item.id,

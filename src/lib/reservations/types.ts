@@ -112,6 +112,7 @@ export function reservationActionsFor(status: ReservationStatus): ReservationAct
   return ACTIONS_BY_STATUS[status];
 }
 
+/** Etiqueta en español del estado de reserva; conserva el valor crudo si no está mapeado. */
 export function reservationStatusLabel(status: ReservationStatus): string {
   return RESERVATION_STATUS_LABELS[status] ?? status;
 }

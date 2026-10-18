@@ -18,15 +18,18 @@ import { formValues, validationErrors } from '$lib/validation/errors';
 
 const PAGE_SIZE = 20;
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudo cargar el catálogo: configura API_BASE_URL y DEFAULT_LOCATION_ID para conectar el panel con la API.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof MenuApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de menú no está disponible en este momento.'] };
 }
 
+/** Extrae campos base del ítem de menú desde FormData. */
 function itemForm(formData: FormData) {
   return {
     categoryId: formText(formData.get('categoryId')),
@@ -42,6 +45,7 @@ function itemForm(formData: FormData) {
   };
 }
 
+/** Lista productos paginados o filtra por categoría recorriendo páginas porque el API no filtra por categoryId. */
 async function listFilteredItems(
   client: ReturnType<typeof createMenuClient>,
   locationId: string,
@@ -94,6 +98,7 @@ async function listFilteredItems(
   };
 }
 
+/** Catálogo paginado de ítems, categorías para filtros y metadatos según permisos de menú. */
 export const load: PageServerLoad = async (event) => {
   const page = parsePositivePage(event.url.searchParams.get('page'));
   const search = event.url.searchParams.get('search')?.trim() ?? '';
@@ -149,7 +154,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** CRUD de productos y operaciones de precio, alérgenos y disponibilidad con permisos granulares. */
 export const actions: Actions = {
+  /** Crea o actualiza ítem del menú. */
   save: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -177,6 +184,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Activa o desactiva el ítem. */
   toggle: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -196,6 +204,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'toggle', errors: response.errors });
     }
   },
+  /** Elimina el ítem del catálogo. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -212,6 +221,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'delete', errors: response.errors });
     }
   },
+  /** Registra un precio por variante, canal y vigencia. */
   price: async (event) => {
     if (!event.locals.permissions.includes('menu_prices.manage'))
       return fail(403, {
@@ -247,6 +257,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'price', errors: response.errors });
     }
   },
+  /** Reemplaza el conjunto de alérgenos de una variante desde JSON. */
   allergens: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -282,6 +293,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'allergens', errors: response.errors });
     }
   },
+  /** Define ventana de disponibilidad horaria para una variante. */
   availability: async (event) => {
     if (!event.locals.permissions.includes('menu_availability.manage'))
       return fail(403, {

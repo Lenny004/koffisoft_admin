@@ -4,6 +4,7 @@ import { RESOURCE_CATEGORIES, RESOURCE_STATUSES } from '$lib/resources/types';
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';
 
 const uuid = z.string().uuid('Selecciona un registro válido.');
+/** Texto opcional recortado; las cadenas vacías se normalizan a literal vacío. */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
 
 export const resourceFilterSchema = z.object({

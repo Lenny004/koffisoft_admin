@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';
 
+/** Texto opcional recortado sin convertir vacíos en undefined (contrato de menú). */
 const optionalText = (maxLength: number) => z.string().trim().max(maxLength).optional();
 
 export const categorySchema = z.object({
@@ -105,15 +106,18 @@ export const availabilitySchema = z.object({
   validTo: z.string().date().optional().or(z.literal('')),
 });
 
+/** Interpreta checkboxes HTML (`on`/`true`) cuando el campo no llega en el FormData. */
 export function formBoolean(value: FormDataEntryValue | null, defaultValue = false): boolean {
   if (value === null) return defaultValue;
   return value === 'true' || value === 'on';
 }
 
+/** Coerce un valor de FormData a cadena, ignorando entradas no textuales. */
 export function formText(value: FormDataEntryValue | null): string {
   return typeof value === 'string' ? value : '';
 }
 
+/** Lista plana de mensajes de Zod para resúmenes de error en formularios de menú. */
 export function validationMessages(result: z.ZodError): string[] {
   return result.issues.map((issue) => issue.message);
 }

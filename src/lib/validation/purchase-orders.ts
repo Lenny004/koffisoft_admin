@@ -4,6 +4,7 @@ import { PURCHASE_ORDER_STATUSES } from '$lib/purchase-orders/types';
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';
 
 const uuid = z.string().uuid('Selecciona un registro válido.');
+/** Texto opcional recortado; las cadenas vacías se normalizan a literal vacío. */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
 const positiveAmount = z
   .string()

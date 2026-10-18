@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * CRUD de productos del menú: tabla TanStack, filtros GET, diálogo de alta/edición
+   * con variantes, alérgenos y permisos diferenciados de catálogo y precios.
+   */
   import {
     createColumnHelper,
     createTable,
@@ -38,10 +42,12 @@
 
   let { data, form }: Props = $props();
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions del catálogo. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
@@ -107,6 +113,7 @@
     },
   });
 
+  /** Abre el diálogo de alta con categoría por defecto y estado visible en menú. */
   function startCreate() {
     editingProduct = null;
     selectedVariantId = '';
@@ -123,6 +130,7 @@
     open = true;
   }
 
+  /** Precarga el formulario de edición y la variante predeterminada del producto. */
   function startEdit(product: MenuRow) {
     editingProduct = product;
     selectedVariantId =
@@ -145,15 +153,18 @@
     open = true;
   }
 
+  /** Traduce el tipo de ítem del menú a la etiqueta en español del selector. */
   function itemTypeLabel(value: string): string {
     return itemTypes.find(([key]) => key.toLowerCase() === value.toLowerCase())?.[1] ?? value;
   }
 
+  /** Sincroniza los identificadores de alérgenos desde el multiselect nativo. */
   function updateAllergenSelection(event: Event) {
     const select = event.currentTarget as HTMLSelectElement;
     selectedAllergenIds = Array.from(select.selectedOptions, (option) => option.value);
   }
 
+  /** Serializa alérgenos seleccionados con tipo de presencia para la action del servidor. */
   function allergenPayload(): string {
     return JSON.stringify(
       selectedAllergenIds.map((allergenId) => ({

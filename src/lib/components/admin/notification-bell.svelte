@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Campana del topbar: lista reciente, contador de no leídas y actualización en vivo
+   * vía SSE cuando el módulo está habilitado para la sesión.
+   */
   import { Bell } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
@@ -36,10 +40,12 @@
     Success: 'success',
   };
 
+  /** Solo enlaces internos del panel pueden navegar con `resolve`; el resto se muestra sin href. */
   function destination(link: string | null): string | null {
     return link?.startsWith('/') ? link : null;
   }
 
+  /** Marca lectura o archiva vía API JSON y sincroniza el estado local del panel desplegable. */
   async function postAction(action: 'mark-read' | 'archive', notificationId?: string) {
     const response = await fetch('/api/notificaciones', {
       method: 'POST',
@@ -67,6 +73,7 @@
     let source: EventSource | null = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
+    /** Abre el stream SSE con reintento exponencial ante cortes de red. */
     function connect() {
       source?.close();
       source = new EventSource('/api/notificaciones/stream');

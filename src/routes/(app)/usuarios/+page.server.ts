@@ -17,21 +17,25 @@ import type { PageMeta, RoleRow } from '$lib/users/types';
 const PAGE_SIZE = 20;
 const emptyMeta: PageMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los usuarios: configura API_BASE_URL para conectar el panel con la API.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof UsersApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de usuarios no está disponible en este momento.'] };
 }
 
+/** Recoge todos los roleIds enviados como campos repetidos en el formulario. */
 function parseRoleIds(formData: FormData): string[] {
   return formData
     .getAll('roleIds')
     .filter((value): value is string => typeof value === 'string' && value.length > 0);
 }
 
+/** Normaliza campos de alta/edición de usuario incluyendo roles y mustChangePassword. */
 function userFields(formData: FormData) {
   return {
     id: formText(formData.get('id')),
@@ -45,6 +49,7 @@ function userFields(formData: FormData) {
   };
 }
 
+/** Usuarios paginados, empleados para enlace y roles si hay permiso roles.read. */
 export const load: PageServerLoad = async (event) => {
   const parsedFilters = userFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -104,7 +109,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Administración de cuentas, estados, roles y MFA bajo permisos users.manage y roles.manage. */
 export const actions: Actions = {
+  /** Crea usuario (con roles si está permitido) o actualiza datos básicos. */
   save: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, {
@@ -159,6 +166,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Activa, desactiva o bloquea una cuenta. */
   status: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, { action: 'status', errors: ['No tienes permiso para cambiar estados.'] });
@@ -180,6 +188,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'status', errors: response.errors });
     }
   },
+  /** Reemplaza roles asignados a un usuario. */
   roles: async (event) => {
     if (!event.locals.permissions.includes('roles.manage'))
       return fail(403, { action: 'roles', errors: ['No tienes permiso para asignar roles.'] });
@@ -201,6 +210,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'roles', errors: response.errors });
     }
   },
+  /** Restablece factores MFA del usuario. */
   resetMfa: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, { action: 'resetMfa', errors: ['No tienes permiso para restablecer MFA.'] });
@@ -216,6 +226,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'resetMfa', errors: response.errors });
     }
   },
+  /** Obliga cambio de contraseña en el próximo acceso. */
   forcePasswordChange: async (event) => {
     if (!event.locals.permissions.includes('users.manage'))
       return fail(403, {

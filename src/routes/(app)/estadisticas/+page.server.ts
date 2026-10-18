@@ -8,22 +8,26 @@ import { analyticsFilterSchema } from '$lib/validation/analytics';
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
 const MAX_RANGE_DAYS = 366;
 
+/** Fecha UTC de hoy en formato YYYY-MM-DD para acotar rangos. */
 function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/** Desplaza una fecha ISO en días usando calendario UTC. */
 function shiftDate(value: string, days: number): string {
   const date = new Date(`${value}T00:00:00.000Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);
 }
 
+/** Comprueba que el query param sea una fecha ISO válida YYYY-MM-DD. */
 function validDate(value: string | null): value is string {
   if (!value || !DATE_PATTERN.test(value)) return false;
   const date = new Date(`${value}T00:00:00.000Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
+/** Deriva from/to desde la URL con tope de MAX_RANGE_DAYS y fallback de 30 días si el rango es inválido. */
 function requestedRange(from: string | null, to: string | null): { from: string; to: string } {
   const defaultTo = today();
   const selectedTo = validDate(to) ? to : defaultTo;
@@ -34,6 +38,7 @@ function requestedRange(from: string | null, to: string | null): { from: string;
     : { from: selectedFrom, to: selectedTo };
 }
 
+/** Estructura vacía de analytics para permisos denegados o errores de carga. */
 function emptyData(filters: AnalyticsFilters) {
   return {
     filters,
@@ -46,6 +51,7 @@ function emptyData(filters: AnalyticsFilters) {
   };
 }
 
+/** Carga sedes, valida filtros y consulta resumen, páginas, productos y referrers en paralelo. */
 export const load: PageServerLoad = async (event) => {
   const permissions = event.locals.permissions;
   const range = requestedRange(

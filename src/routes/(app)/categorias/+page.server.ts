@@ -7,15 +7,18 @@ import { MenuApiError, createMenuClient } from '$lib/server/menu';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { categoryReorderSchema, categorySchema, formBoolean, formText } from '$lib/validation/menu';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar las categorías: configura API_BASE_URL y DEFAULT_LOCATION_ID para conectar el panel con la API.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof MenuApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de menú no está disponible en este momento.'] };
 }
 
+/** Extrae campos de categoría del formulario incluyendo orden y estado activo. */
 function categoryForm(formData: FormData) {
   return {
     slug: formText(formData.get('slug')),
@@ -28,6 +31,7 @@ function categoryForm(formData: FormData) {
   };
 }
 
+/** Lista categorías del menú (con búsqueda) ordenadas por displayOrder para la sede por defecto. */
 export const load: PageServerLoad = async (event) => {
   const search = event.url.searchParams.get('search')?.trim() ?? '';
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
@@ -63,7 +67,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** Administración de categorías del catálogo bajo permiso catalog.manage. */
 export const actions: Actions = {
+  /** Crea o actualiza una categoría; en edición conserva displayOrder explícito. */
   save: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -96,6 +102,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Cambia solo el flag active de la categoría. */
   toggle: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -117,6 +124,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'toggle', errors: response.errors });
     }
   },
+  /** Elimina la categoría en la API de menú. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {
@@ -136,6 +144,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'delete', errors: response.errors });
     }
   },
+  /** Persiste el orden enviado como JSON validado por categoryReorderSchema. */
   reorder: async (event) => {
     if (!event.locals.permissions.includes('catalog.manage'))
       return fail(403, {

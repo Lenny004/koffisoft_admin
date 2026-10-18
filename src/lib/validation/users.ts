@@ -3,7 +3,9 @@ import { z } from 'zod';
 import { EMPLOYEE_STATUSES, JOB_CODES, USER_STATUSES } from '$lib/users/types';
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';
 
+/** Omite claves opcionales del payload cuando el formulario envía cadena vacía. */
 const emptyAsUndefined = (value: string) => (value === '' ? undefined : value);
+/** Convierte campos UUID opcionales vacíos en null para el contrato de la API. */
 const emptyAsNull = (value: string) => (value === '' ? null : value);
 
 const optionalUuid = z

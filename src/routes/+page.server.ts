@@ -27,7 +27,6 @@ import { formValues } from '$lib/validation/errors';
 import { validationErrors } from '$lib/validation/errors';
 import { safeReturnTo } from '$lib/server/return-to';
 
-/** Form actions del acceso: validan en servidor, llaman a auth y trasladan solo cookies seguras. */
 interface LoginResponse {
   requiresMfa?: boolean;
   requiresMfaSetup?: boolean;
@@ -45,10 +44,12 @@ interface RecoveryCodesResponse {
   recoveryCodes: string[];
 }
 
+/** Indica si las cookies de sesión deben marcarse Secure según el protocolo o COOKIE_SECURE. */
 function secureCookie(event: RequestEvent): boolean {
   return event.url.protocol === 'https:' || env.COOKIE_SECURE === 'true';
 }
 
+/** Resuelve la URL de retorno post-login desde el formulario o query, acotada al origen permitido. */
 function returnTo(event: RequestEvent, formData?: FormData): string {
   const submitted = formData?.get('returnTo');
   const requested =
@@ -56,6 +57,7 @@ function returnTo(event: RequestEvent, formData?: FormData): string {
   return safeReturnTo(requested, event.url.origin);
 }
 
+/** Tras MFA, consulta /auth/me para saber si el usuario aún debe cambiar contraseña. */
 async function authenticatedStep(event: RequestEvent): Promise<'password' | undefined> {
   try {
     if (!env.API_BASE_URL) return undefined;
@@ -70,6 +72,7 @@ async function authenticatedStep(event: RequestEvent): Promise<'password' | unde
   }
 }
 
+/** Precarga si el tenant requiere bootstrap inicial, el modo recuperar contraseña y returnTo. */
 export const load: PageServerLoad = async (event) => {
   let setupRequired = false;
   if (env.API_BASE_URL) {
@@ -91,7 +94,9 @@ export const load: PageServerLoad = async (event) => {
   };
 };
 
+/** Flujo de acceso: validación Zod, llamadas a /auth/* y reenvío de cookies HttpOnly al navegador. */
 export const actions: Actions = {
+  /** Registra el primer administrador cuando /auth/setup lo exige y continúa el flujo MFA si aplica. */
   bootstrap: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -155,6 +160,7 @@ export const actions: Actions = {
     redirect(303, destination);
   },
 
+  /** Autentica credenciales y devuelve el siguiente paso (TOTP, setup MFA o cambio de contraseña). */
   login: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -210,6 +216,7 @@ export const actions: Actions = {
     redirect(303, destination);
   },
 
+  /** Valida un código TOTP y completa el acceso o exige cambio de contraseña. */
   verifyMfa: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -251,6 +258,7 @@ export const actions: Actions = {
     redirect(303, destination);
   },
 
+  /** Acepta un código de recuperación MFA para cerrar el segundo factor. */
   recoverMfa: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -289,6 +297,7 @@ export const actions: Actions = {
     redirect(303, destination);
   },
 
+  /** Solicita URI y etiqueta para enrolar TOTP antes de confirmarlo. */
   setupMfa: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -335,6 +344,7 @@ export const actions: Actions = {
     };
   },
 
+  /** Confirma el enrolamiento TOTP y devuelve los códigos de recuperación de un solo uso. */
   confirmMfa: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -385,6 +395,7 @@ export const actions: Actions = {
     };
   },
 
+  /** Actualiza la contraseña obligatoria antes de redirigir al destino. */
   changePassword: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -426,6 +437,7 @@ export const actions: Actions = {
     redirect(303, destination);
   },
 
+  /** Dispara recuperación de contraseña con respuesta uniforme aunque la API falle o el correo no exista. */
   forgot: async (event) => {
     const submitted = await event.request.formData();
     const values = Object.fromEntries(submitted);
@@ -461,6 +473,7 @@ export const actions: Actions = {
     };
   },
 
+  /** Cierra sesión en la API si responde y siempre limpia la cookie local. */
   logout: async (event) => {
     try {
       if (env.API_BASE_URL) {

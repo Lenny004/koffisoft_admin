@@ -65,6 +65,7 @@ export const CONTACT_TOPIC_LABELS: Record<string, string> = {
   other: 'Otro',
 };
 
+/** Etiqueta en español para la bandeja; conserva el valor crudo si no está mapeado. */
 export function contactStatusLabel(status: ContactStatus): string {
   return CONTACT_STATUS_LABELS[status] ?? status;
 }

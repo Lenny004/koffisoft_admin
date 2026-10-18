@@ -12,9 +12,12 @@ import {
 import { changePasswordSchema } from '$lib/validation/auth';
 import { formValues, validationErrors } from '$lib/validation/errors';
 
+/** Expone al usuario autenticado ya resuelto en locals para la vista de perfil. */
 export const load: PageServerLoad = ({ locals }) => ({ user: locals.user });
 
+/** Permite cambiar contraseña propia vía /auth/password reenviando cookies de sesión. */
 export const actions: Actions = {
+  /** Valida y aplica nueva contraseña del usuario en sesión. */
   changePassword: async (event) => {
     const formData = await event.request.formData();
     const values = Object.fromEntries(formData);

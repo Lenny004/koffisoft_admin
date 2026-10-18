@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Overrides SEO editoriales: listado filtrable por tipo de recurso, formulario inline
+   * y vista previa de snippet bajo permiso `seo.manage`.
+   */
   import { Globe2, Pencil, Plus, Save, Trash2 } from '@lucide/svelte';
 
   import { Button } from '$lib/components/ui/button/index.js';
@@ -15,6 +19,7 @@
 
   let { data, form }: PageProps = $props();
   const canManage = $derived(data.permissions.includes('seo.manage'));
+  /** Atajo al mapa de errores de campo devuelto por la action `save`. */
   const error = (name: string) => getFieldError(form?.errors, name);
   const resourceLabels: Record<SeoResourceType, string> = {
     menu_item: 'Plato',
@@ -24,22 +29,26 @@
   };
   const defaultResourceType: SeoResourceType = 'page';
   let filterType = $state<SeoResourceType | 'all'>('all');
+  /** Aplica el filtro de tipo solo en cliente; el `load` trae el catálogo completo. */
   const visibleSeo = $derived(
     filterType === 'all' ? data.seo : data.seo.filter((row) => row.resourceType === filterType),
   );
   let editing = $state<SeoMetadata | null>(null);
   let showForm = $state(false);
 
+  /** Abre el editor con la fila seleccionada; tipo y clave quedan bloqueados al editar. */
   function edit(row: SeoMetadata) {
     editing = row;
     showForm = true;
   }
 
+  /** Muestra el formulario vacío para registrar un override nuevo. */
   function createNew() {
     editing = null;
     showForm = true;
   }
 
+  /** Cierra el panel de edición sin navegar fuera de la pantalla. */
   function closeForm() {
     showForm = false;
     editing = null;

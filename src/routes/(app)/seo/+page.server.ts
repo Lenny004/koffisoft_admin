@@ -7,10 +7,12 @@ import { formBoolean, formText } from '$lib/validation/menu';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { seoSchema } from '$lib/validation/seo';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se puede cargar SEO: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Mapea metadatos SEO desde FormData incluyendo noindex. */
 function seoForm(formData: FormData) {
   return {
     id: formText(formData.get('id')),
@@ -24,11 +26,13 @@ function seoForm(formData: FormData) {
   };
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof SeoApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de SEO no esta disponible en este momento.'] };
 }
 
+/** Lista registros SEO de la sede por defecto. */
 export const load: PageServerLoad = async (event) => {
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
@@ -48,7 +52,9 @@ export const load: PageServerLoad = async (event) => {
   }
 };
 
+/** CRUD de metadatos SEO bajo permiso seo.manage. */
 export const actions: Actions = {
+  /** Crea o actualiza SEO por recurso y clave. */
   save: async (event) => {
     if (!event.locals.permissions.includes('seo.manage'))
       return fail(403, { action: 'save', errors: ['No tienes permiso para administrar SEO.'] });
@@ -76,6 +82,7 @@ export const actions: Actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Elimina un metadato SEO de la sede. */
   delete: async (event) => {
     if (!event.locals.permissions.includes('seo.manage'))
       return fail(403, { action: 'delete', errors: ['No tienes permiso para eliminar SEO.'] });

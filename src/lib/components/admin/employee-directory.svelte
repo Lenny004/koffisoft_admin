@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Directorio de empleados de la sede: tabla TanStack, filtros GET, alta/edición
+   * en diálogo y vinculación opcional con cuentas de usuario vía form actions.
+   */
   import { Pencil, Plus, UserRoundCheck, UserRoundX } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import {
@@ -69,14 +73,17 @@
     },
   });
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions de la ruta. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Abre el diálogo de alta con valores por defecto operativos para la sede. */
   function startCreate() {
     editingEmployeeId = null;
     employeeCode = '';
@@ -92,6 +99,7 @@
     dialogOpen = true;
   }
 
+  /** Precarga el formulario de edición con los datos del empleado seleccionado. */
   function startEdit(employee: EmployeeRow) {
     editingEmployeeId = employee.id;
     employeeCode = employee.employeeCode;
@@ -107,10 +115,12 @@
     dialogOpen = true;
   }
 
+  /** Solicita confirmación nativa antes de acciones destructivas o irreversibles. */
   function confirmAction(message: string): boolean {
     return window.confirm(message);
   }
 
+  /** Traduce códigos de cargo internos a etiquetas visibles en la interfaz. */
   function jobLabel(value: string): string {
     return (
       {
@@ -124,16 +134,19 @@
     );
   }
 
+  /** Traduce el estado laboral del registro a texto en español. */
   function employeeStatusLabel(value: string): string {
     return { active: 'Activo', inactive: 'Inactivo', on_leave: 'En licencia' }[value] ?? value;
   }
 
+  /** Asigna la variante del badge según el estado laboral del empleado. */
   function employeeStatusVariant(value: string): 'success' | 'danger' | 'warning' {
     if (value === 'active') return 'success';
     if (value === 'on_leave') return 'warning';
     return 'danger';
   }
 
+  /** Conserva filtros de búsqueda al navegar entre páginas del listado. */
   function pageQuery(page: number): string {
     const params = new URLSearchParams();
     if (data.filters.search) params.set('search', data.filters.search);

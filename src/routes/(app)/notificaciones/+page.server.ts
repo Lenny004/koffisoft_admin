@@ -12,6 +12,7 @@ import {
 
 const emptyMeta = { page: 1, pageSize: 20, total: 0, totalPages: 1 };
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof NotificationsApiError) {
     return { status: error.status, errors: [error.message] };
@@ -19,6 +20,7 @@ function actionError(error: unknown): { status: number; errors: string[] } {
   return { status: 502, errors: ['La API de notificaciones no está disponible en este momento.'] };
 }
 
+/** Lista notificaciones del usuario autenticado con filtros de tipo, severidad y archivo. */
 export const load = async (event: RequestEvent) => {
   const parsed = notificationFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -60,7 +62,9 @@ export const load = async (event: RequestEvent) => {
   }
 };
 
+/** Marca lectura individual o masiva y archiva alertas vía API de notificaciones. */
 export const actions = {
+  /** Marca una notificación como leída (o la más reciente si el id viene vacío). */
   markRead: async (event: RequestEvent) => {
     const formData = await event.request.formData();
     const result = markNotificationSchema.safeParse({
@@ -79,6 +83,7 @@ export const actions = {
       return fail(response.status, { action: 'markRead', errors: response.errors });
     }
   },
+  /** Marca todas las notificaciones pendientes como leídas. */
   markAll: async (event: RequestEvent) => {
     try {
       await createNotificationsClient(event, env.API_BASE_URL ?? '').markRead();
@@ -88,6 +93,7 @@ export const actions = {
       return fail(response.status, { action: 'markAll', errors: response.errors });
     }
   },
+  /** Archiva una notificación por id. */
   archive: async (event: RequestEvent) => {
     const formData = await event.request.formData();
     const result = archiveNotificationSchema.safeParse({

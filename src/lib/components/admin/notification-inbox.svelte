@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Bandeja de notificaciones: listado filtrado con paginación server-side y acciones
+   * de lectura o archivo mediante form actions de la ruta.
+   */
   import { resolve } from '$app/paths';
 
   import { Alert } from '$lib/components/ui/alert/index.js';
@@ -49,10 +53,12 @@
     Success: 'success',
   };
 
+  /** Solo enlaces internos del panel pueden navegar con `resolve`; el resto se omite. */
   function destination(link: string | null): string | null {
     return link?.startsWith('/') ? link : null;
   }
 
+  /** Conserva filtros de tipo, severidad y lectura al cambiar de página. */
   function pageQuery(page: number): string {
     const params = new URLSearchParams();
     if (data.filters.notificationType)

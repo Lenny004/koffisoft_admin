@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Combobox buscable reutilizable: filtra opciones en cliente, admite valor vacío
+   * opcional y expone el valor seleccionado mediante enlace bidireccional.
+   */
   import { Check, ChevronsUpDown } from '@lucide/svelte';
   import { Combobox } from 'bits-ui';
 
@@ -50,6 +54,7 @@
     });
   });
 
+  /** Restablece el texto de búsqueda al cerrar el desplegable del combobox. */
   function handleOpenChange(nextOpen: boolean) {
     open = nextOpen;
     if (!nextOpen) search = '';

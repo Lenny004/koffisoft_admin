@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { FORM_LIMITS } from './limits';
 
+/** Texto opcional recortado; las cadenas vacías se omiten del payload validado. */
 const optionalText = (max: number) =>
   z
     .string()
@@ -10,6 +11,7 @@ const optionalText = (max: number) =>
     .transform((value) => value || undefined)
     .optional();
 
+/** Rechaza rutas protocol-relative y URLs fuera de HTTP(S) o rutas internas seguras. */
 function isSafeAnnouncementUrl(value: string): boolean {
   if (/[\u0000-\u001f\u007f\\]/u.test(value)) {
     return false;

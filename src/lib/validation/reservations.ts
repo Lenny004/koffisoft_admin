@@ -139,6 +139,7 @@ export const createReservationSchema = z
     }
   });
 
+/** Lista plana de mensajes de Zod para resúmenes de error en formularios de reservas. */
 export function validationMessages(error: z.ZodError): string[] {
   return error.issues.map((issue) => issue.message);
 }

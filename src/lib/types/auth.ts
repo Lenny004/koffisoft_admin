@@ -21,10 +21,12 @@ export interface AuthSnapshot {
   };
 }
 
+/** Nombre visible en la interfaz cuando el usuario no tiene alias explícito. */
 export function displayUserName(user: AuthenticatedUser): string {
   return user.username || user.email.split('@')[0] || 'Usuario';
 }
 
+/** Indica si la sesión debe redirigir al flujo de cambio de contraseña obligatorio. */
 export function needsPasswordChange(user: AuthenticatedUser | undefined): boolean {
   return user?.mustChangePassword === true || user?.passwordChangeRequired === true;
 }

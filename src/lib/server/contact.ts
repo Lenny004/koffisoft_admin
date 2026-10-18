@@ -8,6 +8,7 @@ import type {
 } from '$lib/contact/types';
 import { apiErrorMessage, apiRequest, readJson } from './api';
 
+/** Error al operar la bandeja de mensajes de contacto. */
 export class ContactApiError extends Error {
   constructor(
     public readonly status: number,
@@ -18,6 +19,7 @@ export class ContactApiError extends Error {
   }
 }
 
+/** Construye query string omitiendo parámetros vacíos. */
 function withQuery(
   path: string,
   values: Record<string, string | number | boolean | undefined>,
@@ -32,6 +34,7 @@ function withQuery(
 
 /** Cliente BFF de la bandeja; las cookies de sesión permanecen en el servidor. */
 export function createContactClient(event: RequestEvent, apiBaseUrl: string) {
+  /** Proxy autenticado hacia `/contact/admin`. */
   async function request<T>(
     path: string,
     options: { method?: string; json?: unknown } = {},
@@ -42,6 +45,7 @@ export function createContactClient(event: RequestEvent, apiBaseUrl: string) {
   }
 
   return {
+    /** Lista mensajes paginados con filtros de estado y búsqueda. */
     list(query: {
       locationId: string;
       page?: number;
@@ -52,29 +56,34 @@ export function createContactClient(event: RequestEvent, apiBaseUrl: string) {
     }) {
       return request<ContactPage>(withQuery('/contact/admin', query));
     },
+    /** Detalle de un mensaje en una sede. */
     get(id: string, locationId: string) {
       return request<ContactMessage>(
         withQuery(`/contact/admin/${encodeURIComponent(id)}`, { locationId }),
       );
     },
+    /** Actualiza estado o metadatos del mensaje. */
     update(id: string, locationId: string, payload: unknown) {
       return request<ContactMessage>(
         withQuery(`/contact/admin/${encodeURIComponent(id)}`, { locationId }),
         { method: 'PATCH', json: payload },
       );
     },
+    /** Convierte el lead en registro de cliente. */
     convertCustomer(id: string, locationId: string) {
       return request<ContactConversion>(
         withQuery(`/contact/admin/${encodeURIComponent(id)}/customer`, { locationId }),
         { method: 'POST', json: {} },
       );
     },
+    /** Convierte el mensaje en una reserva usando el payload del formulario. */
     convertReservation(id: string, locationId: string, payload: unknown) {
       return request<ContactConversion>(
         withQuery(`/contact/admin/${encodeURIComponent(id)}/reservation`, { locationId }),
         { method: 'POST', json: payload },
       );
     },
+    /** Convierte el mensaje en un evento con datos adicionales. */
     convertEvent(id: string, locationId: string, payload: unknown) {
       return request<ContactConversion>(
         withQuery(`/contact/admin/${encodeURIComponent(id)}/event`, { locationId }),

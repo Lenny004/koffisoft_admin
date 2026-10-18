@@ -15,10 +15,12 @@ import { formText } from '$lib/validation/menu';
 import { formValues, validationErrors } from '$lib/validation/errors';
 import { publicationSchema } from '$lib/validation/publication';
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'Configura API_BASE_URL y DEFAULT_LOCATION_ID para gestionar publicaciones.';
 }
 
+/** Unifica mensajes de error entre clientes de publicación, avisos, eventos y menú. */
 function apiMessage(error: unknown): string {
   if (
     error instanceof PublicationApiError ||
@@ -30,6 +32,7 @@ function apiMessage(error: unknown): string {
   return 'No se pudo conectar con la API editorial.';
 }
 
+/** Proyecta un aviso importante al modelo unificado de cola editorial. */
 function entryFromAnnouncement(item: ImportantAnnouncement): PublicationEntry {
   return {
     resourceType: 'announcement',
@@ -44,6 +47,7 @@ function entryFromAnnouncement(item: ImportantAnnouncement): PublicationEntry {
   };
 }
 
+/** Proyecta un ítem de menú considerando visibilidad pública y estado activo. */
 function entryFromMenuItem(item: MenuItem): PublicationEntry {
   return {
     resourceType: 'menu_item',
@@ -58,6 +62,7 @@ function entryFromMenuItem(item: MenuItem): PublicationEntry {
   };
 }
 
+/** Proyecta un evento excluyendo cancelados como activos en la cola. */
 function entryFromEvent(item: Event): PublicationEntry {
   return {
     resourceType: 'event',
@@ -72,6 +77,7 @@ function entryFromEvent(item: Event): PublicationEntry {
   };
 }
 
+/** Agrega entradas publicables de avisos, platos y eventos en una sola lista para la sede. */
 export const load: PageServerLoad = async (event) => {
   const locationId = env.DEFAULT_LOCATION_ID ?? '';
   const permissions = event.locals.permissions;
@@ -132,11 +138,14 @@ export const load: PageServerLoad = async (event) => {
   };
 };
 
+/** Valida el tipo de recurso editorial permitido en acciones de publicación. */
 function parseResourceType(value: string): PublicationResourceType | null {
   return value === 'announcement' || value === 'event' || value === 'menu_item' ? value : null;
 }
 
+/** Publicación y previsualización bajo permiso content.publish. */
 export const actions: Actions = {
+  /** Aplica acción editorial (publicar, programar, etc.) con fechas locales convertidas. */
   save: async (event) => {
     if (!event.locals.permissions.includes('content.publish'))
       return fail(403, { action: 'save', errors: ['No tienes permiso para publicar contenido.'] });
@@ -185,6 +194,7 @@ export const actions: Actions = {
       });
     }
   },
+  /** Solicita URL temporal de previsualización para un recurso válido. */
   preview: async (event) => {
     if (!event.locals.permissions.includes('content.publish'))
       return fail(403, {

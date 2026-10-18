@@ -4,6 +4,7 @@ import type { LayoutServerLoad } from './$types';
 import { createNotificationsClient } from '$lib/server/notifications';
 import type { NotificationItem } from '$lib/notifications/types';
 
+/** Usuario, permisos y campana de notificaciones para el shell autenticado del panel. */
 export const load: LayoutServerLoad = async (event) => {
   const permissions = event.locals.permissions;
   let unreadCount = 0;

@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Envoltorio de campo de formulario: etiqueta, ayuda, contador opcional y sincronización
+   * de atributos ARIA en el control hijo según errores de validación.
+   */
   import type { Snippet } from 'svelte';
 
   let {
@@ -34,6 +38,7 @@
     const control = document.getElementById(id);
     if (!(control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement)) return;
 
+    /** Refleja en el contador la longitud actual del input o textarea asociado por `id`. */
     const updateLength = () => {
       currentLength = control.value.length;
     };

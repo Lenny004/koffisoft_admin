@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Bandeja de contacto de la sede: listado con filtros, detalle del mensaje seleccionado
+   * y acciones de gestión o conversión mediante form actions de la ruta padre.
+   */
   import { resolve } from '$app/paths';
   import { Archive, Check, Eye, Mail, UserPlus } from '@lucide/svelte';
 
@@ -46,14 +50,17 @@
   const canManage = $derived(data.permissions.includes('contact.manage'));
   const statuses = Object.keys(CONTACT_STATUS_LABELS) as ContactStatus[];
 
+  /** Expone el error de validación de un campo del último envío del formulario. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Agrupa los errores globales devueltos por las actions de conversión o actualización. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Asigna la variante visual del badge según el ciclo de vida del mensaje. */
   function statusVariant(status: ContactStatus): 'default' | 'success' | 'warning' | 'danger' {
     if (status === 'Replied') return 'success';
     if (status === 'Closed' || status === 'Spam') return 'danger';
@@ -61,6 +68,7 @@
     return 'default';
   }
 
+  /** Conserva filtros, paginación y selección al navegar entre páginas del listado. */
   function queryUrl(page: number): string {
     const query = new URLSearchParams();
     if (data.filters.search) query.set('search', data.filters.search);
@@ -73,12 +81,14 @@
     return value ? `?${value}` : '';
   }
 
+  /** Añade el identificador del mensaje a la consulta actual para abrir su detalle. */
   function selectUrl(message: ContactMessage): string {
     const query = new URLSearchParams(queryUrl(data.meta.page).replace(/^\?/, ''));
     query.set('selected', message.id);
     return `?${query.toString()}`;
   }
 
+  /** Precarga el diálogo de reserva con datos del contacto y valores por defecto operativos. */
   function startReservation(message: ContactMessage) {
     conversionMessage = message;
     reservationDate = '';
@@ -90,6 +100,7 @@
     reservationOpen = true;
   }
 
+  /** Precarga el diálogo de evento reutilizando el nombre del solicitante en el título. */
   function startEvent(message: ContactMessage) {
     conversionMessage = message;
     eventType = 'Corporate';
@@ -101,6 +112,7 @@
     eventOpen = true;
   }
 
+  /** Evita envíos duplicados mientras una action POST sigue en curso. */
   function guardSubmit(action: string, event: SubmitEvent): void {
     if (pendingAction) {
       event.preventDefault();

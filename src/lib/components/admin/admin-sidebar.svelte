@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Barra lateral del panel: navegación filtrada por permisos, iconografía del catálogo
+   * y resaltado de la ruta activa en variantes de escritorio y menú móvil.
+   */
   import {
     BriefcaseBusiness,
     Archive,
@@ -65,6 +69,7 @@
 
   const items = $derived(filterNavigation(permissions));
 
+  /** Indica si la ruta actual coincide con el enlace o una subruta del módulo. */
   function isActive(href: string): boolean {
     return page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
   }

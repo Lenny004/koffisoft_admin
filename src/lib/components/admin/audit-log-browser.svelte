@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Explorador de bitácora: filtros GET por actor, acción, entidad y fechas con
+   * paginación server-side sobre registros de auditoría administrativa.
+   */
   import { resolve } from '$app/paths';
 
   import { Alert } from '$lib/components/ui/alert/index.js';
@@ -37,6 +41,7 @@
     })),
   );
 
+  /** Conserva filtros activos al cambiar de página del listado. */
   function pageQuery(page: number): string {
     const params = new URLSearchParams();
     if (data.filters.actorUserId) params.set('actorUserId', data.filters.actorUserId);
@@ -49,6 +54,7 @@
     return query ? `?${query}` : '';
   }
 
+  /** Muestra el nombre de usuario o «Sistema» cuando no hay actor registrado. */
   function userLabel(userId: string | null): string {
     if (!userId) return 'Sistema';
     return data.users.find((user) => user.id === userId)?.username ?? userId;

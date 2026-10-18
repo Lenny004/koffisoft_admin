@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Gestión de respaldos: alta asíncrona por tipo, historial reciente y descarga o baja
+   * según permisos `backups.create`, `backups.download` y `backups.delete`.
+   */
   import { Archive, CheckCircle2, Download, LoaderCircle, Trash2 } from '@lucide/svelte';
 
   import { Alert } from '$lib/components/ui/alert/index.js';
@@ -28,6 +32,7 @@
     expired: 'Expirado',
   };
 
+  /** Asocia cada estado del job con la variante visual del badge. */
   function statusVariant(
     status: BackupStatus,
   ): 'info' | 'warning' | 'success' | 'danger' | 'secondary' {
@@ -38,6 +43,7 @@
     return 'info';
   }
 
+  /** Formatea instantes ISO para la tabla en locale de El Salvador. */
   function formatDate(value: string | null): string {
     if (!value) return '—';
     return new Intl.DateTimeFormat('es-SV', {
@@ -46,6 +52,7 @@
     }).format(new Date(value));
   }
 
+  /** Convierte `sizeBytes` de la API a unidades legibles para operadores. */
   function formatBytes(value: string | null): string {
     if (!value) return '—';
     const bytes = Number(value);
@@ -60,10 +67,12 @@
     return `${bytes} bytes`;
   }
 
+  /** Muestra un prefijo del hash SHA-256; el valor completo queda en el atributo `title`. */
   function checksumLabel(checksum: string | null): string {
     return checksum ? `${checksum.slice(0, 12)}…` : '—';
   }
 
+  /** Solo jobs exitosos con checksum y permiso de descarga pueden usar la ruta proxy. */
   function isDownloadable(status: BackupStatus, checksum: string | null): boolean {
     return (
       status === 'succeeded' && Boolean(checksum) && data.permissions.includes('backups.download')

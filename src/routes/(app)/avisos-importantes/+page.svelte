@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * CRUD de avisos destacados para la landing: tabla por sede, diálogo de alta/edición
+   * y acciones de guardado, activación o baja lógica vía form actions.
+   */
   import { Pencil, Plus, Power, Trash2 } from '@lucide/svelte';
 
   import { formatElSalvadorDateTime, isoToElSalvadorDateTimeLocal } from '$lib/formatting/dates';
@@ -29,14 +33,17 @@
 
   const canManage = $derived(data.permissions.includes('important_announcements.manage'));
 
+  /** Obtiene el error de un campo tras enviar el formulario del diálogo. */
   function fieldError(name: string): string {
     return getFieldError(form?.errors, name);
   }
 
+  /** Devuelve errores globales de la action `save` u otras del módulo. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }
 
+  /** Abre el diálogo en modo creación con orden sugerido al final de la lista. */
   function startCreate() {
     editingId = null;
     title = '';
@@ -50,6 +57,7 @@
     open = true;
   }
 
+  /** Carga un aviso existente en el diálogo con fechas en formato `datetime-local` local. */
   function startEdit(announcement: ImportantAnnouncement) {
     editingId = announcement.id;
     title = announcement.title;
@@ -63,10 +71,12 @@
     open = true;
   }
 
+  /** Pide confirmación antes de acciones irreversibles o de cambio de estado. */
   function confirmAction(messageText: string): boolean {
     return window.confirm(messageText);
   }
 
+  /** Serializa envíos POST evitando doble clic y respetando confirmaciones opcionales. */
   function guardSubmit(action: string, event: SubmitEvent, messageText?: string): void {
     if (pendingAction || (messageText && !confirmAction(messageText))) {
       event.preventDefault();

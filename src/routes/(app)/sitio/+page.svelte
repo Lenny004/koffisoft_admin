@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Editor del contenido público de la sede: ubicación, hero, horarios, excepciones,
+   * equipo y redes serializados en JSON oculto hacia la action `?/save`.
+   */
   import { Save, Plus, Trash2 } from '@lucide/svelte';
 
   import { Button } from '$lib/components/ui/button/index.js';
@@ -11,6 +15,7 @@
 
   let { data, form }: PageProps = $props();
   const canManage = $derived(data.permissions.includes('site_content.manage'));
+  /** Plantilla de horario cuando la API aún no devolvió filas para ese día. */
   const fallbackHour = (dayOfWeek: number): SiteHour => ({
     id: `new-${dayOfWeek}`,
     serviceType: 'public',
@@ -51,8 +56,10 @@
   let socialTikTokUrl = $state(profile?.socialTikTokUrl ?? '');
 
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  /** Resuelve errores anidados (`location.*`, `profile.*`) tras un `fail()` de `?/save`. */
   const error = (name: string) => getFieldError(form?.errors, name);
 
+  /** Añade una excepción editable en memoria hasta guardar el formulario completo. */
   function addOverride() {
     overrides.push({
       id: `new-${Date.now()}`,
@@ -65,14 +72,17 @@
     });
   }
 
+  /** Quita una excepción del estado local antes de serializar `overrides`. */
   function removeOverride(index: number) {
     overrides.splice(index, 1);
   }
 
+  /** Respeta el tope `FORM_LIMITS.site.maxTeam` al ampliar la sección Nosotros. */
   function addTeamMember() {
     if (team.length < FORM_LIMITS.site.maxTeam) team.push({ name: '', role: '', description: '' });
   }
 
+  /** Elimina un integrante del array que se envía como `aboutTeam`. */
   function removeTeamMember(index: number) {
     team.splice(index, 1);
   }

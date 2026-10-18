@@ -11,21 +11,25 @@ import { supplierFilterSchema, supplierSchema } from '$lib/validation/inventory'
 const PAGE_SIZE = 20;
 const emptyMeta = { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 };
 
+/** Mensaje uniforme cuando faltan variables de entorno requeridas para esta pantalla. */
 function configurationError(): string {
   return 'No se pudieron cargar los proveedores: configura API_BASE_URL y DEFAULT_LOCATION_ID.';
 }
 
+/** Normaliza errores de la API (o fallos de red) a código HTTP y mensajes para fail(). */
 function actionError(error: unknown): { status: number; errors: string[] } {
   if (error instanceof InventoryApiError) return { status: error.status, errors: [error.message] };
   return { status: 502, errors: ['La API de proveedores no está disponible en este momento.'] };
 }
 
+/** Lee el último valor booleano enviado en el formulario (checkbox). */
 function booleanValue(formData: FormData, name: string, defaultValue = false): boolean {
   const values = formData.getAll(name);
   const value = values.at(-1);
   return value === undefined ? defaultValue : value === 'true' || value === 'on';
 }
 
+/** Proveedores paginados enriquecidos con perfil de compras e historial opcional por query historial. */
 export const load = async (event: RequestEvent) => {
   const filters = supplierFilterSchema.safeParse({
     page: event.url.searchParams.get('page') ?? '1',
@@ -122,7 +126,9 @@ export const load = async (event: RequestEvent) => {
   }
 };
 
+/** Alta/edición/baja de proveedores; sincroniza perfil de compras si hay permiso purchase_orders.manage. */
 export const actions = {
+  /** Persiste proveedor y actualiza perfil logístico en módulo de órdenes cuando aplica. */
   save: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('suppliers.manage'))
       return fail(403, {
@@ -180,6 +186,7 @@ export const actions = {
       return fail(response.status, { action: 'save', errors: response.errors });
     }
   },
+  /** Desactiva el proveedor en inventario de la sede. */
   delete: async (event: RequestEvent) => {
     if (!event.locals.permissions.includes('suppliers.manage'))
       return fail(403, {

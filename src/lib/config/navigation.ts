@@ -109,14 +109,17 @@ export const navigationItems: NavigationItem[] = [
   },
 ];
 
+/** Permite el acceso cuando el ítem no exige permiso o la sesión lo incluye. */
 export function hasPermission(permissions: readonly string[], permission?: string): boolean {
   return !permission || permissions.includes(permission);
 }
 
+/** Devuelve solo las entradas visibles según los permisos efectivos del usuario. */
 export function filterNavigation(permissions: readonly string[]): NavigationItem[] {
   return navigationItems.filter((item) => hasPermission(permissions, item.permission));
 }
 
+/** Resuelve el permiso del módulo cuya ruta coincide mejor con la URL actual. */
 export function requiredPermissionForPath(pathname: string): string | undefined {
   const item = navigationItems
     .filter((candidate) => pathname === candidate.href || pathname.startsWith(`${candidate.href}/`))

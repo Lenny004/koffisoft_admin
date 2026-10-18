@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * Calendario editorial unificado: programación y publicación de avisos, eventos y platos
+   * según permisos de lectura, gestión del recurso y `content.publish`.
+   */
   import { resolve } from '$app/paths';
   import { ExternalLink, Save } from '@lucide/svelte';
 
@@ -33,10 +37,12 @@
     menu_item: 'catalog.manage',
   };
 
+  /** Comprueba permiso de lectura del tipo de recurso antes de mostrar la fila. */
   function canRead(resourceType: PublicationEntry['resourceType']): boolean {
     return data.permissions.includes(readPermissions[resourceType]);
   }
 
+  /** Exige publicación editorial más lectura y gestión del recurso concreto. */
   function canManage(resourceType: PublicationEntry['resourceType']): boolean {
     return (
       canPublish &&
@@ -45,6 +51,7 @@
     );
   }
 
+  /** La vista previa solo requiere poder publicar y leer el recurso, no gestionarlo. */
   function canPreview(resourceType: PublicationEntry['resourceType']): boolean {
     return canPublish && canRead(resourceType);
   }
@@ -53,20 +60,24 @@
     data.entries.some((entry) => canManage(entry.resourceType) || canPreview(entry.resourceType)),
   );
 
+  /** Traduce el estado de publicación de la API a etiqueta en español. */
   function statusLabel(status: string): string {
     return { Draft: 'Borrador', Scheduled: 'Programado', Published: 'Publicado' }[status] ?? status;
   }
 
+  /** Asocia cada estado editorial con la variante visual del badge. */
   function statusVariant(status: string): 'secondary' | 'warning' | 'success' {
     if (status === 'Published') return 'success';
     if (status === 'Scheduled') return 'warning';
     return 'secondary';
   }
 
+  /** Adapta instantes ISO al valor esperado por inputs `datetime-local` de la sede. */
   function dateValue(value: string | null): string {
     return isoToElSalvadorDateTimeLocal(value);
   }
 
+  /** Expone errores globales devueltos por las actions `save` o `preview`. */
   function globalErrors(): string[] {
     return getGlobalErrors(form?.errors);
   }

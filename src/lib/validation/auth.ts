@@ -138,6 +138,7 @@ export const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
+/** Puntúa la fortitud visible en el formulario según longitud y mezcla de caracteres. */
 export function passwordStrengthScore(password: string): 0 | 1 | 2 | 3 {
   if (!password) return 0;
   let score = 0;
@@ -147,6 +148,7 @@ export function passwordStrengthScore(password: string): 0 | 1 | 2 | 3 {
   return score as 0 | 1 | 2 | 3;
 }
 
+/** Lista plana de mensajes de Zod para mostrar un resumen de errores de autenticación. */
 export function validationMessages(error: z.ZodError): string[] {
   return error.issues.map((issue) => issue.message);
 }
