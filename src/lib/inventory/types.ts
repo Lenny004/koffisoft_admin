@@ -67,6 +67,10 @@ export interface Supplier {
   phone: string | null;
   email: string | null;
   addressLine: string | null;
+  deliveryDays?: number | null;
+  orderReminderDays?: number | null;
+  lastOrderDate?: string | null;
+  notes?: string | null;
   active: boolean;
   ingredientCount: number;
   createdAt: string;

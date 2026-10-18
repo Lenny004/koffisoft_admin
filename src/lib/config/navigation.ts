@@ -15,7 +15,11 @@ export type NavigationIcon =
   | 'mail'
   | 'building-2'
   | 'globe-2'
-  | 'archive';
+  | 'archive'
+  | 'bell'
+  | 'wrench'
+  | 'shopping-cart'
+  | 'scroll-text';
 
 export interface NavigationItem {
   label: string;
@@ -52,12 +56,36 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Sitio', href: '/sitio', icon: 'building-2', permission: 'site_content.read' },
   { label: 'SEO', href: '/seo', icon: 'globe-2', permission: 'seo.read' },
   { label: 'Respaldos', href: '/respaldos', icon: 'archive', permission: 'backups.read' },
+  {
+    label: 'Notificaciones',
+    href: '/notificaciones',
+    icon: 'bell',
+    permission: 'notifications.read',
+  },
   { label: 'Inventario', href: '/inventario', icon: 'boxes', permission: 'inventory.read' },
   {
     label: 'Proveedores',
     href: '/proveedores',
     icon: 'truck',
     permission: 'inventory.read',
+  },
+  {
+    label: 'Órdenes de compra',
+    href: '/ordenes-compra',
+    icon: 'shopping-cart',
+    permission: 'purchase_orders.read',
+  },
+  {
+    label: 'Recursos',
+    href: '/recursos',
+    icon: 'wrench',
+    permission: 'resources.read',
+  },
+  {
+    label: 'Bitácora',
+    href: '/bitacora',
+    icon: 'scroll-text',
+    permission: 'audit_logs.read',
   },
   { label: 'Empleados', href: '/empleados', icon: 'briefcase-business', permission: 'users.read' },
   { label: 'Usuarios', href: '/usuarios', icon: 'users', permission: 'users.read' },

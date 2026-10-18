@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
 @import url('tailwindcss');
 @import url('tw-animate-css');
 @import url('./lib/styles/admin-shell.css');
 @import url('./lib/styles/admin-login.css');
 @import url('./lib/styles/admin-pages.css');
 @import url('./lib/styles/admin-inventory.css');
+@import url('./lib/styles/admin-forms.css');
+@import url('./lib/styles/admin-notifications.css');
 
 @font-face {
   font-family: 'Helvetica Neue Light';

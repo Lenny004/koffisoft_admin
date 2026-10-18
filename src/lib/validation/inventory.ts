@@ -61,6 +61,27 @@ const supplierFields = {
     ])
     .default(''),
   addressLine: optionalText(FORM_LIMITS.inventory.supplierAddressMaxLength),
+  deliveryDays: z
+    .union([
+      z.coerce
+        .number()
+        .int()
+        .min(FORM_LIMITS.inventory.deliveryDaysMin)
+        .max(FORM_LIMITS.inventory.deliveryDaysMax),
+      z.literal(''),
+    ])
+    .default(''),
+  orderReminderDays: z
+    .union([
+      z.coerce
+        .number()
+        .int()
+        .min(FORM_LIMITS.inventory.orderReminderDaysMin)
+        .max(FORM_LIMITS.inventory.orderReminderDaysMax),
+      z.literal(''),
+    ])
+    .default(''),
+  notes: optionalText(FORM_LIMITS.inventory.notesMaxLength),
   active: z.boolean().default(true),
 };
 

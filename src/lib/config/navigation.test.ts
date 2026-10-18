@@ -17,5 +17,9 @@ describe('navigation permissions', () => {
     expect(requiredPermissionForPath('/productos/123')).toBe('catalog.read');
     expect(requiredPermissionForPath('/dashboard')).toBeUndefined();
     expect(requiredPermissionForPath('/seo')).toBe('seo.read');
+    expect(requiredPermissionForPath('/ordenes-compra')).toBe('purchase_orders.read');
+    expect(requiredPermissionForPath('/recursos')).toBe('resources.read');
+    expect(requiredPermissionForPath('/bitacora')).toBe('audit_logs.read');
+    expect(requiredPermissionForPath('/notificaciones')).toBe('notifications.read');
   });
 });

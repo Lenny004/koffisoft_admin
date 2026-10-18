@@ -96,6 +96,57 @@ export const mfaSetupSchema = z.object({
     .optional(),
 });
 
+export const FORGOT_PASSWORD_MESSAGE =
+  'Si el correo existe, recibirás instrucciones de recuperación.';
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email('Escribe un correo electrónico válido.')
+    .max(FORM_LIMITS.auth.emailMaxLength, 'El correo no puede superar 200 caracteres.'),
+});
+
+const strongPassword = z
+  .string()
+  .min(
+    FORM_LIMITS.passwordReset.newPasswordMinLength,
+    'La contraseña debe tener al menos 12 caracteres.',
+  )
+  .max(
+    FORM_LIMITS.passwordReset.newPasswordMaxLength,
+    'La contraseña no puede superar 128 caracteres.',
+  )
+  .refine(
+    (value) => /[A-Za-z]/u.test(value) && /\d/u.test(value),
+    'La contraseña debe combinar letras y números.',
+  );
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().trim().min(1, 'El enlace de recuperación no es válido.'),
+    newPassword: strongPassword,
+    confirmPassword: z
+      .string()
+      .max(
+        FORM_LIMITS.passwordReset.newPasswordMaxLength,
+        'La contraseña no puede superar 128 caracteres.',
+      ),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: 'Las contraseñas nuevas no coinciden.',
+    path: ['confirmPassword'],
+  });
+
+export function passwordStrengthScore(password: string): 0 | 1 | 2 | 3 {
+  if (!password) return 0;
+  let score = 0;
+  if (password.length >= FORM_LIMITS.passwordReset.newPasswordMinLength) score += 1;
+  if (/[A-Z]/u.test(password) && /[a-z]/u.test(password)) score += 1;
+  if (/\d/u.test(password) && /[^A-Za-z0-9]/u.test(password)) score += 1;
+  return score as 0 | 1 | 2 | 3;
+}
+
 export function validationMessages(error: z.ZodError): string[] {
   return error.issues.map((issue) => issue.message);
 }

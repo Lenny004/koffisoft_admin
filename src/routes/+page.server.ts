@@ -15,6 +15,8 @@ import {
 import { needsPasswordChange, type AuthenticatedUser } from '$lib/types/auth';
 import {
   changePasswordSchema,
+  FORGOT_PASSWORD_MESSAGE,
+  forgotPasswordSchema,
   initialSetupSchema,
   loginSchema,
   mfaSetupSchema,
@@ -422,6 +424,41 @@ export const actions: Actions = {
         returnTo: destination,
       });
     redirect(303, destination);
+  },
+
+  forgot: async (event) => {
+    const submitted = await event.request.formData();
+    const values = Object.fromEntries(submitted);
+    const result = forgotPasswordSchema.safeParse({ email: values.email });
+    const destination = returnTo(event, submitted);
+    if (!result.success) {
+      return fail(400, {
+        action: 'forgot',
+        step: 'forgot' as const,
+        errors: validationErrors(result.error),
+        values: { email: String(values.email ?? '') },
+        returnTo: destination,
+      });
+    }
+
+    try {
+      if (env.API_BASE_URL) {
+        await apiRequest(event, '/auth/forgot-password', env.API_BASE_URL, {
+          method: 'POST',
+          json: { email: result.data.email },
+        });
+      }
+    } catch {
+      // La respuesta es uniforme: no se revela si el correo existe o si la API falló.
+    }
+
+    return {
+      action: 'forgot',
+      step: 'forgot' as const,
+      success: true,
+      message: FORGOT_PASSWORD_MESSAGE,
+      returnTo: destination,
+    };
   },
 
   logout: async (event) => {

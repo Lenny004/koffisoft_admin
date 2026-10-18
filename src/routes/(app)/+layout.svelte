@@ -9,6 +9,11 @@
   <meta name="description" content="Panel privado de administración de Koffi-Soft." />
 </svelte:head>
 
-<AdminShell user={data.user!} permissions={data.permissions ?? []}>
+<AdminShell
+  user={data.user!}
+  permissions={data.permissions ?? []}
+  unreadCount={data.unreadCount}
+  latestNotifications={data.latestNotifications}
+>
   {@render children()}
 </AdminShell>

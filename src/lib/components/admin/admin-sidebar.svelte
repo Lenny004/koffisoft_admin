@@ -2,6 +2,7 @@
   import {
     BriefcaseBusiness,
     Archive,
+    Bell,
     Building2,
     Boxes,
     CalendarCheck,
@@ -13,15 +14,17 @@
     Mail,
     LogOut,
     Megaphone,
+    ScrollText,
+    ShoppingCart,
     Tags,
     Truck,
+    Wrench,
     UserRoundCog,
     Users,
     Utensils,
     X,
   } from '@lucide/svelte';
   import { resolve } from '$app/paths';
-  import type { RouteId } from '$app/types';
   import { page } from '$app/state';
   import { filterNavigation, type NavigationIcon } from '$lib/config/navigation';
   import type { AuthenticatedUser } from '$lib/types/auth';
@@ -54,6 +57,10 @@
     'building-2': Building2,
     'globe-2': Globe2,
     archive: Archive,
+    bell: Bell,
+    wrench: Wrench,
+    'shopping-cart': ShoppingCart,
+    'scroll-text': ScrollText,
   } satisfies Record<NavigationIcon, typeof LayoutDashboard>;
 
   const items = $derived(filterNavigation(permissions));
@@ -87,7 +94,7 @@
       {@const Icon = iconMap[item.icon]}
       <a
         class="admin-sidebar__link"
-        href={resolve(item.href as RouteId)}
+        href={resolve(item.href as '/dashboard')}
         aria-label={item.label}
         aria-current={isActive(item.href) ? 'page' : undefined}
         onclick={closeMenu}

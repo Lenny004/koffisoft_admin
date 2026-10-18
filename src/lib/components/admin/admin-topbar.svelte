@@ -4,15 +4,26 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';
 
+  import NotificationBell from './notification-bell.svelte';
+  import type { NotificationItem } from '$lib/notifications/types';
   import type { AuthenticatedUser } from '$lib/types/auth';
   import { displayUserName } from '$lib/types/auth';
 
   interface Props {
     user: AuthenticatedUser;
+    permissions?: string[];
+    unreadCount?: number;
+    latestNotifications?: NotificationItem[];
     openMenu: () => void;
   }
 
-  let { user, openMenu }: Props = $props();
+  let {
+    user,
+    permissions = [],
+    unreadCount = 0,
+    latestNotifications = [],
+    openMenu,
+  }: Props = $props();
   let dark = $state(false);
 
   const titles: Record<string, string> = {
@@ -23,6 +34,10 @@
     '/eventos': 'Eventos',
     '/inventario': 'Inventario',
     '/proveedores': 'Proveedores',
+    '/ordenes-compra': 'Órdenes de compra',
+    '/recursos': 'Recursos',
+    '/notificaciones': 'Notificaciones',
+    '/bitacora': 'Bitácora',
     '/empleados': 'Empleados',
     '/usuarios': 'Usuarios',
     '/reportes': 'Reportes',
@@ -57,6 +72,11 @@
   </div>
 
   <div class="admin-topbar__actions">
+    <NotificationBell
+      initialItems={latestNotifications}
+      initialUnread={unreadCount}
+      enabled={permissions.includes('notifications.read')}
+    />
     <button
       class="admin-topbar__icon-button"
       type="button"

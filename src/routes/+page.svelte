@@ -19,6 +19,8 @@
     label?: string;
     recoveryCodes?: string[];
     returnTo?: string;
+    success?: boolean;
+    message?: string;
   }
 
   let {
@@ -191,10 +193,41 @@
         <p class="login-card__eyebrow">Acceso</p>
         <h1 class="login-card__title" id="login-title">Olvidé mi contraseña</h1>
         <p class="login-card__description">
-          El panel todavía no envía correos de restablecimiento. Un propietario con sesión debe
-          cambiar el acceso. Los códigos de recuperación sirven para el segundo factor, después de
-          escribir la contraseña.
+          Escribe el correo de tu cuenta. Si existe, la API enviará instrucciones de recuperación.
+          El mensaje es el mismo en todos los casos.
         </p>
+        {#if form?.success && form.message}
+          <div class="login-card__error" role="status">
+            <p>{form.message}</p>
+          </div>
+        {:else}
+          <form class="login-card__form" method="POST" action="?/forgot" autocomplete="on">
+            <input type="hidden" name="returnTo" value={destination} />
+            <FormField
+              id="forgot-email"
+              label="Correo electrónico"
+              required
+              class="login-card__field"
+              error={fieldError('email')}
+            >
+              <input
+                class="login-card__input"
+                id="forgot-email"
+                name="email"
+                type="email"
+                value={formValue('email')}
+                placeholder="Ej. admin@koffisoft.com"
+                maxlength={FORM_LIMITS.auth.emailMaxLength}
+                autocomplete="username"
+                required
+              />
+            </FormField>
+            {#if globalErrors().length}<div class="login-card__error" role="alert">
+                {#each globalErrors() as message (message)}<p>{message}</p>{/each}
+              </div>{/if}
+            <Button class="login-card__submit" type="submit">Enviar instrucciones</Button>
+          </form>
+        {/if}
         <div class="login-card__actions">
           <a
             class="login-card__secondary"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pencil, Plus, Trash2 } from '@lucide/svelte';
+  import { History, Pencil, Plus, Trash2 } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { createColumnHelper, createTable, tableFeatures } from '@tanstack/svelte-table';
 
@@ -29,6 +29,19 @@
       search: string;
       locationId: string;
       permissions: string[];
+      historySupplierId?: string;
+      history?: {
+        supplierName: string;
+        totalOrders: number;
+        totalAmount: string;
+        orders: Array<{
+          id: string;
+          orderNumber: string;
+          status: string;
+          orderDate: string;
+          totalAmount: string;
+        }>;
+      } | null;
       error?: string;
     };
     form?: ActionForm | null;
@@ -43,8 +56,12 @@
   let phone = $state('');
   let email = $state('');
   let addressLine = $state('');
+  let deliveryDays = $state('');
+  let orderReminderDays = $state('');
+  let notes = $state('');
   let active = $state(true);
   const canManage = $derived(data.permissions.includes('suppliers.manage'));
+  const canReadOrders = $derived(data.permissions.includes('purchase_orders.read'));
   const features = tableFeatures({});
   const helper = createColumnHelper<typeof features, Supplier>();
   const columns = helper.columns([
@@ -76,6 +93,9 @@
     phone = '';
     email = '';
     addressLine = '';
+    deliveryDays = '';
+    orderReminderDays = '';
+    notes = '';
     active = true;
     dialogOpen = true;
   }
@@ -87,6 +107,10 @@
     phone = supplier.phone ?? '';
     email = supplier.email ?? '';
     addressLine = supplier.addressLine ?? '';
+    deliveryDays = supplier.deliveryDays == null ? '' : String(supplier.deliveryDays);
+    orderReminderDays =
+      supplier.orderReminderDays == null ? '' : String(supplier.orderReminderDays);
+    notes = supplier.notes ?? '';
     active = supplier.active;
     dialogOpen = true;
   }
@@ -149,7 +173,7 @@
                 >{#each group.headers as header (header.id)}<Table.Head
                     class="suppliers__table-head"
                     >{header.column.columnDef.header as string}</Table.Head
-                  >{/each}{#if canManage}<Table.Head class="suppliers__table-head"
+                  >{/each}{#if canManage || canReadOrders}<Table.Head class="suppliers__table-head"
                     >Acciones</Table.Head
                   >{/if}</Table.Row
               >{/each}</Table.Header
@@ -168,15 +192,29 @@
                   ><Badge variant={row.original.active ? 'success' : 'secondary'}
                     >{row.original.active ? 'Activo' : 'Inactivo'}</Badge
                   ></Table.Cell
-                >{#if canManage}<Table.Cell
+                >{#if canManage || canReadOrders}<Table.Cell
                     ><div class="suppliers__actions">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Editar ${row.original.name}`}
-                        onclick={() => startEdit(row.original)}
-                        ><Pencil class="size-4" aria-hidden="true" /></Button
-                      >{#if row.original.active}<form
+                      {#if canReadOrders}
+                        <a
+                          class="inventory__link"
+                          href={resolve(
+                            `/proveedores?${new URLSearchParams({
+                              ...(data.search ? { search: data.search } : {}),
+                              historial: row.original.id,
+                            }).toString()}` as '/proveedores',
+                          )}
+                          aria-label={`Historial de ${row.original.name}`}
+                          ><History class="size-4" aria-hidden="true" /></a
+                        >
+                      {/if}
+                      {#if canManage}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Editar ${row.original.name}`}
+                          onclick={() => startEdit(row.original)}
+                          ><Pencil class="size-4" aria-hidden="true" /></Button
+                        >{/if}{#if canManage && row.original.active}<form
                           method="POST"
                           action="?/delete"
                           onsubmit={(event: SubmitEvent) => {
@@ -198,7 +236,7 @@
                     </div></Table.Cell
                   >{/if}</Table.Row
               >{:else}<Table.Row
-                ><Table.Cell colspan={canManage ? 6 : 5} class="suppliers__empty"
+                ><Table.Cell colspan={canManage || canReadOrders ? 6 : 5} class="suppliers__empty"
                   >No hay proveedores para mostrar.</Table.Cell
                 ></Table.Row
               >{/each}</Table.Body
@@ -222,6 +260,45 @@
       </nav></Card.CardContent
     ></Card.Card
   >
+  {#if data.history}
+    <Card.Card>
+      <Card.CardHeader>
+        <Card.CardTitle>Historial de {data.history.supplierName}</Card.CardTitle>
+        <Card.CardDescription>
+          {data.history.totalOrders} orden{data.history.totalOrders === 1 ? '' : 'es'} · total
+          {data.history.totalAmount}
+        </Card.CardDescription>
+      </Card.CardHeader>
+      <Card.CardContent>
+        {#if data.history.orders.length}
+          <div class="suppliers__table-wrap">
+            <Table.Root>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head class="suppliers__table-head">Orden</Table.Head>
+                  <Table.Head class="suppliers__table-head">Fecha</Table.Head>
+                  <Table.Head class="suppliers__table-head">Estado</Table.Head>
+                  <Table.Head class="suppliers__table-head">Monto</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {#each data.history.orders as order (order.id)}
+                  <Table.Row>
+                    <Table.Cell>{order.orderNumber}</Table.Cell>
+                    <Table.Cell>{order.orderDate.slice(0, 10)}</Table.Cell>
+                    <Table.Cell>{order.status}</Table.Cell>
+                    <Table.Cell>{order.totalAmount}</Table.Cell>
+                  </Table.Row>
+                {/each}
+              </Table.Body>
+            </Table.Root>
+          </div>
+        {:else}
+          <p class="notifications__empty">Este proveedor aún no tiene órdenes recibidas.</p>
+        {/if}
+      </Card.CardContent>
+    </Card.Card>
+  {/if}
 </section>
 
 <Dialog.Root bind:open={dialogOpen}
@@ -326,6 +403,46 @@
               bind:value={addressLine}
               maxlength={FORM_LIMITS.inventory.supplierAddressMaxLength}
               placeholder="Ej. Calle principal, local 4"
+              rows="3"></textarea></FormField
+          ><FormField
+            id="supplier-delivery-days"
+            label="Días de entrega"
+            error={fieldError('deliveryDays')}
+            ><input
+              id="supplier-delivery-days"
+              name="deliveryDays"
+              type="number"
+              inputmode="numeric"
+              min={FORM_LIMITS.inventory.deliveryDaysMin}
+              max={FORM_LIMITS.inventory.deliveryDaysMax}
+              bind:value={deliveryDays}
+              placeholder="Ej. 3"
+            /></FormField
+          ><FormField
+            id="supplier-reminder-days"
+            label="Días de recordatorio"
+            error={fieldError('orderReminderDays')}
+            ><input
+              id="supplier-reminder-days"
+              name="orderReminderDays"
+              type="number"
+              inputmode="numeric"
+              min={FORM_LIMITS.inventory.orderReminderDaysMin}
+              max={FORM_LIMITS.inventory.orderReminderDaysMax}
+              bind:value={orderReminderDays}
+              placeholder="Ej. 7"
+            /></FormField
+          ><FormField
+            id="supplier-notes"
+            label="Notas"
+            error={fieldError('notes')}
+            maxLength={FORM_LIMITS.inventory.notesMaxLength}
+            ><textarea
+              id="supplier-notes"
+              name="notes"
+              bind:value={notes}
+              maxlength={FORM_LIMITS.inventory.notesMaxLength}
+              placeholder="Ej. Pedir los lunes por la mañana"
               rows="3"></textarea></FormField
           >
         </div>

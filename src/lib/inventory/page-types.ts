@@ -60,5 +60,18 @@ export interface SupplierPageData {
   search: string;
   locationId: string;
   permissions: string[];
+  historySupplierId?: string;
+  history?: {
+    supplierName: string;
+    totalOrders: number;
+    totalAmount: string;
+    orders: Array<{
+      id: string;
+      orderNumber: string;
+      status: string;
+      orderDate: string;
+      totalAmount: string;
+    }>;
+  } | null;
   error?: string;
 }
