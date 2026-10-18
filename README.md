@@ -47,13 +47,15 @@
 - **Shell responsive:** sidebar con permisos, offcanvas móvil, topbar, tema oscuro y enlace al sitio público.
 - **Autenticación server-side:** alta inicial de un solo uso, sesiones HttpOnly, TOTP, recuperación, cambio obligatorio de contraseña y defensa CSRF por origen.
 - **Catálogo conectado:** categorías y productos con form actions, permisos, paginación, búsqueda, validación Zod y cliente server-side para `/menu/admin`.
-- **Diseño compartido:** Helvetica Neue Light, Lucide y tokens café/crema/verde de `koffisoft_web`.
+- **Diseño compartido:** Fraunces + Manrope, Lucide y tokens café/crema/verde de `koffisoft_web`.
 
 - **Reservaciones y eventos conectados:** agenda, creación interna, estados, mesas, espacios, paquetes, cotizaciones y requisitos con permisos y validación Zod.
 - **Contenido editorial:** CRUD de avisos importantes con vigencia, orden, estado y enlaces CTA validados por la API para la landing pública.
 - **Directorio administrativo:** usuarios y empleados conectados a `koffisoft_api` con filtros server-side, roles, vínculos laborales y controles de seguridad.
 
-- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores con form actions, permisos, alcance por sede y validación Zod.
+- **Inventario y proveedores:** existencias, alertas, recepciones, movimientos, recetas y CRUD de proveedores (entrega, recordatorio, notas e historial de compras) con form actions, permisos y validación Zod.
+- **Órdenes, recursos y bitácora:** `/ordenes-compra`, `/recursos` y `/bitacora` cubren el flujo de compra, el equipo/mobiliario con mantenimientos y la consulta de AuditLog.
+- **Notificaciones en vivo:** campana del topbar con SSE autenticado, bandeja `/notificaciones` y recuperación de contraseña contra `/auth/forgot-password` y `/auth/reset-password`.
 - **Descubrimiento público:** la ruta `/seo` administra defaults y overrides de páginas, platos, eventos y avisos mediante BFF.
 
 <!-- section:overview -->
@@ -147,6 +149,9 @@ acciones cuando el usuario no tiene `content.publish`.
 ├── tests/                         # Pruebas E2E de la pantalla pública
 ├── .env.example                   # Variables de entorno sin secretos
 ├── src/lib/inventory/             # Tipos y datos de pantalla de inventario y proveedores
+├── src/lib/notifications/         # Contratos de la campana y la bandeja
+├── src/lib/purchase-orders/       # Contratos de órdenes y perfil de proveedor
+├── src/lib/resources/             # Contratos de recursos y mantenimientos
 └── package.json                   # Scripts y dependencias
 ```
 
@@ -197,6 +202,7 @@ Las pruebas de inventario cubren validación de recepciones y mermas, consultas 
 - [x] Bloque 2: pantalla SEO con permisos, límites y BFF server-side.
 - [x] Directorio administrativo de usuarios y empleados con roles, vínculos y controles de seguridad.
 - [x] Inventario, proveedores, recepciones, movimientos, alertas y recetas conectados al contrato administrativo.
+- [x] Notificaciones en vivo, órdenes de compra, recursos, bitácora y recuperación de contraseña.
 - [x] Bloque 6: pantalla de respaldos con estados, checksum, descarga autenticada y acciones por permiso.
 - [ ] Publicar y consumir la versión aprobada de `@koffisoft/contracts`.
 
