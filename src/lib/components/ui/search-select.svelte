@@ -19,6 +19,7 @@
     required = false,
     disabled = false,
     allowEmpty = true,
+    onSelect,
   }: {
     id: string;
     name?: string;
@@ -30,14 +31,13 @@
     required?: boolean;
     disabled?: boolean;
     allowEmpty?: boolean;
+    onSelect?: (value: string) => void;
   } = $props();
 
   let open = $state(false);
   let search = $state('');
 
-  const items = $derived(
-    allowEmpty ? [{ value: '', label: emptyLabel }, ...options] : options,
-  );
+  const items = $derived(allowEmpty ? [{ value: '', label: emptyLabel }, ...options] : options);
   const selectedLabel = $derived(
     items.find((item) => item.value === value)?.label ?? (value ? value : placeholder),
   );
@@ -67,6 +67,7 @@
     bind:open
     allowDeselect={allowEmpty && !required}
     onOpenChange={handleOpenChange}
+    onValueChange={(next) => onSelect?.(next)}
   >
     <Combobox.Trigger {id} class="search-select__trigger" aria-label={placeholder}>
       <span class="search-select__value" data-empty={!value || undefined}>

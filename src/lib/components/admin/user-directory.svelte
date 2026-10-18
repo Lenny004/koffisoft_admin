@@ -23,6 +23,7 @@
   import * as Card from '$lib/components/ui/card/index.js';
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import SearchSelect from '$lib/components/ui/search-select.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import type { EmployeeRow, PageMeta, RoleRow, UserRow } from '$lib/users/types';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
@@ -547,14 +548,17 @@
             error={fieldError('employeeId')}
             class="users__field--wide"
           >
-            <select id="user-employee" name="employeeId" bind:value={employeeId}>
-              <option value="">Sin vínculo laboral</option>
-              {#each data.employeeOptions as employee (employee.id)}
-                <option value={employee.id}
-                  >{employee.employeeCode} · {employee.firstName} {employee.lastName}</option
-                >
-              {/each}
-            </select>
+            <SearchSelect
+              id="user-employee"
+              name="employeeId"
+              bind:value={employeeId}
+              options={data.employeeOptions.map((employee) => ({
+                value: employee.id,
+                label: `${employee.employeeCode} · ${employee.firstName} ${employee.lastName}`,
+              }))}
+              placeholder="Busca un empleado"
+              emptyLabel="Sin vínculo laboral"
+            />
           </FormField>
         </div>
         {#if !editingUserId && data.roles.length > 0}

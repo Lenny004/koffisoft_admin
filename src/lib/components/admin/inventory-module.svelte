@@ -9,6 +9,7 @@
   import * as Card from '$lib/components/ui/card/index.js';
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import SearchSelect from '$lib/components/ui/search-select.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import {
     formatElSalvadorDate,
@@ -127,6 +128,27 @@
   const canReceive = $derived(data.permissions.includes('inventory.receive'));
   const canAdjust = $derived(data.permissions.includes('inventory.adjust'));
   const canRead = $derived(data.permissions.includes('inventory.read'));
+  const categoryOptions = $derived(
+    data.categories.map((category) => ({ value: category.id, label: category.name })),
+  );
+  const unitOptions = $derived(
+    data.units.map((unit) => ({ value: unit.id, label: `${unit.name} (${unit.code})` })),
+  );
+  const supplierOptions = $derived(
+    data.suppliers.map((supplier) => ({
+      value: supplier.id,
+      label: `${supplier.name} (${supplier.supplierCode})`,
+    })),
+  );
+  const ingredientOptions = $derived(
+    data.filterItems.map((item) => ({ value: item.id, label: `${item.name} (${item.sku})` })),
+  );
+  const storageOptions = $derived(
+    data.storageLocations.map((location) => ({
+      value: location.id,
+      label: `${location.name} (${location.code})`,
+    })),
+  );
   const adjustmentLotRequired = $derived(
     data.filterItems.find((item) => item.id === adjustmentIngredientId)?.trackLots === true &&
       adjustmentType !== 'adjustment_in',
@@ -435,15 +457,14 @@
             /></FormField
           >
           <FormField id="inventory-storage-filter" label="Bodega"
-            ><select
+            ><SearchSelect
               id="inventory-storage-filter"
               name="storageLocationId"
               value={data.filters.storageLocationId}
-              ><option value="">Todas las bodegas</option
-              >{#each data.storageLocations as location (location.id)}<option value={location.id}
-                  >{location.name}</option
-                >{/each}</select
-            ></FormField
+              options={storageOptions}
+              placeholder="Todas las bodegas"
+              emptyLabel="Todas las bodegas"
+            /></FormField
           >
           <Button type="submit" variant="secondary">Buscar</Button>
         </form>
@@ -602,14 +623,14 @@
           <input type="hidden" name="movementPage" value="1" /><FormField
             id="movement-ingredient-filter"
             label="Insumo"
-            ><select
+            ><SearchSelect
               id="movement-ingredient-filter"
               name="ingredientId"
               value={data.filters.ingredientId}
-              ><option value="">Todos los insumos</option
-              >{#each data.filterItems as item (item.id)}<option value={item.id}>{item.name}</option
-                >{/each}</select
-            ></FormField
+              options={ingredientOptions}
+              placeholder="Todos los insumos"
+              emptyLabel="Todos los insumos"
+            /></FormField
           ><FormField id="movement-type-filter" label="Tipo"
             ><select id="movement-type-filter" name="movementType" value={data.filters.movementType}
               ><option value="">Todos los tipos</option><option value="receipt">Recepciones</option
@@ -789,19 +810,25 @@
               required
             /></FormField
           ><FormField id="item-category" label="Categoría" required error={fieldError('categoryId')}
-            ><select id="item-category" name="categoryId" bind:value={itemCategoryId} required
-              ><option value="" disabled>Selecciona una categoría</option
-              >{#each data.categories as category (category.id)}<option value={category.id}
-                  >{category.name}</option
-                >{/each}</select
-            ></FormField
+            ><SearchSelect
+              id="item-category"
+              name="categoryId"
+              bind:value={itemCategoryId}
+              options={categoryOptions}
+              placeholder="Busca una categoría"
+              required
+              allowEmpty={false}
+            /></FormField
           ><FormField id="item-unit" label="Unidad base" required error={fieldError('baseUnitId')}
-            ><select id="item-unit" name="baseUnitId" bind:value={itemBaseUnitId} required
-              ><option value="" disabled>Selecciona una unidad</option
-              >{#each data.units as unit (unit.id)}<option value={unit.id}
-                  >{unit.name} ({unit.code})</option
-                >{/each}</select
-            ></FormField
+            ><SearchSelect
+              id="item-unit"
+              name="baseUnitId"
+              bind:value={itemBaseUnitId}
+              options={unitOptions}
+              placeholder="Busca una unidad"
+              required
+              allowEmpty={false}
+            /></FormField
           ><FormField
             id="item-reorder"
             label="Stock mínimo"
@@ -856,12 +883,14 @@
               <fieldset class="inventory__supplier-link">
                 <legend>Proveedor {index + 1}</legend>
                 <FormField id={`item-supplier-${index}`} label="Proveedor" required>
-                  <select id={`item-supplier-${index}`} bind:value={link.supplierId} required>
-                    <option value="" disabled>Selecciona un proveedor</option>
-                    {#each data.suppliers as supplier (supplier.id)}
-                      <option value={supplier.id}>{supplier.name}</option>
-                    {/each}
-                  </select>
+                  <SearchSelect
+                    id={`item-supplier-${index}`}
+                    bind:value={link.supplierId}
+                    options={supplierOptions}
+                    placeholder="Busca un proveedor"
+                    required
+                    allowEmpty={false}
+                  />
                 </FormField>
                 <FormField id={`item-supplier-sku-${index}`} label="SKU del proveedor">
                   <input
@@ -884,12 +913,14 @@
                   />
                 </FormField>
                 <FormField id={`item-pack-unit-${index}`} label="Unidad de empaque" required>
-                  <select id={`item-pack-unit-${index}`} bind:value={link.packUnitId} required>
-                    <option value="" disabled>Selecciona una unidad</option>
-                    {#each data.units as unit (unit.id)}
-                      <option value={unit.id}>{unit.name} ({unit.code})</option>
-                    {/each}
-                  </select>
+                  <SearchSelect
+                    id={`item-pack-unit-${index}`}
+                    bind:value={link.packUnitId}
+                    options={unitOptions}
+                    placeholder="Busca una unidad"
+                    required
+                    allowEmpty={false}
+                  />
                 </FormField>
                 <FormField id={`item-unit-cost-${index}`} label="Costo unitario" required>
                   <input
@@ -965,12 +996,15 @@
             label="Proveedor"
             required
             error={fieldError('supplierId')}
-            ><select id="receipt-supplier" name="supplierId" bind:value={receiptSupplierId} required
-              ><option value="" disabled>Selecciona un proveedor</option
-              >{#each data.suppliers as supplier (supplier.id)}<option value={supplier.id}
-                  >{supplier.name}</option
-                >{/each}</select
-            ></FormField
+            ><SearchSelect
+              id="receipt-supplier"
+              name="supplierId"
+              bind:value={receiptSupplierId}
+              options={supplierOptions}
+              placeholder="Busca un proveedor"
+              required
+              allowEmpty={false}
+            /></FormField
           ><FormField
             id="receipt-number"
             label="Número de recepción"
@@ -1004,16 +1038,15 @@
             label="Bodega"
             required
             error={fieldError('storageLocationId')}
-            ><select
+            ><SearchSelect
               id="receipt-storage"
               name="storageLocationId"
               bind:value={receiptStorageLocationId}
+              options={storageOptions}
+              placeholder="Busca una bodega"
               required
-              ><option value="" disabled>Selecciona una bodega</option
-              >{#each data.storageLocations as location (location.id)}<option value={location.id}
-                  >{location.name}</option
-                >{/each}</select
-            ></FormField
+              allowEmpty={false}
+            /></FormField
           ><FormField
             id="receipt-notes"
             label="Notas"
@@ -1046,17 +1079,15 @@
                 label="Insumo"
                 required
                 error={fieldError(`lines.${index}.ingredientId`)}
-                ><select
+                ><SearchSelect
                   id={`receipt-line-${index}-ingredient`}
                   bind:value={line.ingredientId}
-                  onchange={(event) =>
-                    setReceiptIngredient(line, (event.currentTarget as HTMLSelectElement).value)}
+                  options={ingredientOptions}
+                  placeholder="Busca un insumo"
                   required
-                  ><option value="" disabled>Selecciona un insumo</option
-                  >{#each data.filterItems as item (item.id)}<option value={item.id}
-                      >{item.name} ({item.baseUnitCode})</option
-                    >{/each}</select
-                ></FormField
+                  allowEmpty={false}
+                  onSelect={(value) => setReceiptIngredient(line, value)}
+                /></FormField
               ><FormField
                 id={`receipt-line-${index}-lot`}
                 label="Lote"
@@ -1172,30 +1203,29 @@
             label="Bodega"
             required
             error={fieldError('storageLocationId')}
-            ><select
+            ><SearchSelect
               id="adjust-storage"
               name="storageLocationId"
               bind:value={adjustmentStorageLocationId}
+              options={storageOptions}
+              placeholder="Busca una bodega"
               required
-              ><option value="" disabled>Selecciona una bodega</option
-              >{#each data.storageLocations as location (location.id)}<option value={location.id}
-                  >{location.name}</option
-                >{/each}</select
-            ></FormField
+              allowEmpty={false}
+            /></FormField
           ><FormField
             id="adjust-ingredient"
             label="Insumo"
             required
             error={fieldError('ingredientId')}
-            ><select
+            ><SearchSelect
               id="adjust-ingredient"
               name="ingredientId"
               bind:value={adjustmentIngredientId}
+              options={ingredientOptions}
+              placeholder="Busca un insumo"
               required
-              ><option value="" disabled>Selecciona un insumo</option
-              >{#each data.filterItems as item (item.id)}<option value={item.id}>{item.name}</option
-                >{/each}</select
-            ></FormField
+              allowEmpty={false}
+            /></FormField
           ><FormField id="adjust-type" label="Operación" required error={fieldError('movementType')}
             ><select id="adjust-type" name="movementType" bind:value={adjustmentType} required
               ><option value="adjustment_in">Ajuste positivo</option><option value="adjustment_out"

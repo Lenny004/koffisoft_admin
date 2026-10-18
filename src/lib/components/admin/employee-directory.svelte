@@ -14,6 +14,7 @@
   import * as Card from '$lib/components/ui/card/index.js';
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import SearchSelect from '$lib/components/ui/search-select.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import type { EmployeeRow, PageMeta, UserRow } from '$lib/users/types';
   import { FORM_LIMITS } from '$lib/validation/limits';
@@ -494,12 +495,17 @@
             error={fieldError('userId')}
             class="employees__field--wide"
           >
-            <select id="employee-user" name="userId" bind:value={userId}>
-              <option value="">Sin usuario vinculado</option>
-              {#each data.userOptions as user (user.id)}<option value={user.id}
-                  >{user.username} · {user.email}</option
-                >{/each}
-            </select>
+            <SearchSelect
+              id="employee-user"
+              name="userId"
+              bind:value={userId}
+              options={data.userOptions.map((user) => ({
+                value: user.id,
+                label: `${user.username} · ${user.email}`,
+              }))}
+              placeholder="Busca un usuario"
+              emptyLabel="Sin usuario vinculado"
+            />
           </FormField>
         </div>
       </Dialog.Body>

@@ -10,6 +10,7 @@
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import FormField from '$lib/components/ui/form-field.svelte';
+  import SearchSelect from '$lib/components/ui/search-select.svelte';
   import * as Table from '$lib/components/ui/table/index.js';
   import { FORM_LIMITS, FORM_PATTERNS } from '$lib/validation/limits';
   import {
@@ -176,17 +177,17 @@
         placeholder="SKU, nombre o slug"
       />
       <label class="products__filter-label" for="product-category">Categoría</label>
-      <select
-        class="products__select"
+      <SearchSelect
         id="product-category"
         name="categoryId"
         bind:value={categoryId}
-      >
-        <option value="">Todas</option>
-        {#each data.categories as category (category.id)}<option value={category.id}
-            >{category.nameEs}</option
-          >{/each}
-      </select>
+        options={data.categories.map((category) => ({
+          value: category.id,
+          label: category.nameEs,
+        }))}
+        placeholder="Todas las categorías"
+        emptyLabel="Todas las categorías"
+      />
       <Button type="submit" variant="secondary">Buscar</Button>
     </form>
     {#if canManage}<Button onclick={startCreate}
@@ -364,18 +365,18 @@
           class="products__field"
           error={fieldError('categoryId')}
         >
-          <select
+          <SearchSelect
             id="product-category-form"
             name="categoryId"
             bind:value={categoryId}
+            options={data.categories.map((category) => ({
+              value: category.id,
+              label: category.nameEs,
+            }))}
+            placeholder="Busca una categoría"
             required
-            aria-invalid={Boolean(fieldError('categoryId'))}
-            aria-describedby={fieldError('categoryId') ? 'product-category-form-error' : undefined}
-            ><option value="" disabled>Selecciona una categoría</option
-            >{#each data.categories as category (category.id)}<option value={category.id}
-                >{category.nameEs}</option
-              >{/each}</select
-          >
+            allowEmpty={false}
+          />
         </FormField>
         <FormField
           id="product-type"
