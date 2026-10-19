@@ -1,3 +1,6 @@
+/**
+ * Validación de overrides SEO (rutas, títulos y descripciones).
+ */
 import { z } from 'zod';
 
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';

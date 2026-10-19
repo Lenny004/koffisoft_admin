@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Pie del shell administrativo con versión y enlaces internos de soporte.
+   */
   import { env } from '$env/dynamic/public';
 
   const publicSiteUrl = env.PUBLIC_SITE_URL || 'http://localhost:5173';

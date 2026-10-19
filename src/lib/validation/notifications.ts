@@ -1,3 +1,6 @@
+/**
+ * Límites de acciones masivas sobre notificaciones in-app.
+ */
 import { z } from 'zod';
 
 import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPES } from '$lib/notifications/types';

@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Campo de contraseña con alternar visibilidad, ARIA y límites compartidos con auth.
+   */
   import { Eye, EyeOff } from '@lucide/svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
 

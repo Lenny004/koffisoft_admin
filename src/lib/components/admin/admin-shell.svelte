@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Estructura responsive del panel: sidebar, topbar, campana y área de contenido.
+   */
   import type { Snippet } from 'svelte';
 
   import AdminFooter from './admin-footer.svelte';

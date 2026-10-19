@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Ruta de productos del menú: CRUD delegado en `product-crud` y acciones del servidor.
+   */
   import type { PageProps } from './$types';
   import ProductCrud from '$lib/components/admin/product-crud.svelte';
 

@@ -1,3 +1,6 @@
+/**
+ * Esquemas Zod de filtros de fechas y sede en estadísticas.
+ */
 import { z } from 'zod';
 
 import { FORM_LIMITS } from './limits';

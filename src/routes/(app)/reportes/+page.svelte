@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Marcador de reportes avanzados; muestra estado “en construcción” hasta haber módulo dedicado.
+   */
   import UnderConstruction from '$lib/components/admin/under-construction.svelte';
 </script>
 

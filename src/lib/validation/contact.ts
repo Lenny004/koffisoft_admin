@@ -1,3 +1,6 @@
+/**
+ * Validación de actualización y conversión de mensajes de contacto.
+ */
 import { z } from 'zod';
 
 import { FORM_LIMITS, FORM_PATTERNS } from './limits';

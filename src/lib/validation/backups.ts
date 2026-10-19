@@ -1,3 +1,6 @@
+/**
+ * Reglas de formulario para crear o eliminar respaldos.
+ */
 import { z } from 'zod';
 
 export const backupCreateSchema = z.object({

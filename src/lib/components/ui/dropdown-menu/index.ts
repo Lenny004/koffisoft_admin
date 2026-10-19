@@ -1,3 +1,6 @@
+/**
+ * Barrel de menús desplegables en tablas y topbar.
+ */
 import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
 
 export const Arrow = DropdownMenuPrimitive.Arrow;

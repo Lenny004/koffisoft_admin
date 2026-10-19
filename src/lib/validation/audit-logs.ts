@@ -1,3 +1,6 @@
+/**
+ * Validación de consultas paginadas de bitácora (fechas y actores).
+ */
 import { z } from 'zod';
 
 import { FORM_LIMITS } from './limits';

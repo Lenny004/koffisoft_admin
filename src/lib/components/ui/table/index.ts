@@ -1,3 +1,6 @@
+/**
+ * Barrel de Table usado por TanStack y listados CRUD.
+ */
 export { default as Body } from './body.svelte';
 export { default as Caption } from './caption.svelte';
 export { default as Cell } from './cell.svelte';

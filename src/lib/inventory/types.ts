@@ -1,3 +1,6 @@
+/**
+ * Entidades de inventario, movimientos, proveedores y recetas alineadas con la API.
+ */
 export interface InventoryPageMeta {
   page: number;
   pageSize: number;

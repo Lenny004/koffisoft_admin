@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Ruta de contacto: monta la bandeja comercial con permisos y form actions del servidor.
+   */
   import ContactInbox from '$lib/components/admin/contact-inbox.svelte';
   import type { PageProps } from './$types';
 

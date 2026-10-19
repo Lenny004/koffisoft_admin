@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Ruta de eventos: orquesta el módulo de espacios, paquetes y cotizaciones.
+   */
   import EventModule from '$lib/components/admin/event-module.svelte';
   import type { PageProps } from './$types';
 

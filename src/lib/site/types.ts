@@ -1,3 +1,6 @@
+/**
+ * Contenido institucional del sitio (horarios, equipo, datos de contacto).
+ */
 export interface SiteHour {
   id: string;
   serviceType: string;

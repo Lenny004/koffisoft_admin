@@ -76,7 +76,18 @@ function auditFile(filePath) {
   }
 
   const missing = funcs.filter((f) => !f.hasDoc);
-  return { funcs, missing };
+  const hasModuleDoc = hasModuleDocumentation(filePath, raw);
+  return { funcs, missing, hasModuleDoc };
+}
+
+function hasModuleDocumentation(filePath, raw) {
+  const isSvelte = filePath.endsWith('.svelte');
+  if (isSvelte) {
+    const match = raw.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+    if (!match) return false;
+    return match[1].trim().startsWith('/**');
+  }
+  return raw.trimStart().startsWith('/**');
 }
 
 const root = path.join(process.cwd(), 'src');
@@ -85,9 +96,16 @@ const report = [];
 
 for (const file of files) {
   const rel = path.relative(process.cwd(), file).replace(/\\/g, '/');
-  const { funcs, missing } = auditFile(file);
+  const raw = fs.readFileSync(file, 'utf8');
+  const { funcs, missing, hasModuleDoc } = auditFile(file);
   if (funcs.length === 0) {
-    report.push({ rel, total: 0, missing: 0, status: 'sin-funciones' });
+    report.push({
+      rel,
+      total: 0,
+      missing: 0,
+      status: hasModuleDoc ? 'modulo' : 'sin-funciones',
+      hasModuleDoc,
+    });
     continue;
   }
   const status =
@@ -105,6 +123,7 @@ for (const file of files) {
 const summary = {
   files: report.length,
   completo: report.filter((r) => r.status === 'completo').length,
+  modulo: report.filter((r) => r.status === 'modulo').length,
   parcial: report.filter((r) => r.status === 'parcial').length,
   pendiente: report.filter((r) => r.status === 'pendiente').length,
   sinFunciones: report.filter((r) => r.status === 'sin-funciones').length,

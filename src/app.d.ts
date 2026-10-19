@@ -1,3 +1,6 @@
+/**
+ * Tipos globales de SvelteKit: usuario en `locals`, roles, permisos y estado MFA tras el hook de auth.
+ */
 import type { AuthenticatedUser } from '$lib/types/auth';
 
 declare global {

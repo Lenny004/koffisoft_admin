@@ -1,3 +1,6 @@
+/**
+ * Modelos de avisos importantes publicados en el sitio público.
+ */
 export interface ImportantAnnouncement {
   id: string;
   locationId: string;

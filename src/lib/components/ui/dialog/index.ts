@@ -1,3 +1,6 @@
+/**
+ * Barrel de Dialog para modales y confirmaciones.
+ */
 export { default as Body } from './body.svelte';
 export { default as Close } from './close.svelte';
 export { default as Content } from './content.svelte';

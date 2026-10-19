@@ -1,3 +1,6 @@
+/**
+ * Contratos de respuesta de analítica web (sedes, resumen, páginas, productos y referrers).
+ */
 export interface AnalyticsLocation {
   id: string;
   code: string;

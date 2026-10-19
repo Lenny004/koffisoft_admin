@@ -1,3 +1,6 @@
+/**
+ * Categorías, ítems, variantes y disponibilidad del menú digital.
+ */
 export interface MenuPageMeta {
   page: number;
   pageSize: number;

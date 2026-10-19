@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Ruta de reservaciones: mesas, espacios y transiciones de estado en `reservation-module`.
+   */
   import ReservationModule from '$lib/components/admin/reservation-module.svelte';
   import type { PageProps } from './$types';
 

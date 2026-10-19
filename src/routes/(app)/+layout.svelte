@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Layout autenticado: envuelve todas las rutas `(app)` con `AdminShell` y datos de `+layout.server.ts`.
+   */
   import AdminShell from '$lib/components/admin/admin-shell.svelte';
   import type { LayoutProps } from './$types';
 

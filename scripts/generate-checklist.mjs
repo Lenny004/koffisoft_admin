@@ -3,6 +3,7 @@ import fs from 'fs';
 const j = JSON.parse(fs.readFileSync('scripts/audit-docs-result.json', 'utf8'));
 const legend = {
   completo: '[x]',
+  modulo: '[m]',
   parcial: '[~]',
   pendiente: '[ ]',
   'sin-funciones': '[-]',
@@ -19,9 +20,10 @@ const lines = [
   '| Símbolo | Significado |',
   '| --- | --- |',
   '| [x] | Todas las funciones detectadas documentadas |',
+  '| [m] | Sin funciones; bloque de módulo/componente documentado |',
   '| [~] | Parcial |',
   '| [ ] | Pendiente |',
-  '| [-] | Sin funciones declaradas en script/módulo |',
+  '| [-] | Sin funciones y sin documentación de módulo |',
   '',
   '## Resumen',
   '',
@@ -37,7 +39,7 @@ const lines = [
 
 for (const r of j.report.sort((a, b) => a.rel.localeCompare(b.rel))) {
   const icon = legend[r.status] || '?';
-  const doc = r.status === 'sin-funciones' ? '—' : String(r.documented);
+  const doc = r.status === 'sin-funciones' || r.status === 'modulo' ? '—' : String(r.documented);
   lines.push(`| ${icon} | \`${r.rel}\` | ${r.total || '—'} | ${doc} |`);
 }
 

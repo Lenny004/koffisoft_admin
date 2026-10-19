@@ -1,3 +1,6 @@
+/**
+ * Usuarios administrativos, roles y empleados expuestos al directorio del panel.
+ */
 export const USER_STATUSES = ['active', 'inactive', 'locked'] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];
 

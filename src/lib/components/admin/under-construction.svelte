@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Placeholder accesible para secciones del menú aún sin implementación.
+   */
   import { Construction } from '@lucide/svelte';
 
   interface Props {

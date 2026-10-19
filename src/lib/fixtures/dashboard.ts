@@ -1,3 +1,6 @@
+/**
+ * Datos de demostración del dashboard cuando la API aún no devuelve KPIs reales de la sede.
+ */
 export interface DashboardReservation {
   id: string;
   guest: string;

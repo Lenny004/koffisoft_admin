@@ -1,3 +1,6 @@
+/**
+ * Esquemas de entradas del calendario editorial y vista previa.
+ */
 import { z } from 'zod';
 
 const resourceTypes = ['announcement', 'event', 'menu_item'] as const;

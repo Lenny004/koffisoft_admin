@@ -1,3 +1,6 @@
+/**
+ * Calendario editorial y entradas de publicación por sede.
+ */
 export type PublicationResourceType = 'announcement' | 'event' | 'menu_item';
 export type PublicationStatus = 'Draft' | 'Scheduled' | 'Published';
 export type PublicationAction = 'draft' | 'schedule' | 'publish' | 'unpublish';

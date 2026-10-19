@@ -1,3 +1,6 @@
+/**
+ * Flujo público de restablecimiento: token por query y POST a `/auth/reset-password` sin sesión.
+ */
 import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';

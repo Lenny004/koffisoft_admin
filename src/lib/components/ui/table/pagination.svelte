@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * Primitivo shadcn-svelte del panel; apariencia vía tokens CSS del tema, sin lógica de negocio.
+   */
   import type { Snippet } from 'svelte';
   import { cn } from '$lib/utils.js';
   import { Button } from '../button/index.js';

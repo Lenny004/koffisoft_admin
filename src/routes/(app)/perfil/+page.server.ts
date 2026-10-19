@@ -1,3 +1,6 @@
+/**
+ * Servidor de perfil: expone el usuario en sesión y la action de cambio de contraseña propia.
+ */
 import { env } from '$env/dynamic/private';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';

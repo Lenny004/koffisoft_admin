@@ -1,3 +1,6 @@
+/**
+ * Overrides SEO por ruta pública y metadatos editables desde el panel.
+ */
 export type SeoResourceType = 'menu_item' | 'event' | 'announcement' | 'page';
 
 export interface SeoMetadata {

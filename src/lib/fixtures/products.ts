@@ -1,3 +1,6 @@
+/**
+ * Fixture de productos para vistas de desarrollo sin backend de menú.
+ */
 export interface ProductFixture {
   id: string;
   name: string;

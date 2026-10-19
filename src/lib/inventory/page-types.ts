@@ -1,3 +1,6 @@
+/**
+ * Props tipadas entre `inventario/+page.server.ts` y `inventory-module.svelte` (listas, filtros y formularios).
+ */
 import type {
   Ingredient,
   IngredientCategory,

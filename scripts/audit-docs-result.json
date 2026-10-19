@@ -2,16 +2,18 @@
   "summary": {
     "files": 175,
     "completo": 93,
+    "modulo": 82,
     "parcial": 0,
     "pendiente": 0,
-    "sinFunciones": 82
+    "sinFunciones": 0
   },
   "report": [
     {
       "rel": "src/app.d.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/hooks.server.ts",
@@ -25,37 +27,43 @@
       "rel": "src/lib/analytics/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/announcements/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/audit/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/backups/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/admin/admin-footer.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/admin/admin-shell.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/admin/admin-sidebar.svelte",
@@ -173,7 +181,8 @@
       "rel": "src/lib/components/admin/under-construction.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/admin/user-directory.svelte",
@@ -187,139 +196,162 @@
       "rel": "src/lib/components/ui/alert/alert.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/alert/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/badge/badge.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/badge/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/button/button.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/button/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/card-content.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/card-description.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/card-header.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/card-title.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/card.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/card/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/body.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/close.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/content.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/description.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/footer.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/header.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/root.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/title.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dialog/trigger.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/dropdown-menu/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/form-field.svelte",
@@ -333,19 +365,22 @@
       "rel": "src/lib/components/ui/input/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/input/input.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/password-input.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/search-select.svelte",
@@ -359,67 +394,78 @@
       "rel": "src/lib/components/ui/table/body.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/caption.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/cell.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/empty.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/footer.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/head.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/header.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/index.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/pagination.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/root.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/components/ui/table/row.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/config/navigation.ts",
@@ -449,13 +495,15 @@
       "rel": "src/lib/fixtures/dashboard.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/fixtures/products.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/formatting/dates.ts",
@@ -469,13 +517,15 @@
       "rel": "src/lib/inventory/page-types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/inventory/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/menu/mappers.ts",
@@ -489,25 +539,29 @@
       "rel": "src/lib/menu/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/notifications/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/publication/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/purchase-orders/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/reservations/types.ts",
@@ -521,13 +575,15 @@
       "rel": "src/lib/resources/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/seo/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/server/analytics.ts",
@@ -693,7 +749,8 @@
       "rel": "src/lib/site/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/types/auth.ts",
@@ -707,7 +764,8 @@
       "rel": "src/lib/users/types.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/utils.ts",
@@ -721,7 +779,8 @@
       "rel": "src/lib/validation/analytics.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/announcements.ts",
@@ -735,7 +794,8 @@
       "rel": "src/lib/validation/audit-logs.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/auth.ts",
@@ -749,13 +809,15 @@
       "rel": "src/lib/validation/backups.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/contact.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/errors.ts",
@@ -785,7 +847,8 @@
       "rel": "src/lib/validation/limits.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/menu.ts",
@@ -799,13 +862,15 @@
       "rel": "src/lib/validation/notifications.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/publication.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/purchase-orders.ts",
@@ -835,7 +900,8 @@
       "rel": "src/lib/validation/seo.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/lib/validation/site.ts",
@@ -865,7 +931,8 @@
       "rel": "src/routes/(app)/+layout.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/avisos-importantes/+page.server.ts",
@@ -895,7 +962,8 @@
       "rel": "src/routes/(app)/bitacora/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/categorias/+page.server.ts",
@@ -925,7 +993,8 @@
       "rel": "src/routes/(app)/contacto/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/dashboard/+page.server.ts",
@@ -955,7 +1024,8 @@
       "rel": "src/routes/(app)/empleados/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/estadisticas/+page.server.ts",
@@ -985,7 +1055,8 @@
       "rel": "src/routes/(app)/eventos/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/inventario/+page.server.ts",
@@ -999,7 +1070,8 @@
       "rel": "src/routes/(app)/inventario/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/notificaciones/+page.server.ts",
@@ -1013,7 +1085,8 @@
       "rel": "src/routes/(app)/notificaciones/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/ordenes-compra/+page.server.ts",
@@ -1027,13 +1100,15 @@
       "rel": "src/routes/(app)/ordenes-compra/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/perfil/+page.server.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/perfil/+page.svelte",
@@ -1055,7 +1130,8 @@
       "rel": "src/routes/(app)/productos/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/proveedores/+page.server.ts",
@@ -1069,7 +1145,8 @@
       "rel": "src/routes/(app)/proveedores/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/publicacion/+page.server.ts",
@@ -1099,13 +1176,15 @@
       "rel": "src/routes/(app)/recursos/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/reportes/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/reservaciones/+page.server.ts",
@@ -1119,7 +1198,8 @@
       "rel": "src/routes/(app)/reservaciones/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/(app)/respaldos/+page.server.ts",
@@ -1189,13 +1269,15 @@
       "rel": "src/routes/(app)/usuarios/+page.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/+layout.svelte",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/+page.server.ts",
@@ -1233,7 +1315,8 @@
       "rel": "src/routes/restablecer/+page.server.ts",
       "total": 0,
       "missing": 0,
-      "status": "sin-funciones"
+      "status": "modulo",
+      "hasModuleDoc": true
     },
     {
       "rel": "src/routes/restablecer/+page.svelte",
